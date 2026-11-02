@@ -4,7 +4,7 @@
 // (see the "Changes" section and AdSlot.astro).
 import LegalLayout from '../layouts/LegalLayout.astro';
 import ContactEmail from '../components/ContactEmail.astro';
-import { SITE } from '../config/site';
+import { SITE, EDITOR } from '../config/site';
 ---
 <LegalLayout
   title="Privacy Policy — StrengthCalc"
@@ -22,7 +22,7 @@ import { SITE } from '../config/site';
   <h2>Who we are</h2>
   <p>
     This policy covers {SITE.name} (the &ldquo;site&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;), operated
-    independently under the {SITE.name} name. Contact: <ContactEmail />.
+    independently by {EDITOR.name}. Contact: <ContactEmail />.
   </p>
 
   <h2>Information we do not collect</h2>

@@ -7,7 +7,7 @@ import SourceList from '../../components/SourceList.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { articleNode, webPageNode } from '../../lib/schema';
 import { LINKS } from '../../data/links';
-import { SITE, formatDate, isoDate } from '../../config/site';
+import { EDITOR, formatDate, isoDate } from '../../config/site';
 
 export async function getStaticPaths() {
   const guides = await getCollection('guides');
@@ -36,7 +36,7 @@ const jsonLd = [
   <article class="prose">
     <h1>{title}</h1>
     <p class="page-meta">
-      By {SITE.name} · Published <time datetime={isoDate(published)}>{formatDate(published)}</time>
+      By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Published <time datetime={isoDate(published)}>{formatDate(published)}</time>
       {updated && <> · Updated <time datetime={isoDate(updated)}>{formatDate(updated)}</time></>}
     </p>
     <Content />

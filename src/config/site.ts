@@ -18,6 +18,22 @@ export const SITE = {
   contentReviewed: '2026-11-02',
 };
 
+/**
+ * The real person responsible for the site, shown on About, in guide bylines
+ * and as the schema.org Person behind the content. Facts only — never add
+ * credentials or experience that are not true.
+ */
+export const EDITOR = {
+  name: 'Muhammad Khuzaima',
+  role: 'Creator and editor',
+  /** Anchor on the About page where the bio lives. */
+  href: '/about/#editor',
+  bio:
+    'Muhammad Khuzaima is the creator and editor of StrengthCalc. He built the site to give lifters one rep max ' +
+    'calculators that show their working: every formula is checked against its published source and covered by ' +
+    'automated tests before it goes live. He is responsible for the site’s content and corrects any error readers report.',
+};
+
 if (!SITE.contactEmail) {
   console.warn('[StrengthCalc] SITE.contactEmail is empty — set it in src/config/site.ts before launch.');
 }

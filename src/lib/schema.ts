@@ -1,7 +1,7 @@
 // schema.org JSON-LD builders. Every node describes only what is visibly on
 // the page: no ratings, no reviews, no invented authors, no prices beyond the
 // true "free". Nodes are linked by @id so one page = one coherent @graph.
-import { SITE } from '../config/site';
+import { SITE, EDITOR } from '../config/site';
 
 export type Node = Record<string, unknown>;
 export interface Crumb { name: string; href: string }
@@ -9,7 +9,20 @@ export interface Crumb { name: string; href: string }
 export const ids = (site: string) => ({
   website: `${site}/#website`,
   org: `${site}/#organization`,
+  editor: `${site}/#editor`,
 });
+
+/** The site's real creator/editor (see EDITOR in config/site.ts). */
+export function personNode(site: string): Node {
+  return {
+    '@type': 'Person',
+    '@id': ids(site).editor,
+    name: EDITOR.name,
+    jobTitle: EDITOR.role,
+    url: `${site}${EDITOR.href}`,
+    worksFor: { '@id': ids(site).org },
+  };
+}
 
 export function websiteNode(site: string): Node {
   return {
@@ -30,6 +43,7 @@ export function organizationNode(site: string): Node {
     name: SITE.name,
     url: `${site}/`,
     logo: { '@type': 'ImageObject', url: `${site}/logo-512.png`, width: 512, height: 512 },
+    founder: { '@id': ids(site).editor },
     ...(SITE.contactEmail ? { email: SITE.contactEmail } : {}),
   };
 }
@@ -81,7 +95,7 @@ export function webAppNode(opts: { site: string; url: string; name: string; desc
   };
 }
 
-/** Editorial article. Author is the publication itself — no invented people. */
+/** Editorial article, written by the site's real editor and published by the site. */
 export function articleNode(opts: {
   site: string; url: string; headline: string; description: string; published: Date; updated?: Date;
 }): Node {
@@ -94,7 +108,7 @@ export function articleNode(opts: {
     mainEntityOfPage: { '@id': `${opts.url}#webpage` },
     datePublished: opts.published.toISOString().slice(0, 10),
     dateModified: (opts.updated ?? opts.published).toISOString().slice(0, 10),
-    author: { '@id': ids(opts.site).org },
+    author: { '@id': ids(opts.site).editor },
     publisher: { '@id': ids(opts.site).org },
     image: `${opts.site}/og-image.png`,
     inLanguage: 'en',

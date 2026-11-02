@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactEmail from '../components/ContactEmail.astro';
 import { webPageNode } from '../lib/schema';
-import { SITE } from '../config/site';
+import { SITE, EDITOR } from '../config/site';
 
 const title = 'About StrengthCalc — Free, Transparent 1RM Calculators';
 const description =
@@ -37,10 +37,11 @@ const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, descript
       <li><strong>Free:</strong> no signup, no paywall.</li>
     </ul>
 
-    <h2>Who runs it</h2>
+    <h2 id="editor">Who runs it</h2>
+    <p><strong>{EDITOR.name}</strong> — {EDITOR.role}</p>
+    <p>{EDITOR.bio}</p>
     <p>
-      {SITE.name} is operated independently under the {SITE.name} name and is written and
-      maintained by its editor. The site does not give medical or individual coaching advice; where
+      {SITE.name} is independent and does not give medical or individual coaching advice; where
       that matters, we point you to qualified professionals.
     </p>
 

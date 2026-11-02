@@ -192,10 +192,28 @@ describe('structured data', () => {
     }
   });
 
-  it('no fabricated ratings, reviews or people', () => {
+  it('no fabricated ratings or reviews; the only Person is the real editor named on About', () => {
+    const about = pages.find((x) => x.route === '/about/');
     for (const { p, data } of graphs()) {
       const json = JSON.stringify(data);
-      expect(json, p.route).not.toMatch(/aggregateRating|"review"|"Review"|"Person"/);
+      expect(json, p.route).not.toMatch(/aggregateRating|"review"|"Review"/);
+      const people = data['@graph'].filter((n) => n['@type'] === 'Person');
+      expect(people.length, p.route).toBeLessThanOrEqual(1);
+      for (const person of people) {
+        expect(person.name).toBe('Muhammad Khuzaima');
+        expect(person.url).toBe(`${SITE}/about/#editor`);
+        expect(text(about.html)).toContain(person.name);
+        expect(about.html).toContain('id="editor"');
+      }
+    }
+  });
+
+  it('guide articles are authored by the editor and bylined visibly', () => {
+    for (const { p, data } of graphs()) {
+      const article = data['@graph'].find((n) => n['@type'] === 'Article');
+      if (!article) continue;
+      expect(article.author['@id'], p.route).toBe(`${SITE}/#editor`);
+      expect(p.html, p.route).toMatch(/By <a href="\/about\/#editor" rel="author">Muhammad Khuzaima<\/a>/);
     }
   });
 

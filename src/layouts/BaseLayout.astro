@@ -8,7 +8,7 @@ import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import { websiteNode, organizationNode, breadcrumbNode, type Crumb, type Node } from '../lib/schema';
+import { websiteNode, organizationNode, personNode, breadcrumbNode, type Crumb, type Node } from '../lib/schema';
 import '../styles/global.css';
 
 interface Props {
@@ -31,7 +31,7 @@ const canonical = `${site}${path}`;
 const trail = crumbs?.length ? [{ name: 'Home', href: '/' }, ...crumbs] : null;
 const graph = noindex
   ? []
-  : [websiteNode(site), organizationNode(site), ...(trail ? [breadcrumbNode(site, trail)] : []), ...jsonLd];
+  : [websiteNode(site), organizationNode(site), personNode(site), ...(trail ? [breadcrumbNode(site, trail)] : []), ...jsonLd];
 ---
 <!doctype html>
 <html lang="en">

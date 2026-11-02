@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import FormulaTable from '../components/FormulaTable.astro';
 import SourceList from '../components/SourceList.astro';
 import { webPageNode } from '../lib/schema';
-import { SITE, formatDate } from '../config/site';
+import { SITE, EDITOR, formatDate } from '../config/site';
 import { estimateAll, LB_PER_KG, MIN_REPS, MAX_REPS, WARN_REPS, MAX_WEIGHT } from '../lib/onerepmax.js';
 
 const title = 'Methodology — How StrengthCalc Calculates Your 1RM';
@@ -18,7 +18,7 @@ const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, descript
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Methodology', href: path }]} jsonLd={jsonLd}>
   <article class="prose">
     <h1>Methodology</h1>
-    <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · Maintained by {SITE.name}</p>
+    <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · Maintained by <a href={EDITOR.href} rel="author">{EDITOR.name}</a></p>
     <p class="answer">
       StrengthCalc estimates a one rep max by running six published formulas on a set you lifted,
       then reports every result, their plain average (the &ldquo;Average Estimate&rdquo;) and the
@@ -95,7 +95,7 @@ const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, descript
 
     <h2>Editorial policy and corrections</h2>
     <p>
-      {SITE.name} is an independent site. Content is written and reviewed by the {SITE.name} editor,
+      {SITE.name} is an independent site. Content is written and reviewed by its editor, <a href={EDITOR.href}>{EDITOR.name}</a>,
       and we do not claim professional credentials on the site. Factual claims are tied to
       the published sources listed on each page, and we separate what research found from our own
       reasoning. If you find an error, please <a href="/contact/">contact us</a> — corrections are
