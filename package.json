@@ -1,12 +1,12 @@
 {
   "dependencies": {
-    "@astrojs/mdx": "^4.0.0",
-    "@astrojs/sitemap": "^3.0.0",
-    "astro": "^5.0.0"
+    "@astrojs/mdx": "~8.0.3",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "~7.3.8"
   },
   "description": "StrengthCalc — free one rep max (1RM) calculator. Astro static site, no backend.",
   "devDependencies": {
-    "vitest": "^3.0.0"
+    "vitest": "^5.0.5"
   },
   "name": "strengthcalc",
   "private": true,
