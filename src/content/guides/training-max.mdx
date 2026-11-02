@@ -1,0 +1,138 @@
+---
+title: 'What Is a Training Max? How to Calculate and Use It'
+shortTitle: 'What Is a Training Max?'
+description: 'A training max is a deliberately lower number, usually 90% of your 1RM, used to set training weights. How to calculate it, 85% vs 90%, and when to raise it.'
+published: 2026-11-02
+sources: ['wendler', 'liftvaulttm', 'helms2018', 'epley']
+related: ['home', 'percent', 'rpe', 'test']
+---
+import TrainingMaxCalculator from '../../components/TrainingMaxCalculator.astro';
+import { estimateAll, loadableDown } from '../../lib/onerepmax.js';
+
+export const ex = estimateAll(225, 5);
+export const tm90 = ex.average * 0.9;
+export const tm85 = ex.average * 0.85;
+export const f1 = (v) => v.toFixed(1);
+
+<p class="answer">
+  <strong>A training max (TM) is a number set deliberately below your one rep max — usually 90% of
+  it — that a program uses to calculate your working weights.</strong> If your 1RM is 300 lb, a 90%
+  training max is 270 lb, and "5 reps at 75%" means 75% of 270 lb, not of 300 lb.
+</p>
+
+The idea was popularised by Jim Wendler's 5/3/1 program, and many strength programs now use it.
+Training from a slightly lower number keeps your sessions achievable on an average day, so you
+can progress steadily for months instead of grinding through weights that are too heavy.
+
+<TrainingMaxCalculator />
+
+## Training max vs. one rep max
+
+| | One rep max (1RM) | Training max (TM) |
+|---|---|---|
+| What it is | The most you can lift once with good form | A planning number, usually 85–90% of your 1RM |
+| How you get it | A tested single, or an estimate from a heavy set | Your 1RM × 0.90 (or 0.85) |
+| What it's for | Measuring maximal strength | Calculating the weights you train with |
+| Should you lift it? | Only when testing | It is not a max — you are not meant to "hit" it |
+
+## How to calculate your training max
+
+1. **Find your 1RM.** Use a recent tested single, or estimate it from a heavy set of 3–6 reps
+   with the [one rep max calculator](/).
+2. **Multiply by 0.90** (or 0.85 for a more conservative start).
+3. **Round down** to a weight you can load. Rounding down keeps every session achievable.
+4. **Calculate working weights from the training max**, not from your 1RM. The
+   [1RM percentage calculator](/1rm-percentage-calculator/) does this if you enter your training
+   max as the "1RM".
+
+### Worked example
+
+Say your best recent set was 225 lb for 5 reps. The six formulas on StrengthCalc estimate your
+1RM at about **{f1(ex.average)} lb** (range {f1(ex.min)}–{f1(ex.max)} lb).
+
+| | Calculation | Training max | Loadable |
+|---|---|---|---|
+| 90% training max | {f1(ex.average)} × 0.90 | {f1(tm90)} lb | {loadableDown(tm90, 5)} lb |
+| 85% training max | {f1(ex.average)} × 0.85 | {f1(tm85)} lb | {loadableDown(tm85, 5)} lb |
+
+A session prescribed as "3 sets of 5 at 75%" would then use 75% of {loadableDown(tm90, 5)} lb,
+about {f1(loadableDown(tm90, 5) * 0.75)} lb — noticeably lighter than 75% of the full estimate.
+
+## Why use a training max instead of your 1RM?
+
+- **Your strength varies day to day.** Sleep, stress and fatigue change what you can lift. A
+  training max leaves a margin, so the planned weights still work on an off day.
+- **1RM estimates are not exact.** Formulas disagree by several percent even on a good 5-rep set,
+  and a single tested max can be a lucky or unlucky day. Percentage-based training depends on that
+  number being right; a study comparing loading methods notes that an unrepresentative 1RM test
+  leads to training loads that are too heavy or too light (Helms et al., 2018).
+- **Better technique and fewer failed reps.** Lighter-than-maximal working sets let you practise
+  good form and build volume without constantly training at your limit.
+- **Room to progress.** Starting lower means the training max can rise steadily for many cycles
+  before it catches up with your real strength.
+
+## Should you use 85% or 90%?
+
+**90%** is the most common default and suits most lifters with a reliable 1RM.
+
+**85%** (or lower) is a sensible choice when:
+
+- your 1RM is an **estimate from a higher-rep set** (8–12 reps), which is less accurate;
+- you are **returning after a break** or an injury;
+- the program has **a lot of volume** or you train many lifts per week;
+- your recent sessions have felt like **grinders** at the prescribed weights.
+
+If in doubt, start lower. Increasing a training max that is too low costs you a few easy weeks;
+a training max that is too high leads to missed reps and stalled progress.
+
+## How to increase your training max
+
+The common convention, used in Wendler's 5/3/1, is to raise the training max after each training
+cycle (usually 3–4 weeks):
+
+| Lift type | Increase per cycle |
+|---|---|
+| Upper body (bench press, overhead press) | +5 lb (+2.5 kg) |
+| Lower body (squat, deadlift) | +10 lb (+5 kg) |
+
+**When not to increase it:** if you miss the prescribed reps, or the last sets turn into grinders,
+keep the training max the same for another cycle or lower it. A simple reset is to re-estimate
+your 1RM from a fresh heavy set and take 85–90% again.
+
+## Common training max mistakes
+
+- **Using your 1RM as your training max.** The whole point is the margin; without it, the
+  heaviest sets become max attempts.
+- **Setting it from an all-time best** you hit months ago rather than your current strength.
+- **Increasing it every cycle no matter what.** Progress the number only when the work is going well.
+- **Rounding up.** Always round the training max and working weights down to loadable plates.
+- **Retesting your true max constantly.** Re-estimate from heavy sets instead; see
+  [how to test your 1RM safely](/guides/how-to-test-1rm/) for when a real test makes sense.
+
+## Training max FAQ
+
+### Is a training max the same as a 1RM?
+
+No. A 1RM is the most you can lift once. A training max is a lower planning number — usually 90%
+of your 1RM — that you never actually need to lift.
+
+### Can I use an estimated 1RM to set my training max?
+
+Yes, and most lifters do. Estimate from a heavy set of 3–6 reps for the best accuracy, and consider
+85% instead of 90% if your estimate came from a higher-rep set.
+
+### Should beginners use a training max?
+
+It can help, because it keeps sessions achievable while technique is still developing. Beginners'
+strength changes quickly, though, so re-estimate your 1RM every few weeks.
+
+### How often should I update my training max?
+
+Usually after every training cycle of 3–4 weeks, by the small increments above — but only if the
+cycle went well. Re-estimate your 1RM every few months to check the training max still makes sense.
+
+### Can I use a training max with RPE training?
+
+They are different ways of choosing load. A training max fixes weights in advance from percentages;
+RPE adjusts weights to how hard a set feels on the day. Some lifters combine them — see the
+[RPE calculator](/rpe-calculator/) for estimating weights by reps in reserve.

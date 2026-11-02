@@ -52,6 +52,20 @@ export const SOURCES: Record<string, Source> = {
     text: 'Stronger by Science. Reps in reserve (RIR): research review and practical guide.',
     url: 'https://www.strongerbyscience.com/reps-in-reserve',
   },
+  wendler: {
+    id: 'wendler',
+    text: 'Wendler, J. (2017). 5/3/1 Forever: Simple and Effective Programming for Size, Speed and Strength. Jim Wendler LLC.',
+  },
+  liftvaulttm: {
+    id: 'liftvaulttm',
+    text: 'Lift Vault. 5/3/1 training max: definition and examples.',
+    url: 'https://liftvault.com/resources/531-training-max-definition-examples/',
+  },
+  helms2018: {
+    id: 'helms2018',
+    text: 'Helms, E. R., Byrnes, R. K., Cooke, D. M., et al. (2018). RPE vs. percentage 1RM loading in periodized programs matched for sets and repetitions. Frontiers in Physiology, 9, 247.',
+    url: 'https://doi.org/10.3389/fphys.2018.00247',
+  },
   nsca: {
     id: 'nsca',
     text: 'Haff, G. G., & Triplett, N. T. (Eds.). (2016). Essentials of Strength Training and Conditioning (4th ed.). Champaign, IL: Human Kinetics.',

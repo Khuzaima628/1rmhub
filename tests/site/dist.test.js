@@ -53,7 +53,7 @@ describe('every indexable page has complete, unique metadata', () => {
     expect(routes).toEqual([
       '/', '/1rm-percentage-calculator/', '/about/', '/barbell-row-calculator/', '/bench-press-calculator/',
       '/contact/', '/deadlift-calculator/', '/disclaimer/', '/guides/', '/guides/1rm-formulas/',
-      '/guides/how-to-test-1rm/', '/methodology/', '/overhead-press-calculator/', '/plate-calculator/',
+      '/guides/how-to-test-1rm/', '/guides/training-max/', '/methodology/', '/overhead-press-calculator/', '/plate-calculator/',
       '/privacy/', '/rpe-calculator/', '/squat-calculator/', '/terms/', '/warm-up-calculator/', '/dots-calculator/',
     ].sort());
   });

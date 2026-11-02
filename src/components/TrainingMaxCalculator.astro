@@ -1,0 +1,92 @@
+---
+// Training max calculator, embedded in the training-max guide.
+// Training max = chosen % of a (tested or estimated) 1RM, plus working
+// weights as percentages of that training max. All loadable values round
+// DOWN (same rule as every other tool). One instance per page.
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="tm-heading" data-tm-calculator>
+  <h2 id="tm-heading">Training max calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="tm-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="tm-orm">Your 1RM <span class="hint">(tested or estimated)</span></label>
+        <input id="tm-orm" type="number" inputmode="decimal" min="0" step="any"
+          placeholder={unit === 'kg' ? '140' : '315'} autocomplete="off" aria-describedby="tm-error" />
+      </div>
+      <UnitToggle id="tm-unit" unit={unit} />
+      <div class="field">
+        <label for="tm-pct">Training max</label>
+        <select id="tm-pct">
+          <option value="90" selected>90% of 1RM (common default)</option>
+          <option value="85">85% of 1RM (more conservative)</option>
+          <option value="80">80% of 1RM (very conservative)</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">Calculate training max</button></div>
+    <p class="error" id="tm-error" role="alert" hidden></p>
+  </form>
+  <p class="disclaimer">No tested max? <a href="/">Estimate your 1RM</a> from a recent heavy set first.</p>
+  <div id="tm-result" aria-live="polite"></div>
+</section>
+
+<script>
+  import { validateWeight, loadableDown, loadStep } from '../lib/onerepmax.js';
+  import { f1, num, esc, bindUnitToggle, convertInput } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-tm-calculator]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('tm-form'), ormEl = $('tm-orm'), pctEl = $<HTMLSelectElement>('tm-pct');
+    const errorEl = $('tm-error'), out = $('tm-result');
+    let shown = false;
+
+    const toggle = bindUnitToggle(root.querySelector('#tm-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      convertInput(ormEl, prev, next);
+      if (shown) calculate();
+    });
+
+    function calculate() {
+      ormEl.removeAttribute('aria-invalid');
+      const orm = validateWeight(ormEl.value, 'your one rep max');
+      if (!orm.ok) {
+        errorEl.textContent = orm.error;
+        errorEl.hidden = false;
+        ormEl.setAttribute('aria-invalid', 'true');
+        out.innerHTML = '';
+        shown = false;
+        return;
+      }
+      errorEl.hidden = true;
+      const u = toggle.get();
+      const step = loadStep(u);
+      const pct = Number(pctEl.value);
+      const tm = (orm.value * pct) / 100;
+      const rows = [95, 90, 85, 80, 75, 70, 65].map((p) => {
+        const raw = (tm * p) / 100;
+        return `<tr><th scope="row">${p}% of TM</th><td class="num">${f1(raw)} ${u}</td>
+          <td class="num">${esc(num(loadableDown(raw, step)))} ${u}</td></tr>`;
+      }).join('');
+      out.innerHTML = `
+        <div class="result-headline">
+          <div class="result-label">Training max (${pct}% of ${esc(num(orm.value))} ${u})</div>
+          <div class="result-big">${f1(tm)} ${u}</div>
+          <p class="result-sub">Loadable: <strong>${esc(num(loadableDown(tm, step)))} ${u}</strong> (rounded down to the nearest ${num(step)} ${u})</p>
+        </div>
+        <div class="table-wrap"><table>
+          <caption>Working weights as a percentage of your training max</caption>
+          <thead><tr><th scope="col">Percentage</th><th scope="col" class="num">Exact</th><th scope="col" class="num">Loadable</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>`;
+      shown = true;
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(); });
+    pctEl.addEventListener('change', () => { if (shown) calculate(); });
+  }
+</script>
