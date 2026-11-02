@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DotsCalculator from '../components/DotsCalculator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { DOTS_COEFFICIENTS, DOTS_BODYWEIGHT_RANGE, dotsScore } from '../lib/dots.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { SITE, formatDate } from '../config/site';
+
+const title = 'DOTS Calculator — Powerlifting Score by Bodyweight';
+const description =
+  'Calculate your DOTS score: compare a powerlifting total across bodyweights for men and women. Enter your lifts or total in kg or lb.';
+const path = '/dots-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+// Example rows computed with the tested scoring function.
+const examples = [
+  { sex: 'male' as const, bw: 75, total: 500 },
+  { sex: 'male' as const, bw: 90, total: 600 },
+  { sex: 'male' as const, bw: 110, total: 700 },
+  { sex: 'female' as const, bw: 60, total: 300 },
+  { sex: 'female' as const, bw: 75, total: 380 },
+].map((e) => ({ ...e, score: dotsScore(e.total, e.bw, e.sex).score }));
+const fmt = (c: number) => String(c);
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webAppNode({ site, url, name: 'StrengthCalc DOTS Calculator', description,
+    features: ['DOTS score for men and women', 'Total from squat, bench and deadlift', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'DOTS Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>DOTS Calculator</h1>
+  <p class="lead">
+    Score your powerlifting total against your bodyweight with the DOTS formula, so lifters of
+    different sizes can be compared on one scale.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time></p>
+
+  <DotsCalculator />
+
+  <div class="prose">
+    <section aria-labelledby="what-dots-heading">
+      <h2 id="what-dots-heading">What is a DOTS score?</h2>
+      <p class="answer">
+        DOTS is a points formula for powerlifting. It divides your total (best squat + bench press +
+        deadlift) by a curve based on bodyweight, so a lighter and a heavier lifter can be compared
+        fairly. A higher score means a stronger total for your size.
+      </p>
+    </section>
+
+    <section aria-labelledby="formula-dots-heading">
+      <h2 id="formula-dots-heading">The DOTS formula</h2>
+      <p><code>DOTS = total × 500 ÷ (a + b·x + c·x² + d·x³ + e·x⁴)</code>, where <em>x</em> is bodyweight in kilograms and the total is in kilograms.</p>
+      <div class="table-wrap">
+        <table>
+          <caption>DOTS coefficients</caption>
+          <thead><tr><th scope="col">Coefficient</th><th scope="col" class="num">Men</th><th scope="col" class="num">Women</th></tr></thead>
+          <tbody>
+            {['a', 'b', 'c', 'd', 'e'].map((name, i) => (
+              <tr><th scope="row">{name}</th><td class="num"><code>{fmt(DOTS_COEFFICIENTS.male[i])}</code></td><td class="num"><code>{fmt(DOTS_COEFFICIENTS.female[i])}</code></td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The curves are fitted for bodyweights of {DOTS_BODYWEIGHT_RANGE.male.min}–{DOTS_BODYWEIGHT_RANGE.male.max} kg
+        for men and {DOTS_BODYWEIGHT_RANGE.female.min}–{DOTS_BODYWEIGHT_RANGE.female.max} kg for women. Outside that
+        range the calculator uses the nearest limit and tells you, because the curve stops making sense
+        beyond it. Pound inputs are converted to kilograms (1 kg = 2.20462 lb) before scoring.
+      </p>
+    </section>
+
+    <section aria-labelledby="examples-heading">
+      <h2 id="examples-heading">Example DOTS scores</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>DOTS scores for example totals</caption>
+          <thead><tr><th scope="col">Category</th><th scope="col" class="num">Bodyweight</th><th scope="col" class="num">Total</th><th scope="col" class="num">DOTS</th></tr></thead>
+          <tbody>
+            {examples.map((e) => (
+              <tr><th scope="row">{e.sex === 'male' ? 'Men' : 'Women'}</th><td class="num">{e.bw} kg</td><td class="num">{e.total} kg</td><td class="num">{e.score.toFixed(1)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="use-dots-heading">
+      <h2 id="use-dots-heading">Using your score</h2>
+      <ul>
+        <li><strong>Use tested lifts.</strong> DOTS is meant for real competition-style singles. You can plug in estimated maxes from the <a href="/">1RM calculator</a>, but the result is then an estimate too.</li>
+        <li><strong>Equipment matters.</strong> Raw and equipped totals are not comparable, even with the same score formula.</li>
+        <li><strong>Federations differ.</strong> Some federations rank lifters with other formulas, such as IPF GL points or Wilks. Check which one your meet uses — scores from different formulas are not interchangeable.</li>
+        <li><strong>Track yourself.</strong> The most useful comparison is your own score over time, especially if your bodyweight changes.</li>
+      </ul>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.home, LINKS.squat, LINKS.bench, LINKS.deadlift]} />
+</BaseLayout>

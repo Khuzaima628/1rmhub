@@ -1,0 +1,115 @@
+---
+// DOTS score calculator. Total can be typed directly or built from the three
+// lifts. One instance per page. Math: src/lib/dots.js (tested).
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="dots-heading" data-dots-calculator>
+  <h2 id="dots-heading">DOTS calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="dots-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="dots-sex">Category</label>
+        <select id="dots-sex">
+          <option value="male">Men</option>
+          <option value="female">Women</option>
+        </select>
+      </div>
+      <UnitToggle id="dots-unit" unit={unit} />
+      <div class="field">
+        <label for="dots-bw">Bodyweight (<span data-unit-label>{unit}</span>)</label>
+        <input id="dots-bw" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? '83' : '183'} autocomplete="off" aria-describedby="dots-error" />
+      </div>
+    </div>
+    <fieldset class="plate-fieldset">
+      <legend>Your lifts <span class="hint">(best successful single of each, or type a total)</span></legend>
+      <div class="field-row">
+        <div class="field">
+          <label for="dots-squat">Squat</label>
+          <input id="dots-squat" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" data-lift />
+        </div>
+        <div class="field">
+          <label for="dots-bench">Bench press</label>
+          <input id="dots-bench" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" data-lift />
+        </div>
+        <div class="field">
+          <label for="dots-deadlift">Deadlift</label>
+          <input id="dots-deadlift" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" data-lift />
+        </div>
+      </div>
+      <div class="field">
+        <label for="dots-total">Total (<span data-unit-label>{unit}</span>) <span class="hint">filled in from the lifts, or type your own</span></label>
+        <input id="dots-total" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" aria-describedby="dots-error" />
+      </div>
+    </fieldset>
+    <div class="actions"><button type="submit" class="btn btn-primary">Calculate DOTS</button></div>
+    <p class="error" id="dots-error" role="alert" hidden></p>
+  </form>
+  <div id="dots-result" aria-live="polite"></div>
+</section>
+
+<script>
+  import { dotsScore } from '../lib/dots.js';
+  import { toKg, fromKg, validateWeight } from '../lib/onerepmax.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-dots-calculator]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('dots-form'), sexEl = $<HTMLSelectElement>('dots-sex');
+    const bwEl = $('dots-bw'), totalEl = $('dots-total'), errorEl = $('dots-error'), out = $('dots-result');
+    const lifts = [...root.querySelectorAll<HTMLInputElement>('[data-lift]')];
+
+    const toggle = bindUnitToggle(root.querySelector('#dots-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      [bwEl, totalEl, ...lifts].forEach((el) => convertInput(el, prev, next));
+      paintUnitLabels(root, next);
+      out.innerHTML = '';
+    });
+
+    // Keep the total in sync with the three lifts while all three are filled.
+    lifts.forEach((el) => el.addEventListener('input', () => {
+      const values = lifts.map((l) => Number(l.value));
+      if (lifts.every((l) => l.value.trim() !== '') && values.every((v) => Number.isFinite(v) && v > 0)) {
+        totalEl.value = num(values.reduce((a, b) => a + b, 0));
+      }
+    }));
+
+    function fail(message: string, el: HTMLInputElement) {
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      el.setAttribute('aria-invalid', 'true');
+      out.innerHTML = '';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      bwEl.removeAttribute('aria-invalid');
+      totalEl.removeAttribute('aria-invalid');
+      const u = toggle.get();
+      const bw = validateWeight(bwEl.value, 'your bodyweight');
+      if (!bw.ok) return fail(bw.error, bwEl);
+      // A three-lift total can legitimately exceed the single-lift sanity cap.
+      const totalText = totalEl.value.trim();
+      const total = { value: Number(totalText) };
+      if (totalText === '' || !Number.isFinite(total.value) || total.value <= 0) {
+        return fail('Please enter your total as a number, or fill in all three lifts.', totalEl);
+      }
+      if (total.value > 4000) return fail('That total is above any recorded result — please check the number and the unit.', totalEl);
+      errorEl.hidden = true;
+      const sex = sexEl.value as 'male' | 'female';
+      const result = dotsScore(toKg(total.value, u), toKg(bw.value, u), sex);
+      const clampNote = result.clamped
+        ? `<p class="notice">Your bodyweight is outside the range the DOTS formula was fitted for, so it was scored as
+           ${esc(num(fromKg(result.usedBodyweight, u), 1))} ${u} (the nearest limit). Treat the score with caution.</p>`
+        : '';
+      out.innerHTML = `<div class="result-headline">
+          <div class="result-label">DOTS score</div>
+          <div class="result-big">${f1(result.score)}</div>
+          <p class="result-sub">${esc(num(total.value))} ${u} total at ${esc(num(bw.value))} ${u} bodyweight (${sex === 'male' ? 'men' : 'women'}’s formula)</p>
+        </div>${clampNote}`;
+    });
+  }
+</script>

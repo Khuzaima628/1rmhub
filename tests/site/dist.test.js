@@ -54,8 +54,8 @@ describe('every indexable page has complete, unique metadata', () => {
       '/', '/1rm-percentage-calculator/', '/about/', '/barbell-row-calculator/', '/bench-press-calculator/',
       '/contact/', '/deadlift-calculator/', '/disclaimer/', '/guides/', '/guides/1rm-formulas/',
       '/guides/how-to-test-1rm/', '/methodology/', '/overhead-press-calculator/', '/plate-calculator/',
-      '/privacy/', '/squat-calculator/', '/terms/', '/warm-up-calculator/',
-    ]);
+      '/privacy/', '/rpe-calculator/', '/squat-calculator/', '/terms/', '/warm-up-calculator/', '/dots-calculator/',
+    ].sort());
   });
 
   it('one <title> (≤ 65 chars) and one meta description (70–160 chars) per page, all unique', () => {

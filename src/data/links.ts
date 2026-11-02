@@ -10,6 +10,8 @@ export const LINKS = {
   percent: { href: '/1rm-percentage-calculator/', title: '1RM Percentage Calculator', text: 'Turn a known 1RM into working weights, e.g. 80% for sets of five.' },
   plates: { href: '/plate-calculator/', title: 'Plate Calculator', text: 'See which plates to load per side — never over your target.' },
   warmup: { href: '/warm-up-calculator/', title: 'Warm-up Calculator', text: 'Build a warm-up ramp to your top set, with loadable weights.' },
+  rpe: { href: '/rpe-calculator/', title: 'RPE Calculator', text: 'Estimate your 1RM from a set rated by RPE, and plan weights by reps in reserve.' },
+  dots: { href: '/dots-calculator/', title: 'DOTS Calculator', text: 'Score a powerlifting total against bodyweight with the DOTS formula.' },
   formulas: { href: '/guides/1rm-formulas/', title: '1RM Formula Guide', text: 'All six equations compared rep by rep, and which to trust when.' },
   test: { href: '/guides/how-to-test-1rm/', title: 'How to Test Your 1RM Safely', text: 'A step-by-step protocol for a true max — and when not to test.' },
   methodology: { href: '/methodology/', title: 'Methodology', text: 'Exactly how every number on StrengthCalc is calculated and rounded.' },

@@ -224,6 +224,65 @@ export function percentageTable(e1rmKg, unit, steps = PERCENT_STEPS) {
   return steps.map((pct) => percentOf(e1rmKg, pct, unit));
 }
 
+/* ------------------------------------------------------------------ */
+/* RPE / reps in reserve (RIR).                                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * RPE values offered, on the RIR-based scale of Zourdos et al. (2016):
+ * RPE 10 = 0 reps in reserve, RPE 9 = 1, … RPE 6 = 4. Half steps allowed.
+ */
+export const RPE_VALUES = [10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6];
+
+/** Reps in reserve for an RPE (10 − RPE). */
+export function rirFromRpe(rpe) {
+  return 10 - rpe;
+}
+
+/**
+ * Validate an RPE set. Returns { ok: true, weight, reps, rpe, effectiveReps }
+ * or { ok: false, error, field }. Effective reps (reps done + reps in reserve)
+ * must stay within the same 1–12 limit as every other estimate.
+ */
+export function validateRpeInput(rawWeight, rawReps, rawRpe) {
+  const base = validateInput(rawWeight, rawReps);
+  if (!base.ok) return base;
+  const rpe = Number(rawRpe);
+  if (!RPE_VALUES.includes(rpe)) {
+    return { ok: false, field: 'rpe', error: 'Choose an RPE between 6 and 10 (half steps allowed).' };
+  }
+  const effectiveReps = base.reps + rirFromRpe(rpe);
+  if (effectiveReps > MAX_REPS) {
+    return {
+      ok: false,
+      field: 'reps',
+      error: `${base.reps} reps at RPE ${rpe} means about ${effectiveReps} reps to failure — above the ${MAX_REPS}-rep limit where estimates stop being useful. Use a heavier set or a higher RPE.`,
+    };
+  }
+  return { ok: true, weight: base.weight, reps: base.reps, rpe, effectiveReps };
+}
+
+/**
+ * Estimate a 1RM from a set with an RPE: the six formulas run on the reps
+ * the lifter could have done to failure (reps + RIR). A single at RPE 10 is
+ * a tested max and is returned unchanged (estimateAll's 1-rep rule).
+ */
+export function estimateFromRpe(weight, reps, rpe) {
+  return { ...estimateAll(weight, reps + rirFromRpe(rpe)), effectiveReps: reps + rirFromRpe(rpe) };
+}
+
+/**
+ * Fraction of 1RM for a target of `reps` at `rpe`, using the Epley equation
+ * solved backwards on reps to failure — the same method as the 2–10RM table.
+ * A single at RPE 10 is 100%. Returns null above the 12-rep limit.
+ */
+export function rpeFraction(reps, rpe) {
+  const effective = reps + rirFromRpe(rpe);
+  if (effective > MAX_REPS) return null;
+  if (effective === 1) return 1;
+  return 1 / (1 + effective / 30);
+}
+
 /**
  * 2RM–10RM estimates derived from an estimated 1RM via the Epley equation
  * solved backwards: w = 1RM ÷ (1 + r/30). Clearly labelled estimates.

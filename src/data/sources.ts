@@ -42,6 +42,16 @@ export const SOURCES: Record<string, Source> = {
     text: 'Human Performance Resources by CHAMP (HPRC), Uniformed Services University. What is a one-rep max?',
     url: 'https://hprc-online.org/articles/what-is-a-one-rep-max',
   },
+  zourdos: {
+    id: 'zourdos',
+    text: 'Zourdos, M. C., Klemp, A., Dolan, C., et al. (2016). Novel resistance training–specific rating of perceived exertion scale measuring repetitions in reserve. Journal of Strength and Conditioning Research, 30(1), 267–275.',
+    url: 'https://doi.org/10.1519/JSC.0000000000001049',
+  },
+  sbsrir: {
+    id: 'sbsrir',
+    text: 'Stronger by Science. Reps in reserve (RIR): research review and practical guide.',
+    url: 'https://www.strongerbyscience.com/reps-in-reserve',
+  },
   nsca: {
     id: 'nsca',
     text: 'Haff, G. G., & Triplett, N. T. (Eds.). (2016). Essentials of Strength Training and Conditioning (4th ed.). Champaign, IL: Human Kinetics.',

@@ -55,6 +55,8 @@ export const FOOTER_GROUPS = [
       { href: '/1rm-percentage-calculator/', label: '1RM Percentage Calculator' },
       { href: '/plate-calculator/', label: 'Plate Calculator' },
       { href: '/warm-up-calculator/', label: 'Warm-up Calculator' },
+      { href: '/rpe-calculator/', label: 'RPE Calculator' },
+      { href: '/dots-calculator/', label: 'DOTS Calculator' },
     ],
   },
   {

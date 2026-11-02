@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RpeCalculator from '../components/RpeCalculator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { rpeFraction } from '../lib/onerepmax.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { SITE, formatDate } from '../config/site';
+
+const title = 'RPE Calculator — Estimate 1RM from RPE & Reps in Reserve';
+const description =
+  'Estimate your one rep max from a set rated by RPE, then plan weights for any reps and RPE. Uses the reps-in-reserve scale and six published 1RM formulas.';
+const path = '/rpe-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+// Reference chart built from the same function the calculator uses.
+const chartRpes = [10, 9, 8, 7, 6];
+const chartRows = Array.from({ length: 10 }, (_, i) => i + 1).map((reps) => ({
+  reps,
+  cells: chartRpes.map((rpe) => rpeFraction(reps, rpe)),
+}));
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webAppNode({ site, url, name: 'StrengthCalc RPE Calculator', description,
+    features: ['1RM estimate from weight, reps and RPE', 'Weight for any reps at any RPE', 'Reps-in-reserve scale', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'RPE Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>RPE Calculator</h1>
+  <p class="lead">
+    Estimate your one rep max from a set you rated by RPE — no need to go to failure — then work out
+    the weight for your next set at any reps and RPE.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · <a href="/methodology/">How we calculate</a></p>
+
+  <RpeCalculator />
+
+  <div class="prose">
+    <section aria-labelledby="what-rpe-heading">
+      <h2 id="what-rpe-heading">What is RPE in lifting?</h2>
+      <p class="answer">
+        RPE (rating of perceived exertion) rates how hard a set was on a 1–10 scale. In strength
+        training it is usually tied to <strong>reps in reserve</strong>: RPE 10 means you could not have
+        done another rep, RPE 9 means one more was left, RPE 8 means two were left, and so on.
+      </p>
+      <p>
+        This reps-in-reserve version of the scale was described by Zourdos and colleagues in 2016.
+        It lets you train hard without going to failure every set, and it adjusts to how strong you
+        are on the day.
+      </p>
+    </section>
+
+    <section aria-labelledby="how-rpe-heading">
+      <h2 id="how-rpe-heading">How the RPE calculator works</h2>
+      <ol>
+        <li><strong>Reps to failure:</strong> reps done + reps in reserve. 5 reps at RPE 8 ≈ 7 reps to failure.</li>
+        <li><strong>1RM estimate:</strong> the same six published formulas as the <a href="/">1RM calculator</a> run on those reps to failure, and their average is shown with the full range.</li>
+        <li><strong>Next-set weight:</strong> the Epley equation solved backwards for your target reps plus reps in reserve.</li>
+      </ol>
+      <p>
+        Because reps to failure must stay within 12, sets that are both long and easy (for example
+        10 reps at RPE 7) are not estimated — they are too far from a max to predict reliably.
+      </p>
+    </section>
+
+    <section aria-labelledby="chart-heading">
+      <h2 id="chart-heading">RPE chart: % of 1RM by reps and RPE</h2>
+      <p>
+        Each cell is the percentage of your 1RM for that many reps at that RPE, calculated with the
+        Epley equation on reps to failure. Real lifters vary, so use it as a starting point.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>Estimated percentage of 1RM by reps and RPE (Epley, reps to failure)</caption>
+          <thead>
+            <tr><th scope="col">Reps</th>{chartRpes.map((r) => <th scope="col" class="num">RPE {r}</th>)}</tr>
+          </thead>
+          <tbody>
+            {chartRows.map((row) => (
+              <tr>
+                <th scope="row">{row.reps}</th>
+                {row.cells.map((c) => <td class="num">{c === null ? '—' : `${(c * 100).toFixed(1)}%`}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="disclaimer">— means more than 12 reps to failure, where estimates are not shown.</p>
+    </section>
+
+    <section aria-labelledby="accuracy-rpe-heading">
+      <h2 id="accuracy-rpe-heading">How accurate is RPE?</h2>
+      <p>
+        RPE depends on your own judgement. A review of the research by Stronger by Science reports
+        that, on average, lifters misjudge their reps in reserve by about one rep — enough to move a
+        1RM estimate by a few percent. If you are new to RPE, check your ratings occasionally by
+        taking a set to a safe failure (for example on a machine or with safeties set), and use the
+        <a href="/">standard 1RM calculator</a> for sets taken close to failure.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.home, LINKS.percent, LINKS.formulas, LINKS.warmup]} />
+  <SourceList ids={['zourdos', 'sbsrir', 'epley']} />
+</BaseLayout>

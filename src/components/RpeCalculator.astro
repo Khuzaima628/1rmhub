@@ -1,0 +1,154 @@
+---
+// RPE calculator: estimate a 1RM from a set with an RPE (reps in reserve),
+// then plan a weight for a target reps × RPE. One instance per page.
+// Math: src/lib/onerepmax.js (estimateFromRpe, rpeFraction) — tested.
+import { RPE_VALUES, MIN_REPS, MAX_REPS } from '../lib/onerepmax.js';
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+const rpeLabel = (r: number) => `RPE ${r} — ${10 - r} rep${10 - r === 1 ? '' : 's'} in reserve`;
+---
+<section class="card calculator" aria-labelledby="rpe-heading" data-rpe-calculator>
+  <h2 id="rpe-heading">RPE calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="rpe-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="rpe-weight">Weight lifted</label>
+        <input id="rpe-weight" type="number" inputmode="decimal" min="0" step="any"
+          placeholder={unit === 'kg' ? '100' : '225'} autocomplete="off" aria-describedby="rpe-error" />
+      </div>
+      <UnitToggle id="rpe-unit" unit={unit} />
+      <div class="field">
+        <label for="rpe-reps">Reps completed <span class="hint">({MIN_REPS}–{MAX_REPS})</span></label>
+        <input id="rpe-reps" type="number" inputmode="numeric" min={MIN_REPS} max={MAX_REPS} step="1"
+          placeholder="5" autocomplete="off" aria-describedby="rpe-error" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="rpe-rpe">How hard was the set?</label>
+      <select id="rpe-rpe">
+        {RPE_VALUES.map((r) => <option value={r} selected={r === 8}>{rpeLabel(r)}</option>)}
+      </select>
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">Estimate 1RM</button></div>
+    <p class="error" id="rpe-error" role="alert" hidden></p>
+  </form>
+
+  <p class="visually-hidden" aria-live="polite" id="rpe-status"></p>
+
+  <div id="rpe-results" hidden>
+    <div id="rpe-core"></div>
+
+    <h3>Plan your next set</h3>
+    <form id="rpe-plan-form" class="tool" novalidate>
+      <div class="field-row two">
+        <div class="field">
+          <label for="rpe-plan-reps">Target reps</label>
+          <input id="rpe-plan-reps" type="number" inputmode="numeric" min="1" max={MAX_REPS} step="1" value="5" />
+        </div>
+        <div class="field">
+          <label for="rpe-plan-rpe">Target RPE</label>
+          <select id="rpe-plan-rpe">
+            {RPE_VALUES.map((r) => <option value={r} selected={r === 8}>{rpeLabel(r)}</option>)}
+          </select>
+        </div>
+      </div>
+      <div class="actions"><button type="submit" class="btn">Calculate weight</button></div>
+    </form>
+    <div id="rpe-plan-result" aria-live="polite"></div>
+  </div>
+</section>
+
+<script>
+  import {
+    validateRpeInput, estimateFromRpe, rpeFraction, confidenceNote, toKg, fromKg, loadableDown, loadStep, MAX_REPS,
+  } from '../lib/onerepmax.js';
+  import { f1, f2, num, esc, bindUnitToggle, convertInput, scrollToEl } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-rpe-calculator]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('rpe-form'), weightEl = $('rpe-weight'), repsEl = $('rpe-reps');
+    const rpeEl = $<HTMLSelectElement>('rpe-rpe'), errorEl = $('rpe-error'), statusEl = $('rpe-status');
+    const resultsEl = $('rpe-results'), coreEl = $('rpe-core');
+    const planForm = $<HTMLFormElement>('rpe-plan-form'), planReps = $('rpe-plan-reps');
+    const planRpe = $<HTMLSelectElement>('rpe-plan-rpe'), planOut = $('rpe-plan-result');
+    let e1rmKg: number | null = null;
+
+    const toggle = bindUnitToggle(root.querySelector('#rpe-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      convertInput(weightEl, prev, next);
+      if (e1rmKg !== null) calculate(false);
+    });
+    const unit = () => toggle.get();
+    const other = () => (unit() === 'kg' ? 'lb' : 'kg');
+
+    function calculate(scroll: boolean) {
+      weightEl.removeAttribute('aria-invalid');
+      repsEl.removeAttribute('aria-invalid');
+      const v = validateRpeInput(weightEl.value, repsEl.value, rpeEl.value);
+      if (!v.ok) {
+        errorEl.textContent = v.error;
+        errorEl.hidden = false;
+        if (v.field === 'weight') weightEl.setAttribute('aria-invalid', 'true');
+        if (v.field === 'reps') repsEl.setAttribute('aria-invalid', 'true');
+        resultsEl.hidden = true;
+        statusEl.textContent = '';
+        e1rmKg = null;
+        return;
+      }
+      errorEl.hidden = true;
+      const u = unit(), o = other();
+      const est = estimateFromRpe(toKg(v.weight, u), v.reps, v.rpe);
+      e1rmKg = est.average;
+      statusEl.textContent = `Estimated one rep max: ${f1(fromKg(est.average, u))} ${u}.`;
+      const rows = est.rows.map((r) => `<tr><th scope="row">${esc(r.name)}</th>
+        <td class="num">${f2(fromKg(r.value, u))} ${u}</td><td class="num">${f2(fromKg(r.value, o))} ${o}</td></tr>`).join('');
+      coreEl.innerHTML = `
+        <div class="result-headline">
+          <div class="result-label">Estimated 1RM — Average Estimate</div>
+          <div class="result-big">${f1(fromKg(est.average, u))} ${u}</div>
+          <div class="result-both">${f1(fromKg(est.average, o))} ${o}</div>
+          <p class="result-sub">${esc(num(v.weight))} ${u} × ${v.reps} at RPE ${v.rpe} ≈ <strong>${esc(num(v.effectiveReps, 1))} reps to failure</strong>
+            · range ${f1(fromKg(est.min, u))}–${f1(fromKg(est.max, u))} ${u}</p>
+          <p class="result-sub">${esc(confidenceNote(Math.round(v.effectiveReps)))}</p>
+          <p class="disclaimer">RPE is a self-rating — most lifters misjudge reps in reserve by about one rep, so treat this as a rough estimate.</p>
+        </div>
+        <div class="table-wrap"><table>
+          <caption>Each formula's estimate, using ${esc(num(v.effectiveReps, 1))} reps to failure</caption>
+          <thead><tr><th scope="col">Formula</th><th scope="col" class="num">${u}</th><th scope="col" class="num">${o}</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>`;
+      resultsEl.hidden = false;
+      plan();
+      if (scroll) scrollToEl(resultsEl);
+    }
+
+    function plan() {
+      if (e1rmKg === null) return;
+      const reps = Number(planReps.value);
+      const rpe = Number(planRpe.value);
+      if (!Number.isInteger(reps) || reps < 1 || reps > MAX_REPS) {
+        planOut.innerHTML = `<p class="error">Target reps must be a whole number from 1 to ${MAX_REPS}.</p>`;
+        return;
+      }
+      const fraction = rpeFraction(reps, rpe);
+      if (fraction === null) {
+        planOut.innerHTML = `<p class="error">${reps} reps at RPE ${rpe} is more than ${MAX_REPS} reps to failure — too far from a max to plan reliably. Pick fewer reps or a higher RPE.</p>`;
+        return;
+      }
+      const u = unit();
+      const raw = fromKg(e1rmKg * fraction, u);
+      planOut.innerHTML = `<div class="result-box">
+        <p><strong>${f1(raw)} ${u}</strong> for ${reps} rep${reps > 1 ? 's' : ''} at RPE ${rpe}
+          (${(fraction * 100).toFixed(1)}% of your estimated 1RM).</p>
+        <p class="disclaimer">Loadable: <strong>${esc(num(loadableDown(raw, loadStep(u))))} ${u}</strong>, rounded down to the nearest ${num(loadStep(u))} ${u}.
+          Start here and adjust by how the first set actually feels.</p></div>`;
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
+    planForm.addEventListener('submit', (e) => { e.preventDefault(); plan(); });
+    planRpe.addEventListener('change', plan);
+  }
+</script>
