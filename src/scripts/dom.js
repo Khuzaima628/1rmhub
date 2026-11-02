@@ -4,6 +4,7 @@
  * widget renders numbers and handles units identically.
  */
 import { toKg, fromKg } from '../lib/onerepmax.js';
+import { getPref, setPref } from './prefs.js';
 
 export const f1 = (v) => Number(v).toFixed(1);
 export const f2 = (v) => Number(v).toFixed(2);
@@ -56,19 +57,29 @@ export function flash(btn, text, ms = 1800) {
  * Wire a kg/lb segmented control (markup from UnitToggle.astro). The current
  * unit lives in the group's data-unit attribute. onChange(next, previous)
  * fires only on a real change.
+ *
+ * The visitor's last chosen unit is remembered (prefs.js) and applied here on
+ * load through the normal change path, so every widget converts and relabels
+ * exactly as if the visitor had clicked. Bind AFTER the widget's own state is
+ * ready, since onChange may run immediately.
  */
 export function bindUnitToggle(group, onChange) {
   const buttons = [...group.querySelectorAll('button[data-unit]')];
   const paint = (u) => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.unit === u)));
   const set = (u) => { group.dataset.unit = u; paint(u); };
-  buttons.forEach((b) => b.addEventListener('click', () => {
+  const change = (next) => {
     const prev = group.dataset.unit;
-    const next = b.dataset.unit;
     if (next === prev) return;
     set(next);
     onChange(next, prev);
+  };
+  buttons.forEach((b) => b.addEventListener('click', () => {
+    setPref('unit', b.dataset.unit);
+    change(b.dataset.unit);
   }));
   paint(group.dataset.unit);
+  const saved = getPref('unit');
+  if (saved) change(saved);
   return { get: () => group.dataset.unit, set };
 }
 

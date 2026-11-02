@@ -39,6 +39,14 @@ const graph = noindex
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
+    <!-- Apply a saved light/dark choice before first paint (no flash).
+         Reads the same key as src/scripts/prefs.js; ignores anything invalid. -->
+    <script is:inline>
+      try {
+        var t = JSON.parse(localStorage.getItem('sc:prefs') || '{}').theme;
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* storage unavailable: follow the system setting */ }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <Seo title={title} description={description} canonical={canonical} site={site}

@@ -1,6 +1,8 @@
 /* ==========================================================================
    StrengthCalc — hand-written, mobile-first, no CSS frameworks.
-   Light/dark mode follows the visitor's system setting via CSS variables.
+   Light/dark mode follows the visitor's system setting via CSS variables,
+   unless they chose one with the theme button: <html data-theme="light|dark">
+   (set before first paint by the inline script in BaseLayout.astro).
    ========================================================================== */
 
 :root {
@@ -23,8 +25,12 @@
   color-scheme: light dark;
 }
 
+/* Dark palette: applied by the system setting unless the visitor chose light,
+   or by an explicit dark choice. CSS cannot share one block between a media
+   query and a plain selector, so the palette appears twice — keep both
+   copies identical when changing a colour. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #14161c;
     --bg-soft: #1b1e25;
     --card: #1b1e25;
@@ -39,6 +45,35 @@
     --warn-bg: #2a2313;
     --warn-border: #b98a1d;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #14161c;
+  --bg-soft: #1b1e25;
+  --card: #1b1e25;
+  --text: #eceef2;
+  --text-muted: #a6b0bd;
+  --border: #2d333f;
+  --accent: #ee566d;
+  --accent-ink: #14161c;
+  --accent-soft: #2b1e25;
+  --focus: #7cc4ff;
+  --ok: #4caf7d;
+  --warn-bg: #2a2313;
+  --warn-border: #b98a1d;
+  color-scheme: dark;
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+/* Theme button in the header. */
+.theme-toggle {
+  min-width: var(--tap); min-height: var(--tap); border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);
+  font-size: 1.15rem; line-height: 1; cursor: pointer; flex: none;
+}
+@media (min-width: 48rem) { .site-nav { margin-left: auto; } }
+@media (max-width: 47.99rem) {
+  .header-inner { position: relative; }
+  .theme-toggle { position: absolute; right: 1rem; top: 0.5rem; }
 }
 
 *, *::before, *::after { box-sizing: border-box; }

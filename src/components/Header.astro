@@ -1,5 +1,5 @@
 ---
-// Site header: brand + primary navigation to the main tools and guides.
+// Site header: brand, primary navigation and the light/dark theme button.
 // The current section is marked with aria-current for users and styling.
 import { NAV } from '../config/site';
 interface Props { path: string }
@@ -14,5 +14,34 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
         <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
       ))}
     </nav>
+    <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch colour theme">◐</button>
   </div>
 </header>
+
+<script>
+  import { setPref } from '../scripts/prefs.js';
+
+  // The saved theme (if any) is already on <html data-theme> from the inline
+  // head script; otherwise the system setting applies.
+  const btn = document.getElementById('theme-toggle');
+  const root = document.documentElement;
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+  const effective = () => root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
+
+  function paint() {
+    if (!btn) return;
+    const toLight = effective() === 'dark';
+    btn.textContent = toLight ? '☀' : '☾';
+    btn.setAttribute('aria-label', toLight ? 'Switch to light theme' : 'Switch to dark theme');
+    btn.title = btn.getAttribute('aria-label')!;
+  }
+
+  btn?.addEventListener('click', () => {
+    const next = effective() === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    setPref('theme', next);
+    paint();
+  });
+  systemDark.addEventListener('change', paint);
+  paint();
+</script>
