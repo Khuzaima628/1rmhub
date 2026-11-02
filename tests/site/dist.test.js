@@ -40,7 +40,9 @@ beforeAll(() => {
     const html = readFileSync(file, 'utf8');
     const route = routeOf(file);
     return { file, route, html, is404: route === '/404' };
-  });
+  })
+    // Skip non-page .html files such as Google's site-verification file.
+    .filter((p) => /<html[\s>]/i.test(p.html));
 });
 
 const indexable = () => pages.filter((p) => !p.is404);
