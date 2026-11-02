@@ -30,6 +30,11 @@ async function sitemapUrls() {
 const args = process.argv.slice(2);
 const urlList = args.length ? args.map((p) => new URL(p, origin).href) : await sitemapUrls();
 if (!urlList.length) throw new Error('No URLs to submit — is the site deployed?');
+// Every URL must be on this site. (Git Bash on Windows rewrites "/about/" into
+// "C:/Program Files/Git/about/" — pass paths without the leading slash there,
+// e.g. `npm run indexnow -- about/`, or set MSYS_NO_PATHCONV=1.)
+const foreign = urlList.filter((u) => new URL(u).origin !== origin);
+if (foreign.length) throw new Error(`Not on ${origin}: ${foreign.join(', ')}`);
 
 // Refuse to submit if the key file is not live yet (the engines would reject it).
 const keyLocation = `${origin}/${KEY}.txt`;
