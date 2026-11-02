@@ -1,0 +1,97 @@
+---
+// Plate loader: which plates to put on each side for a target weight.
+//
+// Standalone (plate calculator page): has its own kg/lb toggle.
+// Linked (inside a calculator's results): follows the calculator's unit and
+// target through document events —
+//   sc:result       { unit, e1rm }   → target = the estimate, solve
+//   sc:load-plates  { unit, target } → target = a percentage-table row, solve
+// The solver never exceeds the target (see solvePlates in src/lib/onerepmax.js).
+import UnitToggle from './UnitToggle.astro';
+import GearFields from './GearFields.astro';
+
+interface Props {
+  id: string;
+  unit: 'kg' | 'lb';
+  linked?: boolean;
+  /** id of a GearFields block shared with other widgets; omit to render one here. */
+  gearId?: string;
+}
+const { id, unit, linked = false, gearId } = Astro.props;
+const gid = gearId ?? `${id}-gear`;
+---
+<div class="tool" id={id} data-plate-loader data-linked={linked ? 'true' : undefined} data-gear-id={gid}>
+  <form data-plate-form novalidate>
+    <div class={linked ? 'field-row one' : 'field-row two'}>
+      {!linked && <UnitToggle id={`${id}-unit`} unit={unit} />}
+      <div class="field">
+        <label for={`${id}-target`}>Target weight (<span data-unit-label>{unit}</span>)</label>
+        <input id={`${id}-target`} type="number" inputmode="decimal" min="0" step="any"
+          placeholder={unit === 'kg' ? '100' : '225'} autocomplete="off" data-target />
+      </div>
+    </div>
+    {!gearId && <GearFields id={gid} unit={unit} />}
+    <p class="disclaimer">
+      <strong>Rounding rule:</strong> the loader finds the heaviest weight your plates can make
+      that does <em>not</em> exceed the target. It never rounds up past it, and any shortfall is
+      shown openly.
+    </p>
+    <div class="actions"><button type="submit" class="btn">Show plates</button></div>
+  </form>
+  <div data-plate-result aria-live="polite"></div>
+</div>
+
+<script>
+  import { solvePlates, validateWeight } from '../lib/onerepmax.js';
+  import { bindUnitToggle, convertInput, esc, num, paintUnitLabels, scrollToEl } from '../scripts/dom.js';
+  import { getGear } from '../scripts/gear.js';
+  import { plateResultHtml } from '../scripts/plates-ui.js';
+
+  function init(root: HTMLElement) {
+    const gear = getGear(document.getElementById(root.dataset.gearId!)!);
+    const form = root.querySelector<HTMLFormElement>('[data-plate-form]')!;
+    const target = root.querySelector<HTMLInputElement>('[data-target]')!;
+    const out = root.querySelector<HTMLElement>('[data-plate-result]')!;
+    let unit = gear.getUnit();
+
+    const setUnit = (u: string) => { unit = u; gear.setUnit(u); paintUnitLabels(root, u); };
+
+    function show() {
+      const t = validateWeight(target.value, 'a target weight');
+      if (!t.ok) { out.innerHTML = `<p class="error">${esc(t.error)}</p>`; return; }
+      const bar = gear.bar();
+      if (!bar.ok) { out.innerHTML = `<p class="error">${esc(bar.error)}</p>`; return; }
+      const plates = gear.plates();
+      if (!plates.ok) { out.innerHTML = `<p class="error">${esc(plates.error)}</p>`; return; }
+      const solved = solvePlates(t.value, bar.value, plates.value);
+      out.innerHTML = plateResultHtml(solved, { target: t.value, bar: bar.value, unit, platesTicked: plates.value.length });
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); show(); });
+    gear.onChange(() => { if (out.innerHTML) show(); });
+
+    if (root.dataset.linked) {
+      document.addEventListener('sc:result', (e: Event) => {
+        const { unit: u, e1rm } = (e as CustomEvent).detail;
+        setUnit(u);
+        target.value = num(e1rm, 1);
+        show();
+      });
+      document.addEventListener('sc:load-plates', (e: Event) => {
+        const { unit: u, target: t } = (e as CustomEvent).detail;
+        setUnit(u);
+        target.value = num(t);
+        show();
+        scrollToEl(root, 'center');
+      });
+    } else {
+      bindUnitToggle(root.querySelector('[data-unit-toggle]')!, (next: string, prev: string) => {
+        convertInput(target, prev, next);
+        setUnit(next);
+        out.innerHTML = '';
+      });
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-plate-loader]').forEach(init);
+</script>

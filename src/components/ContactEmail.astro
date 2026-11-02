@@ -1,0 +1,8 @@
+---
+// The public contact address from SITE.contactEmail, or — until it is set — a
+// clearly marked notice (the build also warns). Never invents an address.
+import { SITE } from '../config/site';
+---
+{SITE.contactEmail
+  ? <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>
+  : <strong class="todo">[contact email not yet configured]</strong>}

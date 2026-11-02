@@ -1,0 +1,64 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Deadlift Calculator — Estimate Your Deadlift 1RM"
+  description="Estimate your deadlift one rep max from a set of 1–12 reps. Six formulas, why estimates may read low for the deadlift, and loadable training weights."
+  path="/deadlift-calculator/"
+  name="Deadlift Calculator"
+  h1="Deadlift 1RM Calculator"
+  lead="Estimate your deadlift max from a recent heavy set. Research suggests formula estimates tend to run low on this lift — here is what that means for your number."
+  exercise="deadlift"
+  lift="Deadlift"
+  example={{ weight: 315, reps: 3, unit: 'lb' }}
+  related={[LINKS.squat, LINKS.plates, LINKS.formulas, LINKS.test]}
+  sources={['lesuer', 'reynolds', 'hprc']}
+>
+  <section aria-labelledby="dl-estimate-heading">
+    <h2 id="dl-estimate-heading">How to estimate your deadlift max</h2>
+    <p class="answer">
+      Pull a weight you can lift for 2–5 clean reps, resetting each rep from the floor, and enter
+      the weight and reps above. For example, 315 lb × 3 estimates a deadlift max of roughly
+      334–359 lb — though your true max may be higher, because formulas have been found to
+      underestimate the deadlift.
+    </p>
+  </section>
+
+  <section aria-labelledby="dl-low-heading">
+    <h2 id="dl-low-heading">Why deadlift estimates may read low</h2>
+    <p>
+      In a study that compared seven published 1RM equations against tested maxes in the bench
+      press, squat and deadlift, <strong>every equation significantly underestimated the deadlift</strong>
+      (LeSuer et al., 1997). The study tested untrained college students, so the size of the gap
+      for experienced lifters is not known — but the direction is worth knowing.
+    </p>
+    <p>
+      A plausible explanation (our reasoning, not a finding of that study): on high-rep deadlift sets, grip and lower-back fatigue often end the set
+      before the legs and hips are truly exhausted. A single does not suffer from that fatigue, so
+      people can often lift more than a long set predicts. Lower-rep sets (2–5) reduce the problem.
+    </p>
+    <p>
+      Treat the deadlift estimate as a conservative guide. The top of the range, or a little above
+      the Average Estimate, may be closer to your real max — but do not program from an optimistic number.
+    </p>
+  </section>
+
+  <section aria-labelledby="dl-rep-heading">
+    <h2 id="dl-rep-heading">What counts as a clean deadlift rep</h2>
+    <ul>
+      <li><strong>Dead-stop reps give the most honest estimate.</strong> Bouncing the plates off the floor (touch-and-go) uses rebound and makes the set easier.</li>
+      <li><strong>Lockout counts:</strong> stand fully upright with hips and knees locked. No hitching the bar up the thighs.</li>
+      <li><strong>Use the same grip, stance (conventional or sumo) and equipment</strong> as the max you want to predict. Straps help grip on high-rep sets, so an estimate from strapped reps may not match an unstrapped max.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="dl-safety-heading">
+    <h2 id="dl-safety-heading">Deadlift safety for heavy sets</h2>
+    <ul>
+      <li>Stop the set when your back position changes noticeably — a rep with poor position is not worth the estimate.</li>
+      <li>Use plates of standard diameter so the bar starts at a consistent height.</li>
+      <li>Leave a rep or two in reserve on high-rep sets; deadlift fatigue accumulates quickly.</li>
+    </ul>
+  </section>
+</ExerciseLayout>

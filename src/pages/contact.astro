@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactEmail from '../components/ContactEmail.astro';
+import { webPageNode } from '../lib/schema';
+import { SITE } from '../config/site';
+
+const title = 'Contact StrengthCalc';
+const description =
+  'How to contact StrengthCalc with questions, corrections or suggestions about the one rep max calculators and guides.';
+const path = '/contact/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, type: 'ContactPage' })];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Contact', href: path }]} jsonLd={jsonLd}>
+  <article class="prose">
+    <h1>Contact {SITE.name}</h1>
+    <p class="answer">Email: <ContactEmail /></p>
+
+    <h2>What to write about</h2>
+    <ul>
+      <li><strong>Corrections:</strong> if a number, formula or claim looks wrong, tell us which page and what you expected. Calculation errors are treated as the top priority.</li>
+      <li><strong>Bugs:</strong> include the page, your device and browser, and the values you entered (a share link from the calculator is ideal).</li>
+      <li><strong>Suggestions:</strong> missing lifts, tools or explanations you would find useful.</li>
+    </ul>
+
+    <h2>What we can&rsquo;t help with</h2>
+    <p>
+      We can&rsquo;t give medical advice or individual training programs. For pain, injury or health
+      questions, please speak to a qualified healthcare professional.
+    </p>
+
+    <h2>Your message and privacy</h2>
+    <p>
+      We use your email address and message only to reply to you. We don&rsquo;t add you to a mailing
+      list or share your message. See the <a href="/privacy/">privacy policy</a>.
+    </p>
+  </article>
+</BaseLayout>

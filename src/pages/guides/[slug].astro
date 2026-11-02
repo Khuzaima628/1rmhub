@@ -1,0 +1,47 @@
+---
+// Guide article route: one static page per .mdx file in src/content/guides/.
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import SourceList from '../../components/SourceList.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { articleNode, webPageNode } from '../../lib/schema';
+import { LINKS } from '../../data/links';
+import { SITE, formatDate, isoDate } from '../../config/site';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides');
+  return guides.map((guide) => ({ params: { slug: guide.id }, props: { guide } }));
+}
+
+const { guide } = Astro.props;
+const { Content } = await render(guide);
+const { title, shortTitle, description, published, updated, sources, related } = guide.data;
+const path = `/guides/${guide.id}/`;
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+const relatedItems = related.map((key) => {
+  const item = LINKS[key as keyof typeof LINKS];
+  if (!item) throw new Error(`Unknown related link "${key}" in guide ${guide.id}`);
+  return item;
+});
+const jsonLd = [
+  webPageNode({ site, url, name: title, description }),
+  articleNode({ site, url, headline: title, description, published, updated }),
+];
+---
+<BaseLayout title={title} description={description} path={path} ogType="article"
+  published={isoDate(published)} modified={isoDate(updated ?? published)}
+  crumbs={[{ name: 'Guides', href: '/guides/' }, { name: shortTitle, href: path }]} jsonLd={jsonLd}>
+  <article class="prose">
+    <h1>{title}</h1>
+    <p class="page-meta">
+      By {SITE.name} · Published <time datetime={isoDate(published)}>{formatDate(published)}</time>
+      {updated && <> · Updated <time datetime={isoDate(updated)}>{formatDate(updated)}</time></>}
+    </p>
+    <Content />
+  </article>
+  <AdSlot />
+  {relatedItems.length > 0 && <RelatedLinks items={relatedItems} />}
+  {sources.length > 0 && <SourceList ids={sources} />}
+</BaseLayout>

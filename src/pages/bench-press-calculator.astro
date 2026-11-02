@@ -1,0 +1,66 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Bench Press Calculator — Estimate Your Bench 1RM"
+  description="Estimate your bench press one rep max from any set of 1–12 reps. Six formulas, the range between them, training percentages and plate loading."
+  path="/bench-press-calculator/"
+  name="Bench Press Calculator"
+  h1="Bench Press 1RM Calculator"
+  lead="Estimate your bench press max from a set you have already done — no max attempt needed. Enter the weight and the clean reps you completed."
+  exercise="bench-press"
+  lift="Bench press"
+  example={{ weight: 185, reps: 5, unit: 'lb' }}
+  related={[LINKS.percent, LINKS.warmup, LINKS.test, LINKS.ohp]}
+  sources={['mayhew', 'lesuer', 'reynolds', 'hprc']}
+>
+  <section aria-labelledby="bench-estimate-heading">
+    <h2 id="bench-estimate-heading">How to estimate your bench press max</h2>
+    <p class="answer">
+      Bench a weight you can lift for 3–6 clean reps, stop when the next rep would be a grind or
+      a miss, and enter the weight and reps above. The calculator returns six formula estimates and
+      their average — for example, 185 lb × 5 estimates a bench max of roughly 208–220 lb.
+    </p>
+    <p>
+      The bench press is the lift most 1RM equations were built around. Mayhew&rsquo;s formula was
+      fitted to bench-press data from college men and women, and later studies that compared
+      equations against tested maxes almost always included the bench (LeSuer et al., 1997;
+      Reynolds et al., 2006). That makes it the lift where formula estimates have been checked most.
+    </p>
+  </section>
+
+  <section aria-labelledby="bench-rep-heading">
+    <h2 id="bench-rep-heading">What counts as a clean bench rep</h2>
+    <ul>
+      <li><strong>Touch the chest every rep.</strong> Stopping a few inches short shortens the range of motion and inflates the estimate.</li>
+      <li><strong>No bouncing.</strong> Bouncing the bar off the chest adds momentum the formulas do not account for. A brief touch is fine; a pause is stricter still.</li>
+      <li><strong>Hips stay on the bench.</strong> Lifting the hips changes the pressing angle and makes reps easier than they should be.</li>
+      <li><strong>Same grip and setup as your heavy sets.</strong> A narrower or wider grip than usual will give a different number.</li>
+    </ul>
+    <p>
+      If you compete or test with a paused bench, estimate from paused reps too. Touch-and-go
+      reps are usually stronger than paused ones, so an estimate from touch-and-go sets can read
+      high for a paused max.
+    </p>
+  </section>
+
+  <section aria-labelledby="bench-safety-heading">
+    <h2 id="bench-safety-heading">Bench press safety for heavy sets</h2>
+    <ul>
+      <li>Use a spotter who knows when to take the bar, or bench inside a rack with safety arms set just below chest height.</li>
+      <li>Use a full grip with the thumb wrapped around the bar — a thumbless grip lets the bar roll out of your hands.</li>
+      <li>For a true max attempt, follow a structured protocol: see <a href="/guides/how-to-test-1rm/">how to test your 1RM safely</a>.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="bench-use-heading">
+    <h2 id="bench-use-heading">Using your bench estimate in training</h2>
+    <p>
+      Bench strength usually moves in small steps, so percentages matter. A 5% change on a 225 lb
+      bench is only about 11 lb. The <a href="/1rm-percentage-calculator/">percentage calculator</a>
+      rounds every working weight <em>down</em> to a loadable 5 lb or 2.5 kg step, and the
+      plate loader in your results shows exactly what goes on each side.
+    </p>
+  </section>
+</ExerciseLayout>

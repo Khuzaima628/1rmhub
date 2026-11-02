@@ -1,0 +1,18 @@
+---
+// Shared frame for Privacy, Terms and Disclaimer: dated, plain prose.
+import BaseLayout from './BaseLayout.astro';
+import { webPageNode } from '../lib/schema';
+import { SITE, formatDate } from '../config/site';
+
+interface Props { title: string; h1: string; description: string; path: string; name: string }
+const { title, h1, description, path, name } = Astro.props;
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description })];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name, href: path }]} jsonLd={jsonLd}>
+  <article class="prose">
+    <h1>{h1}</h1>
+    <p class="page-meta">Effective and last updated <time datetime={SITE.policyDate}>{formatDate(SITE.policyDate)}</time></p>
+    <slot />
+  </article>
+</BaseLayout>

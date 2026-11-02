@@ -1,0 +1,56 @@
+---
+// BaseLayout — shared shell for every page: <head>, header, breadcrumbs, footer.
+// Per-page SEO (title, description, canonical, JSON-LD) comes from Seo.astro.
+// WebSite + Organization nodes (and BreadcrumbList when crumbs are given) are
+// added here so every page carries the same site identity in its @graph.
+// Ads: see AdSlot.astro — renders nothing until PUBLIC_ADSENSE_CLIENT is set.
+import Seo from '../components/Seo.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { websiteNode, organizationNode, breadcrumbNode, type Crumb, type Node } from '../lib/schema';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Clean page path with trailing slash, e.g. '/plate-calculator/'. */
+  path: string;
+  /** Breadcrumb trail BELOW Home; the last item is the current page. */
+  crumbs?: Crumb[];
+  jsonLd?: Node[];
+  ogType?: 'website' | 'article';
+  published?: string;
+  modified?: string;
+  noindex?: boolean;
+}
+
+const { title, description, path, crumbs, jsonLd = [], ogType, published, modified, noindex } = Astro.props;
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const canonical = `${site}${path}`;
+const trail = crumbs?.length ? [{ name: 'Home', href: '/' }, ...crumbs] : null;
+const graph = noindex
+  ? []
+  : [websiteNode(site), organizationNode(site), ...(trail ? [breadcrumbNode(site, trail)] : []), ...jsonLd];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <Seo title={title} description={description} canonical={canonical} site={site}
+      ogType={ogType} published={published} modified={modified} noindex={noindex} jsonLd={graph} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <Header path={path} />
+    <main id="main" class="container">
+      {trail && <Breadcrumbs items={trail} />}
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

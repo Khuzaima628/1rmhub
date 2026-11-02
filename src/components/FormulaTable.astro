@@ -1,0 +1,26 @@
+---
+// The six formulas with their equations, origin and measured behaviour.
+import { FORMULAS } from '../lib/onerepmax.js';
+import { FORMULA_NOTES } from '../data/formulas';
+interface Props { caption?: string }
+const { caption = 'The six 1RM estimation formulas used by StrengthCalc' } = Astro.props;
+---
+<div class="table-wrap">
+  <table>
+    <caption>{caption}</caption>
+    <thead>
+      <tr><th scope="col">Formula</th><th scope="col">Equation</th><th scope="col">Origin</th><th scope="col">How it behaves</th></tr>
+    </thead>
+    <tbody>
+      {FORMULAS.map((f) => (
+        <tr>
+          <th scope="row">{f.name}</th>
+          <td><code>{f.equation}</code></td>
+          <td>{FORMULA_NOTES[f.id].origin}</td>
+          <td>{FORMULA_NOTES[f.id].behaviour}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<p class="disclaimer"><em>w</em> = weight lifted, <em>r</em> = reps completed, <em>e</em> ≈ 2.718.</p>

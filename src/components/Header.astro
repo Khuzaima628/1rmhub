@@ -1,0 +1,18 @@
+---
+// Site header: brand + primary navigation to the main tools and guides.
+// The current section is marked with aria-current for users and styling.
+import { NAV } from '../config/site';
+interface Props { path: string }
+const { path } = Astro.props;
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label="StrengthCalc home">Strength<span>Calc</span></a>
+    <nav class="site-nav" aria-label="Primary">
+      {NAV.map((item) => (
+        <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>

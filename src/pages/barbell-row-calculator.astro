@@ -1,0 +1,57 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Barbell Row Calculator — Estimate Your Row 1RM"
+  description="Estimate a barbell row one rep max for programming from a set of 1–12 reps. Six formulas, why row estimates are less reliable, and loadable weights."
+  path="/barbell-row-calculator/"
+  name="Barbell Row Calculator"
+  h1="Barbell Row 1RM Calculator"
+  lead="Estimate a barbell row max to set training percentages. Rows are rarely tested as a single, so treat the number as a programming tool rather than a target."
+  exercise="barbell-row"
+  lift="Barbell row"
+  example={{ weight: 135, reps: 8, unit: 'lb' }}
+  related={[LINKS.deadlift, LINKS.percent, LINKS.home, LINKS.formulas]}
+  sources={['lesuer', 'reynolds']}
+>
+  <section aria-labelledby="row-estimate-heading">
+    <h2 id="row-estimate-heading">How to estimate your barbell row max</h2>
+    <p class="answer">
+      Row a weight you can lift for 5–8 strict reps, with the same torso angle on every rep, and enter
+      the weight and reps above. For example, 135 lb × 8 estimates a row max of roughly 162–172 lb.
+      Because form varies so much on rows, treat this as the least reliable of our lift estimates.
+    </p>
+  </section>
+
+  <section aria-labelledby="row-reliable-heading">
+    <h2 id="row-reliable-heading">Why row estimates are less reliable</h2>
+    <ul>
+      <li><strong>No formula was validated on rows.</strong> The studies we cite tested the bench press, squat, deadlift and leg press.</li>
+      <li><strong>Form drifts as sets get hard.</strong> The torso rises, the hips start to help and the range shortens — each makes later reps easier than a strict single.</li>
+      <li><strong>Rows are usually trained at higher reps</strong> (often 6–12), where every formula is less accurate.</li>
+    </ul>
+    <p>
+      For tracking progress, a rep record at a fixed strictness — say, the most strict reps with
+      155 lb — is often more meaningful than an estimated max.
+    </p>
+  </section>
+
+  <section aria-labelledby="row-rep-heading">
+    <h2 id="row-rep-heading">What counts as a strict row rep</h2>
+    <ul>
+      <li>Pick a torso angle (for example, roughly parallel to the floor for a Pendlay-style row) and keep it for every rep.</li>
+      <li>Pull the bar to the same point on the torso each rep, with no hip drive or bounce.</li>
+      <li>Lower the bar under control. If you need momentum, the set is over.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="row-use-heading">
+    <h2 id="row-use-heading">Using your row estimate in training</h2>
+    <p>
+      Use the estimate to pick working weights from the percentage table, then adjust by feel in
+      the first session. If the prescribed reps feel easy at your normal strictness, the estimate
+      was conservative; if form breaks, it was optimistic — lower it rather than loosening your form.
+    </p>
+  </section>
+</ExerciseLayout>

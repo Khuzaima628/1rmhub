@@ -1,0 +1,25 @@
+---
+// Guides hub: lists every guide plus the methodology page.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { webPageNode } from '../../lib/schema';
+import { LINKS } from '../../data/links';
+
+const title = 'Strength Training Guides — 1RM Formulas & Testing';
+const description =
+  'Plain-language guides to one rep max formulas, how to test your 1RM safely, and exactly how StrengthCalc calculates every number.';
+const path = '/guides/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const guides = (await getCollection('guides')).sort((a, b) => a.data.published.getTime() - b.data.published.getTime());
+const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, type: 'CollectionPage' })];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Guides', href: path }]} jsonLd={jsonLd}>
+  <h1>Guides</h1>
+  <p class="lead">Short, sourced explanations of the numbers behind the calculators.</p>
+  <ul class="link-grid">
+    {guides.map((g) => (
+      <li><a href={`/guides/${g.id}/`}>{g.data.shortTitle}</a><p>{g.data.description}</p></li>
+    ))}
+    <li><a href={LINKS.methodology.href}>{LINKS.methodology.title}</a><p>{LINKS.methodology.text}</p></li>
+  </ul>
+</BaseLayout>

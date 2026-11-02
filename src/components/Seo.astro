@@ -1,0 +1,50 @@
+---
+// Seo.astro — every page's metadata in one place so no page can forget it.
+// Rules enforced here:
+// - <title> and description are written per page (titles ≤ ~60 characters).
+// - Canonical is an absolute URL from the single `site` config value —
+//   shareable calculator URLs carry query parameters, but the canonical
+//   ALWAYS points to the clean URL (no parameters), so no duplicate
+//   indexable pages can exist.
+// - JSON-LD must describe what is visibly on the page — nothing more.
+import { SITE } from '../config/site';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  site: string;
+  ogType?: 'website' | 'article';
+  published?: string;
+  modified?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { title, description, canonical, site, ogType = 'website', published, modified, noindex = false, jsonLd } = Astro.props;
+const image = `${site}/og-image.png`;
+// Escape "<" so no string inside the data can close the script element.
+const jsonLdText = jsonLd?.length
+  ? JSON.stringify({ '@context': 'https://schema.org', '@graph': jsonLd }).replace(/</g, '\\u003c')
+  : null;
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+{noindex ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={canonical} />}
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+{!noindex && <meta property="og:url" content={canonical} />}
+<meta property="og:image" content={image} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="StrengthCalc — free one rep max calculator" />
+{published && <meta property="article:published_time" content={published} />}
+{modified && <meta property="article:modified_time" content={modified} />}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+{jsonLdText && <script type="application/ld+json" set:html={jsonLdText} />}

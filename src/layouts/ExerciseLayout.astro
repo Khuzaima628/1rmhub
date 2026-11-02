@@ -1,0 +1,64 @@
+---
+// Shared frame for the lift-specific calculator pages. The calculator and
+// worked example are common; the lift-specific guidance comes from each
+// page's slot, so every page carries content unique to that exercise.
+import BaseLayout from './BaseLayout.astro';
+import OneRepMaxCalculator from '../components/OneRepMaxCalculator.astro';
+import WorkedExample from '../components/WorkedExample.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { SITE, formatDate } from '../config/site';
+
+interface Item { href: string; title: string; text: string }
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  /** Breadcrumb / short name, e.g. "Bench Press Calculator". */
+  name: string;
+  h1: string;
+  lead: string;
+  exercise: string;
+  lift: string;
+  example: { weight: number; reps: number; unit: 'kg' | 'lb' };
+  related: Item[];
+  sources: string[];
+}
+const { title, description, path, name, h1, lead, exercise, lift, example, related, sources } = Astro.props;
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webAppNode({
+    site, url, name: `StrengthCalc ${name}`, description,
+    features: ['Six-formula 1RM estimates with range', 'Percentage training table', 'Plate loader', 'Warm-up generator'],
+  }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name, href: path }]} jsonLd={jsonLd}>
+  <h1>{h1}</h1>
+  <p class="lead">{lead}</p>
+  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · <a href="/methodology/">How we calculate</a></p>
+
+  <OneRepMaxCalculator exercise={exercise} heading={`${lift} 1RM calculator`} />
+
+  <div class="prose">
+    <slot />
+
+    <section aria-labelledby="example-heading">
+      <h2 id="example-heading">Worked example</h2>
+      <WorkedExample weight={example.weight} reps={example.reps} unit={example.unit} lift={lift} />
+      <p>
+        Use the range, not just the middle number: plan training from the Average Estimate or
+        lower, and treat the top of the range as optimistic.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={related} />
+  <SourceList ids={sources} />
+</BaseLayout>

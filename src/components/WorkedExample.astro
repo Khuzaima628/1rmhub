@@ -1,0 +1,23 @@
+---
+// A worked example computed at build time with the calculator's own code,
+// so the numbers in the prose can never drift from what the tool outputs.
+import { estimateAll } from '../lib/onerepmax.js';
+interface Props { weight: number; reps: number; unit: 'kg' | 'lb'; lift: string }
+const { weight, reps, unit, lift } = Astro.props;
+const est = estimateAll(weight, reps);
+const f1 = (v: number) => v.toFixed(1);
+---
+<div class="table-wrap">
+  <table>
+    <caption>Worked example: {lift}, {weight} {unit} × {reps} reps</caption>
+    <thead><tr><th scope="col">Formula</th><th scope="col" class="num">Estimated 1RM</th></tr></thead>
+    <tbody>
+      {est.rows.map((r) => <tr><th scope="row">{r.name}</th><td class="num">{f1(r.value)} {unit}</td></tr>)}
+      <tr class="primary-row"><th scope="row">Average Estimate</th><td class="num">{f1(est.average)} {unit}</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The six formulas put this set between <strong>{f1(est.min)}</strong> and <strong>{f1(est.max)} {unit}</strong>
+  — a {est.spreadPct.toFixed(1)}% spread — with an Average Estimate of {f1(est.average)} {unit}.
+</p>

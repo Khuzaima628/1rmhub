@@ -1,0 +1,59 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Overhead Press Calculator — Estimate Your OHP 1RM"
+  description="Estimate your strict overhead press one rep max from a set of 1–12 reps. Six formulas, what makes a strict rep, and how to plan small loadable jumps."
+  path="/overhead-press-calculator/"
+  name="Overhead Press Calculator"
+  h1="Overhead Press 1RM Calculator"
+  lead="Estimate your strict standing overhead press max from a recent set. The press moves in small steps, so the rounding of your training weights matters."
+  exercise="overhead-press"
+  lift="Overhead press"
+  example={{ weight: 115, reps: 5, unit: 'lb' }}
+  related={[LINKS.bench, LINKS.percent, LINKS.plates, LINKS.formulas]}
+  sources={['lesuer', 'reynolds', 'hprc']}
+>
+  <section aria-labelledby="ohp-estimate-heading">
+    <h2 id="ohp-estimate-heading">How to estimate your overhead press max</h2>
+    <p class="answer">
+      Press a weight you can lift for 3–6 strict reps, standing, with no leg drive, and enter the
+      weight and reps above. For example, 115 lb × 5 estimates an overhead press max of roughly
+      129–137 lb.
+    </p>
+    <p>
+      None of the six formulas was built specifically for the overhead press, and the validation
+      studies we cite tested the bench press, squat, deadlift and leg press. The estimate is still a
+      reasonable guide, but expect more individual variation than on the bench press.
+    </p>
+  </section>
+
+  <section aria-labelledby="ohp-strict-heading">
+    <h2 id="ohp-strict-heading">Strict press vs. push press</h2>
+    <ul>
+      <li><strong>Strict press:</strong> knees stay locked; the bar starts from the shoulders and is pressed overhead to lockout. This is what the calculator assumes.</li>
+      <li><strong>Push press:</strong> a dip and drive from the legs launches the bar. If any rep in your set used leg drive, the estimate will read high for a strict max.</li>
+      <li><strong>Excessive layback</strong> turns the press into a steep incline press and also inflates the number. Keep the torso as upright as your technique allows.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="ohp-jumps-heading">
+    <h2 id="ohp-jumps-heading">Small jumps matter on the press</h2>
+    <p>
+      A 5 lb jump on a 135 lb press is almost 4% — far bigger, relatively, than the same jump on a
+      deadlift. StrengthCalc&rsquo;s training tables round <em>down</em> to the smallest standard step
+      (5 lb or 2.5 kg). If your gym has fractional plates, set them in the
+      <a href="/plate-calculator/">plate calculator</a> to load exactly.
+    </p>
+  </section>
+
+  <section aria-labelledby="ohp-safety-heading">
+    <h2 id="ohp-safety-heading">Overhead press safety</h2>
+    <ul>
+      <li>Press inside a rack with the safety pins set just below the shoulders, or with a spotter for a true max attempt.</li>
+      <li>Brace the trunk and squeeze the glutes to limit layback on heavy reps.</li>
+      <li>Stop the set if your lower back starts to arch to finish reps.</li>
+    </ul>
+  </section>
+</ExerciseLayout>

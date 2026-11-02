@@ -1,0 +1,17 @@
+---
+// Breadcrumb trail for pages below the homepage (the homepage never renders
+// it). The last item is the current page. BaseLayout emits the matching
+// BreadcrumbList JSON-LD from the same array, so they cannot drift apart.
+import type { Crumb } from '../lib/schema';
+interface Props { items: Crumb[] }
+const { items } = Astro.props;
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    {items.map((item, i) => (
+      <li>
+        {i < items.length - 1 ? <a href={item.href}>{item.name}</a> : <span aria-current="page">{item.name}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>

@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/sitemap": "^3.0.0",
+    "astro": "^5.0.0"
+  },
+  "description": "StrengthCalc — free one rep max (1RM) calculator. Astro static site, no backend.",
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  },
+  "name": "strengthcalc",
+  "private": true,
+  "scripts": {
+    "astro": "astro",
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run tests/unit",
+    "test:site": "vitest run tests/site",
+    "verify": "npm run test && npm run build && npm run test:site"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}

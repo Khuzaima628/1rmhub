@@ -1,0 +1,14 @@
+---
+// 404 page — served by Cloudflare Pages for unknown paths with a real 404
+// status. Marked noindex and excluded from the sitemap.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { LINKS } from '../data/links';
+const links = [LINKS.home, LINKS.percent, LINKS.plates, LINKS.warmup, LINKS.formulas];
+---
+<BaseLayout title="Page not found — StrengthCalc" description="This page does not exist. Try the one rep max calculator or one of our other tools." path="/404/" noindex>
+  <h1>Page not found</h1>
+  <p class="lead">Sorry — that page doesn&rsquo;t exist or has moved. These might be what you were looking for:</p>
+  <ul class="link-grid">
+    {links.map((l) => <li><a href={l.href}>{l.title}</a><p>{l.text}</p></li>)}
+  </ul>
+</BaseLayout>

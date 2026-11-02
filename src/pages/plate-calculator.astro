@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PlateLoader from '../components/PlateLoader.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { solvePlates, KG_PLATES, LB_PLATES } from '../lib/onerepmax.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { SITE, formatDate } from '../config/site';
+
+const title = 'Plate Calculator — What Plates to Put on the Bar';
+const description =
+  'Barbell plate calculator: enter a target weight and see which plates go on each side, in lb or kg. Set your bar and plates; it never loads over your target.';
+const path = '/plate-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+// Reference tables built with the same solver the tool uses.
+const lbRows = [95, 135, 185, 225, 275, 315, 365, 405].map((t) => ({ t, ...solvePlates(t, 45, LB_PLATES) }));
+const kgRows = [40, 60, 80, 100, 120, 140, 160, 180].map((t) => ({ t, ...solvePlates(t, 20, KG_PLATES) }));
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webAppNode({ site, url, name: 'StrengthCalc Plate Calculator', description,
+    features: ['Per-side plate breakdown', 'Custom bar weight', 'Choose available plate sizes', 'Never exceeds the target weight'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Plate Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>Plate Calculator</h1>
+  <p class="lead">
+    Enter the weight you want on the bar and see exactly which plates to load on each side.
+    Choose your bar and the plate sizes your gym actually has.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time></p>
+
+  <section class="card calculator" aria-labelledby="plate-heading">
+    <h2 id="plate-heading">Barbell plate calculator</h2>
+    <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled. The reference tables below work without it.</p></noscript>
+    <PlateLoader id="plate-tool" unit={SITE.defaultUnit} />
+  </section>
+
+  <div class="prose">
+    <section aria-labelledby="how-plates-heading">
+      <h2 id="how-plates-heading">How to work out which plates to load</h2>
+      <p class="answer">
+        Subtract the bar weight from your target and divide by two — that is the weight for each side.
+        Then build it from the largest plates down. For 225 lb on a 45 lb bar: (225 − 45) ÷ 2 = 90 lb
+        per side, which is two 45 lb plates.
+      </p>
+      <p>
+        When you untick plates you don&rsquo;t have, the &ldquo;largest first&rdquo; shortcut can miss
+        a better answer. With only 20 kg and 15 kg plates, 30 kg per side is two 15s — but largest-first
+        stops at one 20. StrengthCalc searches every combination of the sizes you selected, so it always
+        finds the heaviest load that does not exceed your target, using the fewest plates.
+      </p>
+    </section>
+
+    <section aria-labelledby="ref-heading">
+      <h2 id="ref-heading">Common barbell weights: plates per side</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>Pounds, 45 lb bar, standard plates (45, 35, 25, 10, 5, 2.5 lb)</caption>
+          <thead><tr><th scope="col" class="num">Total</th><th scope="col">Plates on each side</th></tr></thead>
+          <tbody>
+            {lbRows.map((r) => <tr><th scope="row" class="num">{r.t} lb</th><td>{r.perSide.join(' + ')}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption>Kilograms, 20 kg bar, standard plates (25, 20, 15, 10, 5, 2.5, 1.25 kg)</caption>
+          <thead><tr><th scope="col" class="num">Total</th><th scope="col">Plates on each side</th></tr></thead>
+          <tbody>
+            {kgRows.map((r) => <tr><th scope="row" class="num">{r.t} kg</th><td>{r.perSide.join(' + ')}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="bar-heading">
+      <h2 id="bar-heading">Know your bar weight</h2>
+      <ul>
+        <li><strong>Men&rsquo;s Olympic bar:</strong> 20 kg (about 44 lb). In US gyms, bars are commonly sold as 45 lb.</li>
+        <li><strong>Women&rsquo;s Olympic bar:</strong> 15 kg (about 33 lb).</li>
+        <li><strong>Technique, EZ-curl and specialty bars</strong> vary widely — check the marking on the bar or weigh it, then use the custom bar option.</li>
+        <li><strong>Collars</strong> usually weigh little, but competition collars are 2.5 kg each. Add them to a custom bar weight if you use them.</li>
+      </ul>
+      <p>
+        Also check your plates: gym plates are often a little lighter or heavier than marked, so a
+        &ldquo;loaded&rdquo; weight is only as accurate as the plates on the bar.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.warmup, LINKS.percent, LINKS.home, LINKS.ohp]} />
+</BaseLayout>

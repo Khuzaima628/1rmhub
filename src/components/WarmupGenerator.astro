@@ -1,0 +1,156 @@
+---
+// Warm-up generator: a ramp of sets up to a top set, with loadable weights.
+//
+// Standalone (warm-up calculator page): own kg/lb toggle.
+// Linked (inside the 1RM calculator's results): on sc:result the top set is
+// prefilled with the set the lifter actually entered (weight × reps) — a set
+// they have already done, never an untested max.
+import UnitToggle from './UnitToggle.astro';
+import GearFields from './GearFields.astro';
+import { WARMUP_DEFAULT_PERCENTS, WARMUP_DEFAULT_REPS } from '../lib/onerepmax.js';
+
+interface Props {
+  id: string;
+  unit: 'kg' | 'lb';
+  linked?: boolean;
+  gearId?: string;
+}
+const { id, unit, linked = false, gearId } = Astro.props;
+const gid = gearId ?? `${id}-gear`;
+---
+<div class="tool" id={id} data-warmup data-linked={linked ? 'true' : undefined} data-gear-id={gid}>
+  <form data-warmup-form novalidate>
+    <div class="field-row">
+      {!linked && <UnitToggle id={`${id}-unit`} unit={unit} />}
+      <div class="field">
+        <label for={`${id}-top`}>Top set weight (<span data-unit-label>{unit}</span>)</label>
+        <input id={`${id}-top`} type="number" inputmode="decimal" min="0" step="any"
+          placeholder={unit === 'kg' ? '100' : '225'} autocomplete="off" data-top />
+      </div>
+      <div class="field">
+        <label for={`${id}-top-reps`}>Top set reps</label>
+        <input id={`${id}-top-reps`} type="number" inputmode="numeric" min="1" max="20" step="1" value="5" data-top-reps />
+      </div>
+      <div class="field">
+        <label for={`${id}-start`}>Start at (<span data-unit-label>{unit}</span>) <span class="hint">blank = empty bar</span></label>
+        <input id={`${id}-start`} type="number" inputmode="decimal" min="0" step="any" placeholder="bar" data-start />
+      </div>
+    </div>
+    <div class="field-row two">
+      <div class="field">
+        <label for={`${id}-jumps`}>Jumps <span class="hint">(% of top set, comma-separated)</span></label>
+        <input id={`${id}-jumps`} type="text" inputmode="decimal" value={WARMUP_DEFAULT_PERCENTS.join(', ')} data-jumps />
+      </div>
+      <div class="field">
+        <label for={`${id}-reps`}>Warm-up reps <span class="hint">(start set first, comma-separated)</span></label>
+        <input id={`${id}-reps`} type="text" inputmode="numeric" value={WARMUP_DEFAULT_REPS.join(', ')} data-reps />
+      </div>
+    </div>
+    {!gearId && <GearFields id={gid} unit={unit} />}
+    <p class="disclaimer">
+      A starting suggestion — adjust sets, jumps and weights by feel, equipment and the lift.
+      Never a prescription. One warm-up set is added per jump, after the starting set.
+    </p>
+    <div class="actions"><button type="submit" class="btn">Generate warm-up</button></div>
+  </form>
+  <div data-warmup-result aria-live="polite"></div>
+</div>
+
+<script>
+  import { warmupSets, solvePlates, validateWeight, MAX_WEIGHT } from '../lib/onerepmax.js';
+  import { bindUnitToggle, convertInput, esc, num, paintUnitLabels, parseList } from '../scripts/dom.js';
+  import { getGear } from '../scripts/gear.js';
+
+  function init(root: HTMLElement) {
+    const gear = getGear(document.getElementById(root.dataset.gearId!)!);
+    const q = <T extends Element = HTMLInputElement>(sel: string) => root.querySelector(sel) as unknown as T;
+    const form = q<HTMLFormElement>('[data-warmup-form]');
+    const top = q('[data-top]'), topReps = q('[data-top-reps]'), start = q('[data-start]');
+    const jumps = q('[data-jumps]'), reps = q('[data-reps]');
+    const out = q<HTMLElement>('[data-warmup-result]');
+    let unit = gear.getUnit();
+
+    const setUnit = (u: string) => { unit = u; gear.setUnit(u); paintUnitLabels(root, u); };
+    const fail = (msg: string) => { out.innerHTML = `<p class="error">${esc(msg)}</p>`; };
+
+    function generate() {
+      const t = validateWeight(top.value, 'your top-set weight');
+      if (!t.ok) return fail(t.error);
+      const tr = Number(topReps.value);
+      if (!Number.isInteger(tr) || tr < 1 || tr > 20) return fail('Top-set reps must be a whole number from 1 to 20.');
+      const bar = gear.bar();
+      if (!bar.ok) return fail(bar.error);
+
+      let startWeight = bar.value;
+      if (start.value.trim() !== '') {
+        startWeight = Number(start.value);
+        if (!Number.isFinite(startWeight) || startWeight < 0 || startWeight > MAX_WEIGHT) {
+          return fail('The starting weight must be zero or more (leave it blank to start with the empty bar).');
+        }
+      }
+      const pcts = parseList(jumps.value);
+      if (!pcts || pcts.some((p: number) => p <= 0 || p >= 100)) {
+        return fail('Jumps must be percentages between 1 and 99, separated by commas (for example 50, 70, 85).');
+      }
+      const repList = parseList(reps.value);
+      if (!repList || repList.some((r: number) => !Number.isInteger(r) || r < 1 || r > 20)) {
+        return fail('Warm-up reps must be whole numbers from 1 to 20, separated by commas (for example 8, 5, 3, 1).');
+      }
+
+      const sets = warmupSets({ topWeight: t.value, topReps: tr, startWeight, percents: pcts, repsPerSet: repList });
+      const platesRes = gear.plates();
+      if (!platesRes.ok) return fail(platesRes.error);
+      const plates = platesRes.value;
+      const rows = sets.map((s: { label: string; weight: number; reps: number; pct: number }) => {
+        let loadCell: string;
+        if (s.weight < bar.value) {
+          loadCell = '<span class="hint">lighter than the bar</span>';
+        } else {
+          const solved = solvePlates(s.weight, bar.value, plates);
+          const perSide = solved.perSide.length ? `${solved.perSide.map((p: number) => num(p)).join(' + ')} / side` : 'bar only';
+          loadCell = `${esc(num(solved.loaded))} ${unit}<br><span class="hint">${esc(perSide)}</span>`;
+        }
+        return `<tr><th scope="row">${esc(s.label)}</th>
+          <td class="num">${esc(num(s.weight, 1))} ${unit}</td>
+          <td class="num">${Math.round(s.pct)}%</td>
+          <td class="num">${s.reps}</td>
+          <td class="num">${loadCell}</td></tr>`;
+      }).join('');
+
+      const warmupCount = sets.length - 1;
+      const requested = new Set(pcts).size + (startWeight > 0 && startWeight < t.value ? 1 : 0);
+      const skipped = requested - warmupCount;
+      const skippedNote = skipped > 0
+        ? `<p class="disclaimer">${skipped} jump${skipped > 1 ? 's were' : ' was'} skipped because it fell at or below your starting weight.</p>`
+        : '';
+
+      out.innerHTML = `<div class="table-wrap"><table>
+        <caption>Suggested warm-up to ${esc(num(t.value))} ${unit} × ${tr} — adjust by feel; not a prescription</caption>
+        <thead><tr><th scope="col">Set</th><th scope="col" class="num">Target</th><th scope="col" class="num">% of top</th>
+          <th scope="col" class="num">Reps</th><th scope="col" class="num">Loadable (rounded down)</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>${skippedNote}`;
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); generate(); });
+    gear.onChange(() => { if (out.innerHTML) generate(); });
+
+    if (root.dataset.linked) {
+      document.addEventListener('sc:result', (e: Event) => {
+        const { unit: u, weight, reps: r } = (e as CustomEvent).detail;
+        setUnit(u);
+        top.value = num(weight);
+        topReps.value = String(r);
+        generate();
+      });
+    } else {
+      bindUnitToggle(root.querySelector('[data-unit-toggle]')!, (next: string, prev: string) => {
+        convertInput(top, prev, next);
+        convertInput(start, prev, next);
+        setUnit(next);
+        out.innerHTML = '';
+      });
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-warmup]').forEach(init);
+</script>

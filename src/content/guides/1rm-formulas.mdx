@@ -1,0 +1,91 @@
+---
+title: '1RM Formulas Compared: Epley, Brzycki and 4 More'
+shortTitle: '1RM Formula Guide'
+description: 'The six one rep max formulas side by side, rep by rep: where each reads high or low, why they disagree, and when an estimate stops being reliable.'
+published: 2026-11-02
+sources: ['epley', 'brzycki', 'lombardi', 'mayhew', 'oconner', 'wathan', 'lesuer', 'reynolds']
+related: ['home', 'percent', 'test', 'methodology']
+---
+import FormulaTable from '../../components/FormulaTable.astro';
+import FormulaGridTable from '../../components/FormulaGridTable.astro';
+
+<p class="answer">
+  <strong>Which 1RM formula is most accurate?</strong> None is best for everyone. The six common
+  formulas were built from different lifters and different maths, and studies have found their
+  accuracy changes with the exercise and the number of reps. For a set of 3–6 hard reps they all
+  land within about 6–8% of each other; above 10 reps they drift much further apart.
+</p>
+
+## What a 1RM formula does
+
+A one rep max (1RM) formula predicts the heaviest single you could lift from a set you did for
+several reps. Every formula takes the weight lifted (*w*) and the reps completed (*r*) and returns
+an estimated 1RM. The difference between them is the *shape* of the relationship they assume:
+
+- **Linear** formulas (Epley, O'Conner) add a fixed percentage per rep.
+- **Brzycki** rises slowly at first and then steeply as reps climb.
+- **Lombardi** is a power curve that flattens out at higher reps.
+- **Mayhew** and **Wathan** are exponential curves fitted to measured data.
+
+<FormulaTable />
+
+## The formulas compared, rep by rep
+
+The table below shows each formula's estimate as a percentage of the weight you lifted. It is
+generated from the same code the [calculator](/) runs, so the two always match.
+
+<FormulaGridTable />
+
+### What the comparison shows
+
+- **The formulas agree most closely at 5–7 reps**, where the spread is under 6%.
+- **They disagree more at 1–3 reps**, mostly because Mayhew is not anchored to a single: for one
+  rep it returns about 109% of the weight, so it reads high on very heavy sets. (StrengthCalc
+  never estimates from a single — 1 rep returns the weight you lifted.)
+- **They diverge most above 10 reps.** At 12 reps the spread is over 12%: Brzycki has become the
+  highest estimate and Lombardi the lowest.
+- **O'Conner is the most conservative formula from 6 to 10 reps**; Wathan is the most generous
+  from 7 to 10.
+
+## Why the formulas disagree
+
+Each equation was developed from a different group of people, a different lift or a different
+method. Epley's formula comes from a coaching chart; Mayhew's was fitted to bench-press data
+from college men and women; Wathen's appeared in an NSCA textbook. None was designed to be
+universal, so none should be expected to fit every lifter on every lift.
+
+Your own muscular endurance matters too. Two lifters with the same 1RM can do very different
+numbers of reps at 80% of it — and a formula can only assume an average.
+
+## What research says about accuracy
+
+- In a comparison of seven equations against tested maxes in college students, predictions were
+  strongly correlated with real 1RMs, but **every equation significantly underestimated the
+  deadlift** (LeSuer et al., 1997). Accuracy, in other words, depends on the lift.
+- In a study of 70 adults, predictions from a **5-rep maximum were more accurate than from 10- or
+  20-rep maximums** (Reynolds et al., 2006).
+
+Both findings point the same way: estimate from a heavy set of roughly 3–6 reps, and expect
+lift-to-lift differences.
+
+## When estimates become less reliable
+
+- **More than about 10 reps.** The formulas diverge and fatigue, not strength, ends the set.
+  StrengthCalc warns above 10 reps and shows no number above 12.
+- **Reps that were not to (or near) failure.** If you could have done two more, the estimate
+  reads low.
+- **Inconsistent technique** — bounced, half-range or loosened reps make the set easier than a
+  strict single and inflate the estimate.
+- **Lifts the formulas were not studied on**, such as rows or isolation exercises.
+
+## Why StrengthCalc shows all six, plus an average
+
+Showing one formula hides how uncertain an estimate is. StrengthCalc shows all six and the
+**Average Estimate** — the plain arithmetic mean of the six. The average is a convenient summary
+of where the formulas cluster; it is *not* a scientifically validated consensus, and we do not
+claim it beats any individual formula. The spread between the lowest and highest result is just
+as important: a wide spread is a sign to treat the number cautiously.
+
+Lander's formula, which appears on some calculators, is not included until its equation can be
+verified against its original published source. See the [methodology](/methodology/) for every
+other rule the calculator follows.

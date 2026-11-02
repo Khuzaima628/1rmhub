@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactEmail from '../components/ContactEmail.astro';
+import { webPageNode } from '../lib/schema';
+import { SITE } from '../config/site';
+
+const title = 'About StrengthCalc — Free, Transparent 1RM Calculators';
+const description =
+  'Who runs StrengthCalc, why it exists, how it is funded, and the principles behind its free one rep max calculators.';
+const path = '/about/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, type: 'AboutPage' })];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'About', href: path }]} jsonLd={jsonLd}>
+  <article class="prose">
+    <h1>About {SITE.name}</h1>
+    <p class="answer">
+      {SITE.name} is an independent website offering free one rep max (1RM) calculators and
+      plain-language guides for people who lift weights. Every result shows its working: the
+      formulas used, the range between them and the limits of an estimate.
+    </p>
+
+    <h2>Why it exists</h2>
+    <p>
+      Most 1RM calculators show one number from one formula, with no hint of how uncertain it is.
+      {SITE.name} shows all six common formulas side by side, explains where each reads high or
+      low, and rounds training weights to loads you can actually put on a bar — never above the
+      number you asked for.
+    </p>
+
+    <h2>Principles</h2>
+    <ul>
+      <li><strong>Transparent:</strong> every equation, rounding rule and limit is published in the <a href="/methodology/">methodology</a>.</li>
+      <li><strong>Honest about uncertainty:</strong> estimates are labelled as estimates, with warnings where they become unreliable.</li>
+      <li><strong>Sourced:</strong> factual claims cite published research or recognised textbooks, and our own reasoning is labelled as such.</li>
+      <li><strong>Private by design:</strong> calculations run in your browser. There are no accounts and nothing you enter is sent to us.</li>
+      <li><strong>Free:</strong> no signup, no paywall.</li>
+    </ul>
+
+    <h2>Who runs it</h2>
+    <p>
+      {SITE.name} is operated independently under the {SITE.name} name and is written and
+      maintained by its editor. The site does not give medical or individual coaching advice; where
+      that matters, we point you to qualified professionals.
+    </p>
+
+    <h2>How the site is funded</h2>
+    <p>
+      {SITE.name} currently shows no advertising and earns no money. In future it may display
+      advertising (such as Google AdSense) to cover its costs. If it does, ads will be clearly
+      labelled, kept away from the calculators&rsquo; inputs and results, and will never influence
+      how anything is calculated. The <a href="/privacy/">privacy policy</a> will be updated before
+      any ads appear.
+    </p>
+
+    <h2>Contact</h2>
+    <p>Questions, corrections and suggestions are welcome: <ContactEmail />. See the <a href="/contact/">contact page</a> for details.</p>
+  </article>
+</BaseLayout>

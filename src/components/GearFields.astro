@@ -1,0 +1,36 @@
+---
+// "Your bar and plates" settings, shared by the plate loader and warm-up
+// generator (src/scripts/gear.js). Options for the initial unit are rendered
+// at build time, so the block is complete before any script runs.
+import { BAR_PRESETS, KG_PLATES, LB_PLATES } from '../lib/onerepmax.js';
+interface Props { id: string; unit: 'kg' | 'lb' }
+const { id, unit } = Astro.props;
+const presets = BAR_PRESETS.filter((b) => b.unit === unit);
+const plates = unit === 'kg' ? KG_PLATES : LB_PLATES;
+---
+<fieldset class="gear" id={id} data-gear data-unit={unit}>
+  <legend>Your bar and plates</legend>
+  <div class="field-row two">
+    <div class="field">
+      <label for={`${id}-bar`}>Bar weight</label>
+      <select id={`${id}-bar`} data-gear-bar>
+        {presets.map((b, i) => <option value={b.value} selected={i === 0}>{b.label}</option>)}
+        <option value="custom">Custom…</option>
+      </select>
+    </div>
+    <div class="field" data-gear-custom-wrap hidden>
+      <label for={`${id}-custom`}>Custom bar weight (<span data-unit-label>{unit}</span>)</label>
+      <input id={`${id}-custom`} type="number" inputmode="decimal" min="0" step="any" value={presets[0].value} data-gear-custom />
+    </div>
+  </div>
+  <fieldset class="plate-fieldset">
+    <legend>Plate sizes you have <span class="hint">(any number of each)</span></legend>
+    <div class="plate-checks" data-gear-plates>
+      {plates.map((p) => <label><input type="checkbox" value={p} checked /> {p} {unit}</label>)}
+    </div>
+    <div class="field">
+      <label for={`${id}-extra`}>Extra plate sizes (<span data-unit-label>{unit}</span>) <span class="hint">optional, comma-separated — e.g. fractional plates</span></label>
+      <input id={`${id}-extra`} type="text" inputmode="decimal" placeholder={unit === 'kg' ? '0.5, 0.25' : '1.25, 0.5'} autocomplete="off" data-gear-extra />
+    </div>
+  </fieldset>
+</fieldset>

@@ -1,0 +1,36 @@
+---
+// AdSlot — reserved, clearly labelled advertising position.
+//
+// Renders NOTHING until both are true:
+//   1. PUBLIC_ADSENSE_CLIENT is set at build time (e.g. "ca-pub-1234…"), and
+//   2. a slot id is passed for this placement.
+// The client id is a public identifier, not a secret — never put private
+// credentials in PUBLIC_ variables. The AdSense loader script itself is NOT
+// included yet: add it (once, in BaseLayout) only after approval.
+//
+// Placement rules (enforced by where pages use this component):
+// - never above the calculator or between inputs and results;
+// - never next to calculator buttons (accidental clicks);
+// - at most one slot per screenful of content on mobile;
+// - fixed min-height so a loading ad does not shift the layout (CLS).
+//
+// BEFORE enabling: update the Privacy Policy (Google cookies, opt-out links),
+// publish ads.txt, and set up a Google-certified CMP for EEA/UK/Swiss visitors.
+interface Props {
+  /** AdSense ad-unit slot id for this placement. */
+  slot?: string;
+  /** Reserved height in px to prevent layout shift. */
+  minHeight?: number;
+}
+const { slot, minHeight = 280 } = Astro.props;
+const client = import.meta.env.PUBLIC_ADSENSE_CLIENT as string | undefined;
+const enabled = Boolean(client && slot);
+---
+{enabled && (
+  <aside class="ad-slot no-print" aria-label="Advertisement" style={`min-height:${minHeight}px`}>
+    <span class="ad-label">Advertisement</span>
+    <ins class="adsbygoogle" style="display:block" data-ad-client={client} data-ad-slot={slot}
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </aside>
+)}

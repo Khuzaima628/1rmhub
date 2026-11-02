@@ -1,0 +1,13 @@
+---
+// kg/lb segmented control. Behaviour is wired by bindUnitToggle() in
+// src/scripts/dom.js; the current unit lives in data-unit on the group.
+interface Props { id: string; unit: 'kg' | 'lb'; label?: string }
+const { id, unit, label = 'Unit' } = Astro.props;
+---
+<div class="field">
+  <span class="field-label" id={`${id}-label`}>{label}</span>
+  <div class="segmented" role="group" aria-labelledby={`${id}-label`} data-unit-toggle data-unit={unit}>
+    <button type="button" data-unit="lb" aria-pressed={String(unit === 'lb')}>lb</button>
+    <button type="button" data-unit="kg" aria-pressed={String(unit === 'kg')}>kg</button>
+  </div>
+</div>

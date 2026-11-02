@@ -1,0 +1,65 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Squat Calculator — Estimate Your Squat 1RM"
+  description="Estimate your back squat one rep max from a set of 1–12 reps. See six formula estimates, why squat depth changes the number, and loadable training weights."
+  path="/squat-calculator/"
+  name="Squat Calculator"
+  h1="Squat 1RM Calculator"
+  lead="Estimate your back squat max from a recent heavy set. The number is only as good as the reps behind it — consistent depth matters more here than on any other lift."
+  exercise="squat"
+  lift="Squat"
+  example={{ weight: 225, reps: 5, unit: 'lb' }}
+  related={[LINKS.warmup, LINKS.plates, LINKS.deadlift, LINKS.test]}
+  sources={['lesuer', 'hprc', 'nsca']}
+>
+  <section aria-labelledby="squat-estimate-heading">
+    <h2 id="squat-estimate-heading">How to estimate your squat max</h2>
+    <p class="answer">
+      Squat a weight you can move for 3–6 reps at your normal depth, stop before form breaks down,
+      and enter the weight and reps above. For example, 225 lb × 5 estimates a squat max of roughly
+      253–268 lb, with an Average Estimate near 260 lb.
+    </p>
+    <p>
+      The squat was one of the three lifts in a classic comparison of seven 1RM equations
+      against tested maxes in college students (LeSuer et al., 1997), alongside the bench press and
+      deadlift. Predictions were strongly correlated with tested maxes — but a strong correlation is
+      not the same as an exact match, and individual lifters can still land well above or below any
+      formula.
+    </p>
+  </section>
+
+  <section aria-labelledby="squat-depth-heading">
+    <h2 id="squat-depth-heading">Depth changes the number</h2>
+    <p>
+      A squat that stops a few inches higher is a much easier lift. If your 5-rep set was cut short
+      but your max attempt would be to full depth, the estimate will read high — sometimes by a lot.
+    </p>
+    <ul>
+      <li><strong>Use the same depth for every rep</strong> and for any max you compare against. Powerlifting rules require the crease of the hip to drop below the top of the knee.</li>
+      <li><strong>Keep the setup consistent:</strong> the same bar position (high- or low-bar), stance and equipment, such as a belt or knee sleeves, as the max you want to predict.</li>
+      <li><strong>Count only reps you would show a judge</strong> — no half reps at the end of the set.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="squat-safety-heading">
+    <h2 id="squat-safety-heading">Squat safety for heavy sets</h2>
+    <ul>
+      <li>Squat inside a power rack with the safety pins or straps set just below your lowest position, so a missed rep can be set down.</li>
+      <li>If you use spotters for a max attempt, they should know the plan before you unrack.</li>
+      <li>Learn to bail before you need to: practise sitting a light failed rep onto the safeties.</li>
+      <li>Warm up gradually — the <a href="/warm-up-calculator/">warm-up calculator</a> builds a ramp with loadable weights.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="squat-use-heading">
+    <h2 id="squat-use-heading">Using your squat estimate in training</h2>
+    <p>
+      Squat programs often prescribe percentages such as 75–85% for sets of 3–6. Plan those from
+      the Average Estimate or slightly below; an estimate from a set with shallow reps will make every
+      percentage too heavy. When in doubt, re-estimate from a fresh, strict set rather than testing.
+    </p>
+  </section>
+</ExerciseLayout>

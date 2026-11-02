@@ -1,0 +1,53 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { SITE } from '../config/site';
+---
+<LegalLayout
+  title="Disclaimer — StrengthCalc"
+  h1="Disclaimer"
+  description="StrengthCalc results are estimates, not tested maxes, guaranteed performance or medical advice. Read how to interpret them and lift safely."
+  path="/disclaimer/"
+  name="Disclaimer"
+>
+  <p class="answer">
+    Every number on {SITE.name} is an <strong>estimate</strong>. It is not a tested maximum, not a
+    guarantee of what you can lift, and not medical, health or individual coaching advice.
+  </p>
+
+  <h2>Estimates, not guarantees</h2>
+  <p>
+    One rep max results are calculated from published prediction formulas applied to the set you
+    enter. Real performance depends on technique, fatigue, sleep, stress, experience, equipment and
+    the exercise itself. Formulas can over- or under-estimate an individual&rsquo;s true max, and they
+    become less reliable as the number of reps rises. See the <a href="/methodology/">methodology</a>
+    for the limits of each tool.
+  </p>
+
+  <h2>Not medical advice</h2>
+  <p>
+    The content on this site is general educational information. It does not replace advice from
+    a doctor, physiotherapist or other qualified professional. If you have an injury, a medical
+    condition, are pregnant, or are unsure whether strength training or maximal lifting is safe for
+    you, seek professional advice before you start.
+  </p>
+
+  <h2>Lifting carries risk</h2>
+  <p>
+    Heavy and maximal lifting can cause injury. Use proper technique and suitable equipment, warm up,
+    use a spotter or safety arms, and stop if you feel pain, dizziness or anything unusual. Never
+    attempt a weight because a calculator suggests you could lift it.
+  </p>
+
+  <h2>Accuracy of content</h2>
+  <p>
+    We check calculations with automated tests and cite sources for factual claims, but errors are
+    possible. If you find one, please <a href="/contact/">tell us</a>. Use of the site is also subject to
+    the <a href="/terms/">terms of use</a>.
+  </p>
+
+  <h2>Advertising and affiliate links</h2>
+  <p>
+    {SITE.name} currently contains no advertising and no affiliate links. If that changes, ads and
+    affiliate links will be clearly identified, and they will never affect how anything is calculated.
+  </p>
+</LegalLayout>

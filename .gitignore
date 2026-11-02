@@ -1,0 +1,15 @@
+# Dependencies and build output (Cloudflare Pages rebuilds from source)
+node_modules/
+dist/
+.astro/
+
+# Environment files — never commit secrets
+.env
+.env.*
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

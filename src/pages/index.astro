@@ -1,0 +1,181 @@
+---
+// StrengthCalc homepage: the 1RM calculator plus the explanations that make
+// its numbers trustworthy. Calculator UI: src/components/OneRepMaxCalculator.astro.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import OneRepMaxCalculator from '../components/OneRepMaxCalculator.astro';
+import FormulaTable from '../components/FormulaTable.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { webAppNode, webPageNode, faqNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { SITE } from '../config/site';
+
+const title = 'One Rep Max Calculator — Free 1RM Calculator (6 Formulas)';
+const description =
+  'Free one rep max calculator using 6 published formulas. See every estimate, the range between them, training percentages, plate loading and warm-up sets.';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}/`;
+
+// FAQ — rendered verbatim below AND used for the FAQPage JSON-LD, so the
+// structured data always matches the visible text. Questions here are not
+// repeated as FAQs on other pages.
+const faqs = [
+  {
+    q: 'What is a one rep max?',
+    a: 'A one rep max (1RM) is the heaviest weight you can lift for one complete repetition of an exercise with good technique. Lifters and coaches use it to measure maximal strength and to set training weights as percentages of it.',
+  },
+  {
+    q: 'How do I calculate my 1RM?',
+    a: 'Take a set you lifted with good form, then apply a 1RM formula. With Epley, 1RM = weight × (1 + reps ÷ 30), so 225 lb for 5 reps estimates about 262.5 lb. This calculator runs six published formulas at once and shows each result, the Average Estimate and the range between them.',
+  },
+  {
+    q: 'Which 1RM formula is most accurate?',
+    a: 'No single formula is most accurate for everyone. Research has found that accuracy depends on the lift, the lifter and the rep count — in one study comparing seven equations, every one underestimated the deadlift. That is why StrengthCalc shows all six results and the spread instead of a single number.',
+  },
+  {
+    q: 'How many reps should I use for a 1RM estimate?',
+    a: 'Use a set of about 3 to 6 clean reps taken close to failure. Heavier sets need less extrapolation, and a 2006 study found 5-rep-max tests predicted 1RM more accurately than 10- or 20-rep tests. This calculator accepts 1 to 12 reps and shows no number above 12.',
+  },
+  {
+    q: 'Is a calculated 1RM accurate?',
+    a: 'It is an estimate, not a measurement. Estimates from heavy, near-failure sets are usually a useful guide for programming, but your true max can be higher or lower depending on technique, fatigue, experience and the exercise. Only a tested single tells you your actual 1RM on that day.',
+  },
+  {
+    q: 'What is the difference between a 1RM and an estimated 1RM?',
+    a: 'A 1RM is the weight you actually lift once. An estimated 1RM (often written e1RM) is a prediction calculated from a heavier-than-one-rep set, such as 5 reps. Estimating avoids the fatigue and injury risk of a true max attempt, at the cost of some accuracy.',
+  },
+  {
+    q: 'How do I calculate 80% of my 1RM?',
+    a: 'Multiply your 1RM by 0.80. For a 300 lb max, 80% is 240 lb; for a 140 kg max, it is 112 kg. The percentage table in your results, and the 1RM Percentage Calculator, do this for every common percentage and round down to a weight you can load.',
+  },
+  {
+    q: 'What is the Average Estimate?',
+    a: 'The Average Estimate is the plain arithmetic mean of the six formula results. It summarises where the formulas cluster; it is not a scientifically validated consensus and is not claimed to be more accurate than any single formula.',
+  },
+  {
+    q: 'Should beginners test their 1RM?',
+    a: 'Usually not. Beginners gain more from practising technique, and can estimate their max from a submaximal set of 5–8 reps instead. A true max attempt needs consistent technique, proper equipment and a spotter or safety arms.',
+  },
+  {
+    q: 'Should I use kg or lb?',
+    a: 'Use whichever unit you train in. The math is identical; switching units converts what you typed and every result is also shown in the other unit (1 kg = 2.20462 lb).',
+  },
+];
+
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webAppNode({
+    site, url, name: 'StrengthCalc One Rep Max Calculator', description,
+    features: [
+      'Six-formula 1RM estimates with range and spread',
+      'Kilogram/pound unit toggle',
+      'Percentage training table with round-down loadable weights',
+      '2RM to 10RM estimates',
+      'Plate loading calculator with configurable bar and plates',
+      'Customizable warm-up set generator',
+      'Copy, share-link and print results',
+    ],
+  }),
+  faqNode(faqs),
+];
+---
+
+<BaseLayout title={title} description={description} path="/" jsonLd={jsonLd}>
+  <div class="print-header">
+    <strong>StrengthCalc — One Rep Max Calculator</strong><br />
+    <span class="disclaimer">Estimates only. Not guaranteed results, not medical advice.</span>
+  </div>
+
+  <h1>One Rep Max Calculator</h1>
+  <p class="lead">
+    Estimate your one rep max from a set you have actually lifted. Six published
+    formulas, the honest range between them, training percentages, plate loading
+    and warm-up sets — free, instant, no signup.
+  </p>
+
+  <OneRepMaxCalculator />
+
+  <section id="what-is-1rm" aria-labelledby="what-heading">
+    <h2 id="what-heading">What is a one rep max?</h2>
+    <p class="answer">
+      A one rep max (1RM) is the heaviest weight you can lift for a single, complete
+      repetition with good technique. An <strong>estimated</strong> 1RM predicts that
+      number from a lighter set you did for several reps, so you do not have to attempt
+      a true max.
+    </p>
+    <p>
+      Coaches use the 1RM to set training loads: “5 sets of 5 at 80%” means 80% of your
+      one rep max. Estimating it from a set of 3–6 reps is safer and less fatiguing than
+      testing it, which is why most lifters use a calculator between occasional tested maxes.
+    </p>
+  </section>
+
+  <section id="how-it-works" aria-labelledby="how-heading">
+    <h2 id="how-heading">How the calculator works</h2>
+    <ol class="tight">
+      <li><strong>Enter a set you actually lifted</strong> — the weight, how many clean reps you completed, and your unit.</li>
+      <li><strong>Six published formulas run on it</strong> — Epley, Brzycki, Lombardi, Mayhew, O&rsquo;Conner and Wathan. Every equation is shown below; nothing is hidden.</li>
+      <li><strong>You get the honest range</strong> — the Average Estimate (the plain mean of the six), the lowest and highest formula, how far apart they are, and a confidence note tied to your rep count.</li>
+      <li><strong>Training tools use the result</strong> — a percentage table, 2RM–10RM estimates, a plate loader and a warm-up generator, all rounded <em>down</em> to weights you can actually load.</li>
+    </ol>
+    <p>
+      If you lifted a true single (1 rep), there is nothing to estimate: every formula
+      returns the weight you entered. See the <a href="/methodology/">methodology</a> for
+      every rounding rule and the automated checks behind the numbers.
+    </p>
+  </section>
+
+  <section id="formulas" aria-labelledby="formulas-heading">
+    <h2 id="formulas-heading">The six 1RM formulas, side by side</h2>
+    <p>
+      Each formula estimates 1RM from a weight <em>w</em> lifted for <em>r</em> reps. They
+      were built from different groups of lifters and different assumptions, so they give
+      different answers for the same set.
+    </p>
+    <FormulaTable />
+    <p>
+      For a rep-by-rep comparison and when each formula tends to read high or low, see the
+      <a href="/guides/1rm-formulas/">1RM formula guide</a>. Lander&rsquo;s formula, used on some
+      other calculators, is deliberately not included until its equation is verified against
+      its original published source.
+    </p>
+  </section>
+
+  <AdSlot />
+
+  <section id="reading-results" aria-labelledby="reading-heading">
+    <h2 id="reading-heading">How to read your result</h2>
+    <ul class="tight">
+      <li><strong>Average Estimate:</strong> a convenient single number for planning — the middle of the six formulas, not a promise.</li>
+      <li><strong>Range and spread:</strong> how much the formulas disagree on your set. On a 5-rep set they differ by about 6%; at 12 reps, by more than 12%.</li>
+      <li><strong>Programming from it:</strong> many training programs start from a deliberately conservative “training max” below the estimate (often around 90%), so early sessions are achievable.</li>
+      <li><strong>Re-test with fresh sets:</strong> re-estimate every few weeks from a new heavy set rather than chasing the number by testing often.</li>
+    </ul>
+  </section>
+
+  <section id="limitations" aria-labelledby="limits-heading">
+    <h2 id="limits-heading">Accuracy and limitations</h2>
+    <ul class="tight">
+      <li><strong>Estimates are not tested maxes.</strong> They predict what you could lift once; fatigue, sleep, stress and the day itself are invisible to every formula.</li>
+      <li><strong>Accuracy depends on the lift.</strong> In a study of seven equations on the bench press, squat and deadlift, all of them significantly underestimated the deadlift (LeSuer et al., 1997).</li>
+      <li><strong>Fewer reps, better estimates.</strong> Predictions from 5-rep maxes were more accurate than from 10- or 20-rep maxes (Reynolds et al., 2006). Above 10 reps the formulas diverge sharply; above 12 this calculator shows no number.</li>
+      <li><strong>Only count clean reps.</strong> Bounced, half-range or assisted reps inflate every estimate.</li>
+      <li><strong>Beginners:</strong> estimate from a submaximal set of 5–8 reps rather than attempting a true max. See <a href="/guides/how-to-test-1rm/">how to test your 1RM safely</a>.</li>
+    </ul>
+  </section>
+
+  <RelatedLinks heading="Calculators for each lift" items={[LINKS.bench, LINKS.squat, LINKS.deadlift, LINKS.ohp, LINKS.row, LINKS.percent, LINKS.plates, LINKS.warmup]} />
+
+  <section id="faq" aria-labelledby="faq-heading">
+    <h2 id="faq-heading">Frequently asked questions</h2>
+    {faqs.map((f) => (
+      <details class="faq">
+        <summary>{f.q}</summary>
+        <div class="faq-a"><p>{f.a}</p></div>
+      </details>
+    ))}
+  </section>
+
+  <SourceList ids={['epley', 'brzycki', 'lombardi', 'mayhew', 'oconner', 'wathan', 'lesuer', 'reynolds']} />
+</BaseLayout>

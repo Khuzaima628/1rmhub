@@ -1,0 +1,312 @@
+---
+// The 1RM calculator: inputs, six-formula results, training tables, a linked
+// plate loader and warm-up generator, and copy/share/print.
+// Formula logic lives in src/lib/onerepmax.js (pure functions, tested).
+// One instance per page (element ids are fixed). Vanilla JS, no frameworks;
+// everything runs in the browser — no server calls, no accounts.
+import { FORMULAS, MIN_REPS, MAX_REPS } from '../lib/onerepmax.js';
+import { EXERCISES } from '../data/exercises';
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+import GearFields from './GearFields.astro';
+import PlateLoader from './PlateLoader.astro';
+import WarmupGenerator from './WarmupGenerator.astro';
+
+interface Props {
+  /** Exercise preselected in the dropdown. */
+  exercise?: string;
+  heading?: string;
+}
+const { exercise = 'bench-press', heading = '1RM calculator' } = Astro.props;
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="calc-heading" data-orm-calculator data-default-unit={unit}>
+  <h2 id="calc-heading">{heading}</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="calc-form" novalidate>
+    <div class="field">
+      <label for="exercise">Exercise</label>
+      <select id="exercise" name="exercise">
+        {EXERCISES.map((e) => <option value={e.id} selected={e.id === exercise}>{e.label}</option>)}
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="weight">Weight lifted</label>
+        <input id="weight" name="weight" type="number" inputmode="decimal" min="0" step="any"
+          placeholder={unit === 'kg' ? '100' : '225'} autocomplete="off" aria-describedby="form-error" />
+      </div>
+      <UnitToggle id="calc-unit" unit={unit} />
+      <div class="field">
+        <label for="reps">Reps completed <span class="hint">({MIN_REPS}–{MAX_REPS})</span></label>
+        <input id="reps" name="reps" type="number" inputmode="numeric" min={MIN_REPS} max={MAX_REPS} step="1"
+          placeholder="5" autocomplete="off" aria-describedby="form-error" />
+      </div>
+    </div>
+
+    <div class="field-row two">
+      <div class="field">
+        <label for="bodyweight">Bodyweight <span class="hint">(optional, same unit)</span></label>
+        <input id="bodyweight" name="bodyweight" type="number" inputmode="decimal" min="0" step="any" placeholder="—" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="primary-formula">Headline number</label>
+        <select id="primary-formula" name="primary-formula">
+          <option value="average">Average Estimate (mean of all six)</option>
+          {FORMULAS.map((f) => <option value={f.id}>{f.name}</option>)}
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Calculate 1RM</button>
+      <button type="button" class="btn" id="reset-btn">Reset</button>
+    </div>
+    <p class="error" id="form-error" role="alert" hidden></p>
+  </form>
+
+  <p class="visually-hidden" aria-live="polite" id="calc-status"></p>
+
+  <div id="results" hidden>
+    <div id="results-core"></div>
+
+    <h3>Plate loader</h3>
+    <GearFields id="calc-gear" unit={unit} />
+    <PlateLoader id="calc-plates" unit={unit} linked gearId="calc-gear" />
+
+    <h3>Warm-up sets</h3>
+    <p class="disclaimer">Prefilled with the set you entered. Change the top set to plan a different session.</p>
+    <WarmupGenerator id="calc-warmup" unit={unit} linked gearId="calc-gear" />
+
+    <h3>Save or share this result</h3>
+    <div class="actions no-print">
+      <button type="button" class="btn" id="copy-btn">Copy results</button>
+      <button type="button" class="btn" id="share-btn">Copy share link</button>
+      <button type="button" class="btn" id="print-btn">Print</button>
+    </div>
+    <p class="disclaimer">
+      A share link stores your inputs in the page address (for example <code>?w=225&amp;r=5&amp;u=lb</code>).
+      Nothing is sent to us; anyone with the link sees the same calculation.
+    </p>
+  </div>
+</section>
+
+<script>
+  import {
+    estimateAll, confidenceNote, validateInput, validateWeight, toKg, fromKg, WARN_REPS,
+  } from '../lib/onerepmax.js';
+  import { f1, f2, num, esc, copyText, flash, bindUnitToggle, convertInput, scrollToEl } from '../scripts/dom.js';
+  import { percentTableHtml, repMaxTableHtml, wirePlateButtons } from '../scripts/tables.js';
+
+  const root = document.querySelector<HTMLElement>('[data-orm-calculator]');
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('calc-form');
+    const resultsEl = $('results'), coreEl = $('results-core'), errorEl = $('form-error'), statusEl = $('calc-status');
+    const weightEl = $('weight'), repsEl = $('reps'), bwEl = $('bodyweight');
+    const exerciseEl = $<HTMLSelectElement>('exercise'), primaryEl = $<HTMLSelectElement>('primary-formula');
+    const defaultUnit = root.dataset.defaultUnit!;
+    const defaultExercise = exerciseEl.value;
+
+    type Result = { weight: number; weightKg: number; reps: number; est: ReturnType<typeof estimateAll> };
+    let last: Result | null = null;
+
+    const toggle = bindUnitToggle(root.querySelector('#calc-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      // Convert what the lifter already typed so the set keeps its meaning.
+      convertInput(weightEl, prev, next);
+      convertInput(bwEl, prev, next);
+      if (last) calculate({ scroll: false });
+    });
+    const unit = () => toggle.get();
+    const other = () => (unit() === 'kg' ? 'lb' : 'kg');
+    const exLabel = () => exerciseEl.options[exerciseEl.selectedIndex]?.text ?? '';
+    const hasOption = (sel: HTMLSelectElement, value: string | null) =>
+      value !== null && [...sel.options].some((o) => o.value === value);
+
+    function showError(message: string, field?: string) {
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      weightEl.toggleAttribute('aria-invalid', field === 'weight');
+      repsEl.toggleAttribute('aria-invalid', field === 'reps');
+      resultsEl.hidden = true;
+      statusEl.textContent = '';
+      last = null;
+    }
+
+    function calculate({ scroll }: { scroll: boolean }) {
+      const v = validateInput(weightEl.value, repsEl.value);
+      if (!v.ok) {
+        showError(v.error, v.field);
+        if (scroll) (v.field === 'reps' ? repsEl : weightEl).focus();
+        return;
+      }
+      errorEl.hidden = true;
+      weightEl.removeAttribute('aria-invalid');
+      repsEl.removeAttribute('aria-invalid');
+      const weightKg = toKg(v.weight, unit());
+      last = { weight: v.weight, weightKg, reps: v.reps, est: estimateAll(weightKg, v.reps) };
+      render();
+      resultsEl.hidden = false;
+      // Hand the result to the linked plate loader and warm-up generator.
+      document.dispatchEvent(new CustomEvent('sc:result', {
+        detail: { unit: unit(), e1rm: fromKg(last.est.average, unit()), weight: v.weight, reps: v.reps },
+      }));
+      if (scroll) scrollToEl(resultsEl);
+    }
+
+    function headline(r: Result) {
+      const row = r.est.rows.find((x) => x.id === primaryEl.value);
+      return { name: row ? row.name : 'Average Estimate', kg: row ? row.value : r.est.average };
+    }
+
+    function render() {
+      if (!last) return;
+      const { weight, reps, est } = last;
+      const u = unit(), o = other();
+      const head = headline(last);
+      statusEl.textContent = `Estimated one rep max: ${f1(fromKg(head.kg, u))} ${u} (${head.name}).`;
+
+      let bwLine = '';
+      if (bwEl.value.trim() !== '') {
+        const bw = validateWeight(bwEl.value, 'your bodyweight');
+        bwLine = bw.ok
+          ? `<p class="result-sub">Average Estimate = <strong>${f2(fromKg(est.average, u) / bw.value)}×</strong> your bodyweight.</p>`
+          : `<p class="result-sub">Bodyweight ignored: ${esc(bw.error)}</p>`;
+      }
+
+      const notices = [
+        reps > WARN_REPS
+          ? `<div class="notice" role="note"><strong>High-rep warning:</strong> above ${WARN_REPS} reps the formulas diverge sharply and can miss your real max by a wide margin. A heavier set of 3–6 clean reps gives a far better estimate.</div>`
+          : '',
+        est.oneRep
+          ? '<div class="notice" role="note"><strong>One rep entered:</strong> you already lifted a single, so there is nothing to estimate — every formula below simply returns the weight you entered. (Run raw, the formulas would add up to 9%.)</div>'
+          : '',
+      ].join('');
+
+      const formulaRows = est.rows.map((r) => `
+        <tr class="${r.id === primaryEl.value ? 'primary-row' : ''}">
+          <th scope="row">${esc(r.name)}<br><code class="disclaimer">${esc(r.equation)}</code></th>
+          <td class="num">${f2(fromKg(r.value, u))} ${u}</td>
+          <td class="num">${f2(fromKg(r.value, o))} ${o}</td>
+        </tr>`).join('');
+
+      const spreadLine = est.oneRep
+        ? ''
+        : ` · the six formulas differ by <strong>${f1(est.spreadPct)}%</strong> on this set`;
+
+      coreEl.innerHTML = `
+        <div class="print-header"><strong>StrengthCalc result — ${esc(exLabel())}, ${esc(num(weight))} ${u} × ${reps}</strong></div>
+        ${notices}
+        <div class="result-headline">
+          <div class="result-label">Estimated 1RM — ${esc(head.name)}</div>
+          <div class="result-big">${f1(fromKg(head.kg, u))} ${u}</div>
+          <div class="result-both">${f1(fromKg(head.kg, o))} ${o}</div>
+          <p class="result-sub"><strong>Average Estimate ≈ ${f1(fromKg(est.average, u))} ${u}</strong>
+            · range ${f1(fromKg(est.min, u))}–${f1(fromKg(est.max, u))} ${u}${spreadLine}</p>
+          <p class="result-sub">${esc(confidenceNote(reps))}</p>
+          ${bwLine}
+          <p class="disclaimer">An estimate from a submaximal set — not a tested max and not a guarantee of what you can lift today.</p>
+        </div>
+
+        <h3>All six formulas</h3>
+        <div class="table-wrap"><table>
+          <caption>Each formula's estimate for ${esc(num(weight))} ${u} × ${reps} reps</caption>
+          <thead><tr><th scope="col">Formula</th><th scope="col" class="num">${u}</th><th scope="col" class="num">${o}</th></tr></thead>
+          <tbody>${formulaRows}</tbody>
+        </table></div>
+        <p class="disclaimer">The Average Estimate is the plain mean of the six results above — a summary of the spread, not a scientifically validated “best” number.</p>
+
+        <h3>Training percentages</h3>
+        ${percentTableHtml(est.average, u, { caption: 'Working weights from the Average Estimate' })}
+
+        <h3>Rep-max estimates (2–10RM)</h3>
+        ${repMaxTableHtml(est.average, u)}
+        <p class="disclaimer">Rep-max rows use the Epley equation solved backwards from the Average Estimate.</p>
+      `;
+    }
+
+    wirePlateButtons(coreEl, unit);
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate({ scroll: true }); });
+    primaryEl.addEventListener('change', () => { if (last) render(); });
+    exerciseEl.addEventListener('change', () => { if (last) render(); });
+
+    $('reset-btn').addEventListener('click', () => {
+      form.reset();
+      exerciseEl.value = defaultExercise;
+      toggle.set(defaultUnit);
+      errorEl.hidden = true;
+      weightEl.removeAttribute('aria-invalid');
+      repsEl.removeAttribute('aria-invalid');
+      resultsEl.hidden = true;
+      coreEl.innerHTML = '';
+      statusEl.textContent = '';
+      last = null;
+      history.replaceState(null, '', location.pathname);
+      weightEl.focus();
+    });
+
+    function resultText() {
+      if (!last) return '';
+      const { weight, reps, est } = last;
+      const u = unit(), o = other();
+      return [
+        'StrengthCalc 1RM estimate',
+        `${exLabel()} — ${num(weight)} ${u} × ${reps} reps`,
+        `Average Estimate: ${f1(fromKg(est.average, u))} ${u} (${f1(fromKg(est.average, o))} ${o})`,
+        `Formula range: ${f1(fromKg(est.min, u))}–${f1(fromKg(est.max, u))} ${u}`,
+        ...est.rows.map((r) => `${r.name}: ${f2(fromKg(r.value, u))} ${u}`),
+        'Estimates only — not a tested max or guaranteed result.',
+        location.origin + location.pathname,
+      ].join('\n');
+    }
+
+    function shareParams() {
+      const p = new URLSearchParams({ w: weightEl.value.trim(), r: repsEl.value.trim(), u: unit(), e: exerciseEl.value, f: primaryEl.value });
+      if (bwEl.value.trim() !== '') p.set('bw', bwEl.value.trim());
+      return p;
+    }
+
+    $('copy-btn').addEventListener('click', async () => {
+      const ok = await copyText(resultText());
+      flash($('copy-btn'), ok ? 'Copied ✓' : 'Copy failed — use Print instead');
+    });
+
+    $('share-btn').addEventListener('click', async () => {
+      const p = shareParams();
+      const url = `${location.origin}${location.pathname}?${p.toString()}`;
+      // Keep the address bar shareable without adding a history entry per click.
+      // The canonical tag still points at the clean URL.
+      history.replaceState(null, '', `?${p.toString()}`);
+      const ok = await copyText(url);
+      flash($('share-btn'), ok ? 'Link copied ✓' : 'Copy failed — copy the address bar');
+    });
+
+    $('print-btn').addEventListener('click', () => window.print());
+
+    // Restore from a shared link. Unknown values are ignored, never trusted.
+    // Runs after DOMContentLoaded so the linked widgets' listeners exist.
+    function restoreFromUrl() {
+      const p = new URLSearchParams(location.search);
+      if (!p.has('w') || !p.has('r')) return;
+      const u = p.get('u');
+      if (u === 'kg' || u === 'lb') toggle.set(u);
+      // Number inputs only accept numeric text; anything else is left blank so
+      // validation explains the problem instead of the browser rejecting it.
+      const numeric = (key: string) => {
+        const v = (p.get(key) ?? '').trim();
+        return v !== '' && Number.isFinite(Number(v)) ? v : '';
+      };
+      weightEl.value = numeric('w');
+      repsEl.value = numeric('r');
+      bwEl.value = numeric('bw');
+      if (hasOption(exerciseEl, p.get('e'))) exerciseEl.value = p.get('e')!;
+      if (hasOption(primaryEl, p.get('f'))) primaryEl.value = p.get('f')!;
+      calculate({ scroll: false });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', restoreFromUrl);
+    else setTimeout(restoreFromUrl, 0);
+  }
+</script>

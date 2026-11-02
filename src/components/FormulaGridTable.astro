@@ -1,0 +1,36 @@
+---
+// Every formula's estimate as a % of the weight lifted, for 2–12 reps,
+// generated at build time from the same functions the calculator runs.
+import { FORMULAS, formulaGrid } from '../lib/onerepmax.js';
+interface Props { from?: number; to?: number }
+const { from = 2, to = 12 } = Astro.props;
+const rows = formulaGrid(from, to);
+const pct = (v: number) => `${v.toFixed(1)}%`;
+---
+<div class="table-wrap">
+  <table>
+    <caption>Estimated 1RM as a percentage of the weight lifted, by rep count</caption>
+    <thead>
+      <tr>
+        <th scope="col">Reps</th>
+        {FORMULAS.map((f) => <th scope="col" class="num">{f.name}</th>)}
+        <th scope="col" class="num">Average</th>
+        <th scope="col" class="num">Spread</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">{r.reps}</th>
+          {FORMULAS.map((f) => <td class="num">{pct(r.byFormula[f.id])}</td>)}
+          <td class="num">{pct(r.average)}</td>
+          <td class="num">{r.spreadPct.toFixed(1)}%</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<p class="disclaimer">
+  Read across a row: for a set of 100 lb (or kg) × 5 reps, Epley estimates 116.7, Mayhew 119.0.
+  “Spread” is the gap between the highest and lowest formula, relative to the lowest.
+</p>

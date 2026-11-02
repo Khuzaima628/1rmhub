@@ -1,0 +1,22 @@
+---
+// Numbered reference list for a page. Pass the source ids the page cites.
+import { SOURCES } from '../data/sources';
+interface Props { ids: string[]; heading?: string }
+const { ids, heading = 'Sources' } = Astro.props;
+const items = ids.map((id) => {
+  const s = SOURCES[id];
+  if (!s) throw new Error(`Unknown source id: ${id}`);
+  return s;
+});
+---
+<section aria-labelledby="sources-heading">
+  <h2 id="sources-heading">{heading}</h2>
+  <ol class="sources">
+    {items.map((s) => (
+      <li>
+        {s.text}
+        {s.url && <> <a href={s.url} rel="noopener" target="_blank">Link<span class="visually-hidden"> (opens in a new tab)</span></a></>}
+      </li>
+    ))}
+  </ol>
+</section>

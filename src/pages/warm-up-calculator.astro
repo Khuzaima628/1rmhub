@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WarmupGenerator from '../components/WarmupGenerator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { SITE, formatDate } from '../config/site';
+
+const title = 'Warm-up Calculator — Warm-up Sets for Lifting';
+const description =
+  'Build warm-up sets for any top set: choose your jumps and reps, and get loadable weights with plates per side. A starting suggestion you can adjust by feel.';
+const path = '/warm-up-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webAppNode({ site, url, name: 'StrengthCalc Warm-up Calculator', description,
+    features: ['Customizable warm-up jumps and reps', 'Loadable weights rounded down', 'Plates per side for every set', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Warm-up Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>Warm-up Calculator</h1>
+  <p class="lead">
+    Enter your top set for the day and get a warm-up ramp that builds up to it, with each weight
+    rounded down to what your plates can make.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time></p>
+
+  <section class="card calculator" aria-labelledby="wu-heading">
+    <h2 id="wu-heading">Warm-up set generator</h2>
+    <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+    <WarmupGenerator id="wu-tool" unit={SITE.defaultUnit} />
+  </section>
+
+  <div class="prose">
+    <section aria-labelledby="how-wu-heading">
+      <h2 id="how-wu-heading">How to warm up before a heavy lift</h2>
+      <p class="answer">
+        Start light — usually the empty bar — then do a few sets that climb toward your top set
+        while the reps drop, so you practise the movement without getting tired. A common pattern is
+        the bar for 8 reps, then about 50% × 5, 70% × 3 and 85% × 1 of your top set.
+      </p>
+      <p>
+        That default is a sensible starting point, not a rule. Heavier lifters often need more jumps
+        between the bar and their working weight; lighter lifters may need fewer. Rest briefly
+        between light warm-ups and a little longer before the last one.
+      </p>
+    </section>
+
+    <section aria-labelledby="adjust-heading">
+      <h2 id="adjust-heading">Adjusting the warm-up</h2>
+      <ul>
+        <li><strong>Jumps</strong> are percentages of your top set. Add more for a heavier top set (for example 40, 55, 70, 80, 90).</li>
+        <li><strong>Reps</strong> are listed starting with the first (bar) set. Keep warm-up reps well short of fatigue — the point is to rehearse, not to tire out.</li>
+        <li><strong>Start at</strong> lets you skip the empty bar, for example starting a deadlift at 135 lb.</li>
+        <li>Jumps that land at or below the starting weight are skipped automatically, so the ramp only goes up.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="max-wu-heading">
+      <h2 id="max-wu-heading">Warming up for a 1RM test</h2>
+      <p>
+        A max attempt needs a more structured ramp than a normal training day, with longer rests and
+        single reps near the top. Follow the step-by-step protocol in
+        <a href="/guides/how-to-test-1rm/">how to test your 1RM safely</a>, which is based on the
+        NSCA approach.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.plates, LINKS.test, LINKS.home, LINKS.squat]} />
+  <SourceList ids={['hprc', 'nsca']} />
+</BaseLayout>

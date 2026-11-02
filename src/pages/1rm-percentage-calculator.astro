@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PercentageCalculator from '../components/PercentageCalculator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { repsAtPercent } from '../lib/onerepmax.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { SITE, formatDate } from '../config/site';
+
+const title = '1RM Percentage Calculator — Training Weights from Your Max';
+const description =
+  'Calculate any percentage of your one rep max, such as 80% or 70%, with loadable weights rounded down to real plates. Plus the reps each percentage implies.';
+const path = '/1rm-percentage-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+const repRows = [95, 90, 85, 80, 75, 70, 65, 60].map(repsAtPercent);
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webAppNode({ site, url, name: 'StrengthCalc 1RM Percentage Calculator', description,
+    features: ['Any percentage of a 1RM', 'Percentage table from 100% to 50%', 'Round-down loadable weights', 'Plate loader'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: '1RM Percentage Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>1RM Percentage Calculator</h1>
+  <p class="lead">
+    Enter a one rep max — tested or estimated — to get working weights for every common
+    percentage, or type any percentage you need. Every weight is also rounded down to one you can load.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · Don&rsquo;t know your max? <a href="/">Estimate it first</a>.</p>
+
+  <PercentageCalculator />
+
+  <div class="prose">
+    <section aria-labelledby="how-pct-heading">
+      <h2 id="how-pct-heading">How to calculate a percentage of your 1RM</h2>
+      <p class="answer">
+        Multiply your 1RM by the percentage written as a decimal. 80% of a 300 lb max is
+        300 × 0.80 = 240 lb; 70% of a 140 kg max is 140 × 0.70 = 98 kg.
+      </p>
+      <p>
+        The exact answer is often a number you cannot load, such as 237.6 lb. The calculator shows
+        the exact figure and a <strong>loadable</strong> figure, rounded <em>down</em> to the nearest
+        5 lb or 2.5 kg — the smallest jump with standard plates — so a prescribed percentage is
+        never quietly rounded up into a heavier set.
+      </p>
+    </section>
+
+    <section aria-labelledby="reps-pct-heading">
+      <h2 id="reps-pct-heading">How many reps can you do at each percentage?</h2>
+      <p>
+        Two of the six formulas can be solved backwards to show how many reps they assume you can
+        do at a given percentage. Treat these as rough guides: people vary widely, especially at
+        lower percentages, and the two formulas disagree more as the weight gets lighter.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>Reps to failure implied by the Epley and Brzycki formulas</caption>
+          <thead><tr><th scope="col">% of 1RM</th><th scope="col" class="num">Epley</th><th scope="col" class="num">Brzycki</th></tr></thead>
+          <tbody>
+            {repRows.map((r) => (
+              <tr><th scope="row">{r.pct}%</th><td class="num">{r.epley.toFixed(1)}</td><td class="num">{r.brzycki.toFixed(1)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="disclaimer">Epley: reps = 30 × (100 ÷ % − 1). Brzycki: reps = 37 − 36 × % ÷ 100.</p>
+    </section>
+
+    <section aria-labelledby="zones-heading">
+      <h2 id="zones-heading">Which percentages to train with</h2>
+      <p>
+        The NSCA&rsquo;s strength-and-conditioning textbook gives these general load ranges by
+        training goal. They are starting points; programs vary widely.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>General load guidelines by training goal (NSCA)</caption>
+          <thead><tr><th scope="col">Goal</th><th scope="col">Load</th><th scope="col">Reps per set</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Maximal strength</th><td>≥ 85% of 1RM</td><td>≤ 6</td></tr>
+            <tr><th scope="row">Muscle size (hypertrophy)</th><td>67–85% of 1RM</td><td>6–12</td></tr>
+            <tr><th scope="row">Muscular endurance</th><td>≤ 67% of 1RM</td><td>≥ 12</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        If your 1RM is an estimate, many programs suggest working from a lower “training max”
+        (often about 90% of the estimate), so the prescribed percentages are achievable on an
+        average day. You can enter that training max here instead of your full estimate.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.home, LINKS.plates, LINKS.warmup, LINKS.formulas]} />
+  <SourceList ids={['epley', 'brzycki', 'nsca']} />
+</BaseLayout>

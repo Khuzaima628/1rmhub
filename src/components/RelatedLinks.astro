@@ -1,0 +1,12 @@
+---
+// "Related tools and guides" card grid — contextual internal links.
+interface Item { href: string; title: string; text: string }
+interface Props { items: Item[]; heading?: string }
+const { items, heading = 'Related tools and guides' } = Astro.props;
+---
+<section aria-labelledby="related-heading">
+  <h2 id="related-heading">{heading}</h2>
+  <ul class="link-grid">
+    {items.map((i) => <li><a href={i.href}>{i.title}</a><p>{i.text}</p></li>)}
+  </ul>
+</section>

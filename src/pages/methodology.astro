@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FormulaTable from '../components/FormulaTable.astro';
+import SourceList from '../components/SourceList.astro';
+import { webPageNode } from '../lib/schema';
+import { SITE, formatDate } from '../config/site';
+import { estimateAll, LB_PER_KG, MIN_REPS, MAX_REPS, WARN_REPS, MAX_WEIGHT } from '../lib/onerepmax.js';
+
+const title = 'Methodology — How StrengthCalc Calculates Your 1RM';
+const description =
+  'How StrengthCalc calculates: the six 1RM formulas, the Average Estimate, rep limits, unit conversion, rounding rules, the plate solver and how it is tested.';
+const path = '/methodology/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const golden = estimateAll(100, 5);
+const f2 = (v: number) => v.toFixed(2);
+const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, reviewed: SITE.contentReviewed })];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Methodology', href: path }]} jsonLd={jsonLd}>
+  <article class="prose">
+    <h1>Methodology</h1>
+    <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · Maintained by {SITE.name}</p>
+    <p class="answer">
+      StrengthCalc estimates a one rep max by running six published formulas on a set you lifted,
+      then reports every result, their plain average (the &ldquo;Average Estimate&rdquo;) and the
+      range between them. Everything runs in your browser; nothing you type is sent to us.
+    </p>
+
+    <h2>The six formulas</h2>
+    <p>These are the only formulas used. Each is cited in the sources below.</p>
+    <FormulaTable />
+    <p>
+      Lander&rsquo;s formula is deliberately excluded until its equation is verified against its
+      original published source. We would rather show six checked formulas than seven unchecked ones.
+    </p>
+
+    <h2>The Average Estimate</h2>
+    <p>
+      The Average Estimate is the arithmetic mean of the six formula results. It is a summary of
+      where the formulas cluster — <strong>not</strong> a scientifically validated consensus, and we
+      never describe it as more accurate than any single formula. It is the default headline number
+      because it is less sensitive to any one formula&rsquo;s quirks; you can switch the headline
+      to any individual formula.
+    </p>
+    <p>
+      Alongside it we show the lowest and highest formula and the <strong>spread</strong>: the gap
+      between them as a percentage of the lowest. A larger spread means the formulas disagree more
+      about your set.
+    </p>
+
+    <h2>Input rules</h2>
+    <ul>
+      <li><strong>Reps:</strong> whole numbers from {MIN_REPS} to {MAX_REPS}. Above {WARN_REPS} reps a high-rep warning is shown. Above {MAX_REPS} no number is shown, because the formulas diverge too much for an estimate to be useful.</li>
+      <li><strong>One rep:</strong> if you enter a single, there is nothing to estimate, so every formula returns the weight you entered (run raw, the formulas would add up to 9%).</li>
+      <li><strong>Weight:</strong> any positive number up to {MAX_WEIGHT} in your chosen unit. Decimals are allowed. Zero, negative, empty and non-numeric values are rejected with a plain-language message — the calculator never shows a number for invalid input.</li>
+      <li><strong>Units:</strong> 1 kg = {LB_PER_KG} lb. Switching units converts the numbers you typed so the set keeps its meaning.</li>
+    </ul>
+
+    <h2>Rounding rules</h2>
+    <ul>
+      <li><strong>Display:</strong> headline numbers to 0.1, individual formulas to 0.01. Calculations use full precision; only the display is rounded.</li>
+      <li><strong>Loadable weights</strong> in percentage tables are rounded <em>down</em> to the nearest 2.5 kg or 5 lb (the smallest jump with standard plates), so a loadable weight never exceeds the exact percentage.</li>
+      <li><strong>Plate loading</strong> finds the heaviest weight your selected plates can make that does <em>not</em> exceed the target. It checks every combination of the plate sizes you select (not just &ldquo;largest plate first&rdquo;), uses the fewest plates among equal answers, and shows any shortfall. If the target is lighter than the bar, it says so instead of suggesting the bar.</li>
+      <li><strong>Rep-max estimates (2RM–10RM)</strong> use the Epley equation solved backwards from the Average Estimate: weight = 1RM ÷ (1 + reps ÷ 30).</li>
+      <li><strong>Warm-ups</strong> are percentages of the top set you enter. Jumps at or below the starting weight are skipped so the ramp only climbs, and the top set always uses your own reps.</li>
+    </ul>
+
+    <h2>How the numbers are checked</h2>
+    <p>
+      All calculation code is a small set of pure JavaScript functions covered by an automated
+      test suite. The reference case is 100 kg × 5 reps:
+    </p>
+    <div class="table-wrap">
+      <table>
+        <caption>Reference test case: 100 × 5 reps</caption>
+        <thead><tr><th scope="col">Formula</th><th scope="col" class="num">Expected result</th></tr></thead>
+        <tbody>
+          {golden.rows.map((r) => <tr><th scope="row">{r.name}</th><td class="num">{f2(r.value)}</td></tr>)}
+          <tr class="primary-row"><th scope="row">Average Estimate</th><td class="num">{f2(golden.average)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      The tests also cover invalid input, the 1-rep rule, unit conversion, rounding, the plate solver
+      (including cases where &ldquo;largest first&rdquo; gives the wrong answer) and the warm-up
+      generator. Statements on this site that compare formulas — such as &ldquo;Mayhew is highest at 1–6
+      reps&rdquo; — are checked against the formula outputs by the same tests.
+    </p>
+
+    <h2>What the numbers are not</h2>
+    <p>
+      Every result is an <strong>estimate</strong>. It is not a tested max, not a prediction of what
+      you will lift on a given day, and not medical or coaching advice. Technique, fatigue,
+      experience and the lift itself all move your real number. See the <a href="/disclaimer/">disclaimer</a>.
+    </p>
+
+    <h2>Editorial policy and corrections</h2>
+    <p>
+      {SITE.name} is an independent site. Content is written and reviewed by the {SITE.name} editor,
+      and we do not claim professional credentials on the site. Factual claims are tied to
+      the published sources listed on each page, and we separate what research found from our own
+      reasoning. If you find an error, please <a href="/contact/">contact us</a> — corrections are
+      made promptly and the review date above is updated.
+    </p>
+  </article>
+  <SourceList ids={['epley', 'brzycki', 'lombardi', 'mayhew', 'oconner', 'wathan', 'lesuer', 'reynolds']} />
+</BaseLayout>

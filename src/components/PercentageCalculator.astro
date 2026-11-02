@@ -1,0 +1,110 @@
+---
+// 1RM percentage calculator: working weights from a known (tested or
+// estimated) 1RM, a custom-percentage answer, and a linked plate loader.
+// One instance per page. Shares table rendering with the 1RM calculator.
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+import PlateLoader from './PlateLoader.astro';
+
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="pct-heading" data-pct-calculator>
+  <h2 id="pct-heading">Percentage calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="pct-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="pct-orm">Your 1RM <span class="hint">(tested or estimated)</span></label>
+        <input id="pct-orm" type="number" inputmode="decimal" min="0" step="any"
+          placeholder={unit === 'kg' ? '120' : '275'} autocomplete="off" aria-describedby="pct-error" />
+      </div>
+      <UnitToggle id="pct-unit" unit={unit} />
+      <div class="field">
+        <label for="pct-custom">Any percentage <span class="hint">(optional, 1–100)</span></label>
+        <input id="pct-custom" type="number" inputmode="decimal" min="1" max="100" step="any" placeholder="80" autocomplete="off" aria-describedby="pct-error" />
+      </div>
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Show percentages</button>
+    </div>
+    <p class="error" id="pct-error" role="alert" hidden></p>
+  </form>
+  <p class="visually-hidden" aria-live="polite" id="pct-status"></p>
+  <div id="pct-results" hidden>
+    <div id="pct-core"></div>
+    <h3>Plate loader</h3>
+    <PlateLoader id="pct-plates" unit={unit} linked />
+  </div>
+</section>
+
+<script>
+  import { validateWeight, percentOf, toKg, loadStep } from '../lib/onerepmax.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, scrollToEl } from '../scripts/dom.js';
+  import { percentTableHtml, wirePlateButtons } from '../scripts/tables.js';
+
+  const root = document.querySelector<HTMLElement>('[data-pct-calculator]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('pct-form'), ormEl = $('pct-orm'), customEl = $('pct-custom');
+    const errorEl = $('pct-error'), resultsEl = $('pct-results'), coreEl = $('pct-core'), statusEl = $('pct-status');
+    let shown = false;
+
+    const toggle = bindUnitToggle(root.querySelector('#pct-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      convertInput(ormEl, prev, next);
+      if (shown) calculate(false);
+    });
+    const unit = () => toggle.get();
+
+    function fail(message: string, el: HTMLInputElement) {
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      el.setAttribute('aria-invalid', 'true');
+      resultsEl.hidden = true;
+      statusEl.textContent = '';
+      shown = false;
+    }
+
+    function calculate(scroll: boolean) {
+      ormEl.removeAttribute('aria-invalid');
+      customEl.removeAttribute('aria-invalid');
+      const orm = validateWeight(ormEl.value, 'your one rep max');
+      if (!orm.ok) return fail(orm.error, ormEl);
+      const customText = customEl.value.trim();
+      const custom = Number(customText);
+      if (customText !== '' && (!Number.isFinite(custom) || custom < 1 || custom > 100)) {
+        return fail('The custom percentage must be a number from 1 to 100.', customEl);
+      }
+      errorEl.hidden = true;
+      const u = unit();
+      const ormKg = toKg(orm.value, u);
+
+      let customHtml = '';
+      if (customText !== '') {
+        const row = percentOf(ormKg, custom, u);
+        customHtml = `<div class="result-headline">
+          <div class="result-label">${esc(num(custom))}% of ${esc(num(orm.value))} ${u}</div>
+          <div class="result-big">${f1(row.raw)} ${u}</div>
+          <p class="result-sub">Loadable with standard plates: <strong>${esc(num(row.loadable))} ${u}</strong>
+            (rounded down to the nearest ${num(loadStep(u))} ${u}).</p>
+          <p class="actions" style="justify-content:center"><button type="button" class="btn btn-small" data-load-plates="${row.loadable}">Load plates for ${esc(num(row.loadable))} ${u}</button></p>
+        </div>`;
+        statusEl.textContent = `${num(custom)}% of ${num(orm.value)} ${u} is ${f1(row.raw)} ${u}.`;
+      } else {
+        statusEl.textContent = `Percentage table ready for a ${num(orm.value)} ${u} one rep max.`;
+      }
+
+      coreEl.innerHTML = `${customHtml}
+        <h3>Percentage table</h3>
+        ${percentTableHtml(ormKg, u, { caption: `Working weights for a ${num(orm.value)} ${u} one rep max` })}`;
+      resultsEl.hidden = false;
+      shown = true;
+      document.dispatchEvent(new CustomEvent('sc:result', {
+        detail: { unit: u, e1rm: customText !== '' ? percentOf(ormKg, custom, u).loadable : orm.value },
+      }));
+      if (scroll) scrollToEl(resultsEl);
+    }
+
+    wirePlateButtons(coreEl, unit);
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
+  }
+</script>
