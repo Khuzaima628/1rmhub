@@ -6,11 +6,10 @@ export const SITE = {
   name: 'StrengthCalc',
   tagline: 'Free, transparent one rep max calculators',
   /**
-   * Public contact address shown on Contact, About and Privacy.
-   * TODO(launch blocker): set a real, monitored address before launch.
-   * While empty, pages show a neutral notice and the build prints a warning.
+   * Public contact address shown on Contact, About, Privacy and Terms.
+   * If ever emptied, pages show a visible notice and the build prints a warning.
    */
-  contactEmail: '',
+  contactEmail: 'strengthcalc.team@outlook.com',
   /** Unit the calculators start in (visitors can always switch). */
   defaultUnit: 'lb' as 'kg' | 'lb',
   /** Effective / last-updated date for Privacy, Terms and Disclaimer. */
