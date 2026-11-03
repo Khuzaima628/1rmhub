@@ -28,12 +28,18 @@ can progress steadily for months instead of grinding through weights that are to
 
 ## Training max vs. one rep max
 
-| | One rep max (1RM) | Training max (TM) |
-|---|---|---|
-| What it is | The most you can lift once with good form | A planning number, usually 85–90% of your 1RM |
-| How you get it | A tested single, or an estimate from a heavy set | Your 1RM × 0.90 (or 0.85) |
-| What it's for | Measuring maximal strength | Calculating the weights you train with |
-| Should you lift it? | Only when testing | It is not a max — you are not meant to "hit" it |
+<div class="table-wrap">
+  <table>
+    <caption>One rep max and training max compared</caption>
+    <thead><tr><th scope="col"><span class="visually-hidden">Question</span></th><th scope="col">One rep max (1RM)</th><th scope="col">Training max (TM)</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">What it is</th><td>The most you can lift once with good form</td><td>A planning number, usually 85–90% of your 1RM</td></tr>
+      <tr><th scope="row">How you get it</th><td>A tested single, or an estimate from a heavy set</td><td>Your 1RM × 0.90 (or 0.85)</td></tr>
+      <tr><th scope="row">What it's for</th><td>Measuring maximal strength</td><td>Calculating the weights you train with</td></tr>
+      <tr><th scope="row">Should you lift it?</th><td>Only when testing</td><td>It is not a max — you are not meant to "hit" it</td></tr>
+    </tbody>
+  </table>
+</div>
 
 ## How to calculate your training max
 
@@ -50,10 +56,16 @@ can progress steadily for months instead of grinding through weights that are to
 Say your best recent set was 225 lb for 5 reps. The six formulas on StrengthCalc estimate your
 1RM at about **{f1(ex.average)} lb** (range {f1(ex.min)}–{f1(ex.max)} lb).
 
-| | Calculation | Training max | Loadable |
-|---|---|---|---|
-| 90% training max | {f1(ex.average)} × 0.90 | {f1(tm90)} lb | {loadableDown(tm90, 5)} lb |
-| 85% training max | {f1(ex.average)} × 0.85 | {f1(tm85)} lb | {loadableDown(tm85, 5)} lb |
+<div class="table-wrap">
+  <table>
+    <caption>Training max from a 225 lb × 5 set</caption>
+    <thead><tr><th scope="col">Option</th><th scope="col">Calculation</th><th scope="col" class="num">Training max</th><th scope="col" class="num">Loadable</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">90% training max</th><td>{f1(ex.average)} × 0.90</td><td class="num">{f1(tm90)} lb</td><td class="num">{loadableDown(tm90, 5)} lb</td></tr>
+      <tr><th scope="row">85% training max</th><td>{f1(ex.average)} × 0.85</td><td class="num">{f1(tm85)} lb</td><td class="num">{loadableDown(tm85, 5)} lb</td></tr>
+    </tbody>
+  </table>
+</div>
 
 A session prescribed as "3 sets of 5 at 75%" would then use 75% of {loadableDown(tm90, 5)} lb,
 about {f1(loadableDown(tm90, 5) * 0.75)} lb — noticeably lighter than 75% of the full estimate.
@@ -90,10 +102,16 @@ a training max that is too high leads to missed reps and stalled progress.
 The common convention, used in Wendler's 5/3/1, is to raise the training max after each training
 cycle (usually 3–4 weeks):
 
-| Lift type | Increase per cycle |
-|---|---|
-| Upper body (bench press, overhead press) | +5 lb (+2.5 kg) |
-| Lower body (squat, deadlift) | +10 lb (+5 kg) |
+<div class="table-wrap">
+  <table>
+    <caption>Training max increase per cycle (5/3/1 convention)</caption>
+    <thead><tr><th scope="col">Lift type</th><th scope="col">Increase per cycle</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Upper body (bench press, overhead press)</th><td>+5 lb (+2.5 kg)</td></tr>
+      <tr><th scope="row">Lower body (squat, deadlift)</th><td>+10 lb (+5 kg)</td></tr>
+    </tbody>
+  </table>
+</div>
 
 **When not to increase it:** if you miss the prescribed reps, or the last sets turn into grinders,
 keep the training max the same for another cycle or lower it. A simple reset is to re-estimate

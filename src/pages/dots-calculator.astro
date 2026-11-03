@@ -7,7 +7,7 @@ import AdSlot from '../components/AdSlot.astro';
 import { DOTS_COEFFICIENTS, DOTS_BODYWEIGHT_RANGE, dotsScore } from '../lib/dots.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, formatDate } from '../config/site';
+import { SITE, formatDate, reviewedFor } from '../config/site';
 
 const title = 'DOTS Calculator — Powerlifting Score by Bodyweight';
 const description =
@@ -25,7 +25,7 @@ const examples = [
 ].map((e) => ({ ...e, score: dotsScore(e.total, e.bw, e.sex).score }));
 const fmt = (c: number) => String(c);
 const jsonLd = [
-  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: 'StrengthCalc DOTS Calculator', description,
     features: ['DOTS score for men and women', 'Total from squat, bench and deadlift', 'kg and lb'] }),
 ];
@@ -36,7 +36,7 @@ const jsonLd = [
     Score your powerlifting total against your bodyweight with the DOTS formula, so lifters of
     different sizes can be compared on one scale.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time></p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
 
   <DotsCalculator />
 

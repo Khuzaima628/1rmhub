@@ -9,7 +9,7 @@ import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { webAppNode, webPageNode } from '../lib/schema';
-import { SITE, formatDate } from '../config/site';
+import { SITE, formatDate, reviewedFor } from '../config/site';
 
 interface Item { href: string; title: string; text: string }
 interface Props {
@@ -30,7 +30,7 @@ const { title, description, path, name, h1, lead, exercise, lift, example, relat
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const url = `${site}${path}`;
 const jsonLd = [
-  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({
     site, url, name: `StrengthCalc ${name}`, description,
     features: ['Six-formula 1RM estimates with range', 'Percentage training table', 'Plate loader', 'Warm-up generator'],
@@ -40,7 +40,7 @@ const jsonLd = [
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name, href: path }]} jsonLd={jsonLd}>
   <h1>{h1}</h1>
   <p class="lead">{lead}</p>
-  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · <a href="/methodology/">How we calculate</a></p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · <a href="/methodology/">How we calculate</a></p>
 
   <OneRepMaxCalculator exercise={exercise} heading={`${lift} 1RM calculator`} />
 

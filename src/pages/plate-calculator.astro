@@ -6,7 +6,7 @@ import AdSlot from '../components/AdSlot.astro';
 import { solvePlates, KG_PLATES, LB_PLATES } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, formatDate } from '../config/site';
+import { SITE, formatDate, reviewedFor } from '../config/site';
 
 const title = 'Plate Calculator — What Plates to Put on the Bar';
 const description =
@@ -18,7 +18,7 @@ const url = `${site}${path}`;
 const lbRows = [95, 135, 185, 225, 275, 315, 365, 405].map((t) => ({ t, ...solvePlates(t, 45, LB_PLATES) }));
 const kgRows = [40, 60, 80, 100, 120, 140, 160, 180].map((t) => ({ t, ...solvePlates(t, 20, KG_PLATES) }));
 const jsonLd = [
-  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: 'StrengthCalc Plate Calculator', description,
     features: ['Per-side plate breakdown', 'Custom bar weight', 'Choose available plate sizes', 'Never exceeds the target weight'] }),
 ];
@@ -29,7 +29,7 @@ const jsonLd = [
     Enter the weight you want on the bar and see exactly which plates to load on each side.
     Choose your bar and the plate sizes your gym actually has.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time></p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
 
   <section class="card calculator" aria-labelledby="plate-heading">
     <h2 id="plate-heading">Barbell plate calculator</h2>

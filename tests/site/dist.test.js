@@ -127,6 +127,15 @@ describe('content structure', () => {
     }
   });
 
+  it('every table has a caption and no empty header cells', () => {
+    for (const p of pages) {
+      for (const t of p.html.match(/<table[\s\S]*?<\/table>/g) ?? []) {
+        expect(t, `${p.route} table without <caption>`).toMatch(/<caption>/);
+        expect(t, `${p.route} empty <th>`).not.toMatch(/<th[^>]*>\s*<\/th>/);
+      }
+    }
+  });
+
   it('every image has alt text', () => {
     for (const p of pages) {
       for (const [tag] of p.html.matchAll(/<img\b[^>]*>/g)) expect(tag, p.route).toMatch(/\salt="/);
@@ -269,6 +278,9 @@ describe('sitemap, robots and 404', () => {
       // Guides show their date in article:modified_time; it must agree.
       const modified = page.html.match(/property="article:modified_time" content="([^"]+)"/)?.[1];
       if (modified) expect(lastmod.slice(0, 10), loc).toBe(modified.slice(0, 10));
+      // Calculator pages show "Last reviewed <time datetime=…>"; it must agree too.
+      const reviewed = page.html.match(/Last reviewed <time datetime="(\d{4}-\d{2}-\d{2})"/)?.[1];
+      if (reviewed) expect(lastmod.slice(0, 10), loc).toBe(reviewed);
     }
   });
 

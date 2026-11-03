@@ -14,9 +14,23 @@ export const SITE = {
   defaultUnit: 'lb' as 'kg' | 'lb',
   /** Effective / last-updated date for Privacy, Terms and Disclaimer. */
   policyDate: '2026-11-02',
-  /** Date the calculator pages and methodology were last reviewed. */
+  /** Default date the calculator pages and methodology were last reviewed. */
   contentReviewed: '2026-11-02',
 };
+
+/**
+ * Pages reviewed after the site-wide date. When a page's content changes, add
+ * (or update) its path here: the visible "Last reviewed" date, its JSON-LD and
+ * its sitemap <lastmod> (astro.config.mjs) all read from reviewedFor().
+ */
+const PAGE_REVIEWED: Record<string, string> = {
+  '/dots-calculator/': '2026-11-03',
+};
+
+/** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
+export function reviewedFor(path: string): string {
+  return PAGE_REVIEWED[path] ?? SITE.contentReviewed;
+}
 
 /**
  * The real person responsible for the site, shown on About, in guide bylines
@@ -80,6 +94,7 @@ export const FOOTER_GROUPS = [
     links: [
       { href: '/guides/1rm-formulas/', label: '1RM Formula Guide' },
       { href: '/guides/how-to-test-1rm/', label: 'How to Test Your 1RM Safely' },
+      { href: '/guides/training-max/', label: 'What Is a Training Max?' },
       { href: '/methodology/', label: 'Methodology' },
       { href: '/guides/', label: 'All guides' },
     ],

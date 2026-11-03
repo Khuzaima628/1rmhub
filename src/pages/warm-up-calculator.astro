@@ -6,7 +6,7 @@ import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, formatDate } from '../config/site';
+import { SITE, formatDate, reviewedFor } from '../config/site';
 
 const title = 'Warm-up Calculator — Warm-up Sets for Lifting';
 const description =
@@ -15,7 +15,7 @@ const path = '/warm-up-calculator/';
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const url = `${site}${path}`;
 const jsonLd = [
-  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: 'StrengthCalc Warm-up Calculator', description,
     features: ['Customizable warm-up jumps and reps', 'Loadable weights rounded down', 'Plates per side for every set', 'kg and lb'] }),
 ];
@@ -26,7 +26,7 @@ const jsonLd = [
     Enter your top set for the day and get a warm-up ramp that builds up to it, with each weight
     rounded down to what your plates can make.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time></p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
 
   <section class="card calculator" aria-labelledby="wu-heading">
     <h2 id="wu-heading">Warm-up set generator</h2>

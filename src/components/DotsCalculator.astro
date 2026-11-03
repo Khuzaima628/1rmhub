@@ -69,11 +69,21 @@ const unit = SITE.defaultUnit;
       out.innerHTML = '';
     });
 
-    // Keep the total in sync with the three lifts while all three are filled.
+    // The total follows the three lifts while it was filled in from them. If a
+    // lift is then cleared or made invalid, that auto-filled total is cleared too
+    // (never scored stale). A total the visitor typed themselves is left alone.
+    let totalFromLifts = false;
+    totalEl.addEventListener('input', () => { totalFromLifts = false; });
     lifts.forEach((el) => el.addEventListener('input', () => {
       const values = lifts.map((l) => Number(l.value));
       if (lifts.every((l) => l.value.trim() !== '') && values.every((v) => Number.isFinite(v) && v > 0)) {
         totalEl.value = num(values.reduce((a, b) => a + b, 0));
+        totalFromLifts = true;
+        out.innerHTML = '';
+      } else if (totalFromLifts) {
+        totalEl.value = '';
+        totalFromLifts = false;
+        out.innerHTML = '';
       }
     }));
 

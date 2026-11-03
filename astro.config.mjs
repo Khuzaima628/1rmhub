@@ -6,12 +6,12 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import { readdirSync, readFileSync } from 'node:fs';
-import { SITE } from './src/config/site.ts';
+import { SITE, reviewedFor } from './src/config/site.ts';
 
 // <lastmod> for each sitemap URL, taken from the dates the pages themselves
 // show — so search engines get the same date visitors see, never the build
 // time. Guides: frontmatter `updated`, else `published`. Legal pages: the
-// policy date. Everything else: the site-wide "Last reviewed" date.
+// policy date. Everything else: the page's "Last reviewed" date (reviewedFor).
 const LEGAL = ['/privacy/', '/terms/', '/disclaimer/'];
 const GUIDES_DIR = new URL('./src/content/guides/', import.meta.url);
 const guideDates = Object.fromEntries(
@@ -25,7 +25,7 @@ const guideDates = Object.fromEntries(
 );
 function lastmodFor(url) {
   const path = new URL(url).pathname;
-  return guideDates[path] ?? (LEGAL.includes(path) ? SITE.policyDate : SITE.contentReviewed);
+  return guideDates[path] ?? (LEGAL.includes(path) ? SITE.policyDate : reviewedFor(path));
 }
 
 export default defineConfig({

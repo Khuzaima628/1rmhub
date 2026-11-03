@@ -7,7 +7,7 @@ import AdSlot from '../components/AdSlot.astro';
 import { rpeFraction } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, formatDate } from '../config/site';
+import { SITE, formatDate, reviewedFor } from '../config/site';
 
 const title = 'RPE Calculator — Estimate 1RM from RPE & Reps in Reserve';
 const description =
@@ -22,7 +22,7 @@ const chartRows = Array.from({ length: 10 }, (_, i) => i + 1).map((reps) => ({
   cells: chartRpes.map((rpe) => rpeFraction(reps, rpe)),
 }));
 const jsonLd = [
-  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: 'StrengthCalc RPE Calculator', description,
     features: ['1RM estimate from weight, reps and RPE', 'Weight for any reps at any RPE', 'Reps-in-reserve scale', 'kg and lb'] }),
 ];
@@ -33,7 +33,7 @@ const jsonLd = [
     Estimate your one rep max from a set you rated by RPE — no need to go to failure — then work out
     the weight for your next set at any reps and RPE.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · <a href="/methodology/">How we calculate</a></p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · <a href="/methodology/">How we calculate</a></p>
 
   <RpeCalculator />
 

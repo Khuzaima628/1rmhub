@@ -150,5 +150,8 @@ const rpeLabel = (r: number) => `RPE ${r} — ${10 - r} rep${10 - r === 1 ? '' :
     form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
     planForm.addEventListener('submit', (e) => { e.preventDefault(); plan(); });
     planRpe.addEventListener('change', plan);
+    // Update as target reps are typed; an empty box mid-edit waits for a value
+    // instead of flashing an error (the button still validates it).
+    planReps.addEventListener('input', () => { if (planReps.value.trim() !== '') plan(); });
   }
 </script>

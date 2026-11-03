@@ -7,7 +7,7 @@ import AdSlot from '../components/AdSlot.astro';
 import { repsAtPercent } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, formatDate } from '../config/site';
+import { SITE, formatDate, reviewedFor } from '../config/site';
 
 const title = '1RM Percentage Calculator — Training Weights from Your Max';
 const description =
@@ -17,7 +17,7 @@ const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const url = `${site}${path}`;
 const repRows = [95, 90, 85, 80, 75, 70, 65, 60].map(repsAtPercent);
 const jsonLd = [
-  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: 'StrengthCalc 1RM Percentage Calculator', description,
     features: ['Any percentage of a 1RM', 'Percentage table from 100% to 50%', 'Round-down loadable weights', 'Plate loader'] }),
 ];
@@ -28,7 +28,7 @@ const jsonLd = [
     Enter a one rep max — tested or estimated — to get working weights for every common
     percentage, or type any percentage you need. Every weight is also rounded down to one you can load.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={SITE.contentReviewed}>{formatDate(SITE.contentReviewed)}</time> · Don&rsquo;t know your max? <a href="/">Estimate it first</a>.</p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Don&rsquo;t know your max? <a href="/">Estimate it first</a>.</p>
 
   <PercentageCalculator />
 

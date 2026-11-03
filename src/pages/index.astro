@@ -9,7 +9,7 @@ import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { webAppNode, webPageNode, faqNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE } from '../config/site';
+import { SITE, reviewedFor } from '../config/site';
 
 const title = 'One Rep Max Calculator — Free 1RM Calculator (6 Formulas)';
 const description =
@@ -64,7 +64,7 @@ const faqs = [
 ];
 
 const jsonLd = [
-  webPageNode({ site, url, name: title, description, reviewed: SITE.contentReviewed }),
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor('/') }),
   webAppNode({
     site, url, name: 'StrengthCalc One Rep Max Calculator', description,
     features: [
