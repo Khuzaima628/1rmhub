@@ -3,6 +3,10 @@
  * bodyweights:  DOTS = total × 500 ÷ P(bodyweight), with
  *   P(x) = a + b·x + c·x² + d·x³ + e·x⁴   (x = bodyweight in kg)
  * using separate coefficient sets for men and women. All inputs in KG.
+ * Coefficients and the "use the boundary value outside the range" rule are from
+ * the formula's author: Konertz (2019), https://kraftsport-colonia.de/dots.
+ * The 40–210 kg / 40–150 kg ranges are as given by German Wikipedia
+ * ("DOTS-Relativwertung"), which attributes them to the author.
  *
  * Pure functions only. Coefficients are locked by tests (including a
  * published worked example), so a typo cannot ship silently.

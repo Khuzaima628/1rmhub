@@ -92,9 +92,17 @@ describe('weight for reps at an RPE', () => {
 });
 
 describe('DOTS score', () => {
+  // Source of the coefficients: Konertz (2019), "Die DOTS-Formeln – die neuen
+  // Wilks", https://kraftsport-colonia.de/dots (the formula author's own text).
   it('coefficients are the published values', () => {
     expect(DOTS_COEFFICIENTS.male).toEqual([-307.75076, 24.0900756, -0.1918759221, 0.0007391293, -0.000001093]);
     expect(DOTS_COEFFICIENTS.female).toEqual([-57.96288, 13.6175032, -0.1126655495, 0.0005158568, -0.0000010706]);
+  });
+
+  it('independent worked example (German Wikipedia, "DOTS-Relativwertung"): three bench pressers', () => {
+    expect(dotsScore(100, 74, 'male').score).toBeCloseTo(72.365, 3);
+    expect(dotsScore(115, 93, 'male').score).toBeCloseTo(73.169, 3);
+    expect(dotsScore(125, 120, 'male').score).toBeCloseTo(71.788, 3);
   });
 
   it('published worked example: 90 kg male → denominator ≈ 773.25', () => {

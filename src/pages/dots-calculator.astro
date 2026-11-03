@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DotsCalculator from '../components/DotsCalculator.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { DOTS_COEFFICIENTS, DOTS_BODYWEIGHT_RANGE, dotsScore } from '../lib/dots.js';
 import { webAppNode, webPageNode } from '../lib/schema';
@@ -47,6 +48,36 @@ const jsonLd = [
         deadlift) by a curve based on bodyweight, so a lighter and a heavier lifter can be compared
         fairly. A higher score means a stronger total for your size.
       </p>
+      <p>
+        DOTS was developed by Tim Konertz and published in 2019. According to its author, the name
+        stands for &ldquo;Dynamic Objective Team Scoring&rdquo;: it was first built for the German team
+        league, to score team competitions fairly — including mixed teams of men and women. The German powerlifting federation (BVDK)
+        replaced Wilks points with DOTS for its team competitions from 2020.
+      </p>
+    </section>
+
+    <section aria-labelledby="dots-vs-heading">
+      <h2 id="dots-vs-heading">How is DOTS different from Wilks and IPF points?</h2>
+      <p>
+        All three turn a total and a bodyweight into one comparable number, but they use different
+        curves, so the same total gives different scores in each.
+      </p>
+      <ul>
+        <li><strong>Wilks</strong> was created by Robert Wilks in the 1990s and was the main formula in the
+          International Powerlifting Federation (IPF) until the IPF decided in 2018 to replace it.
+          Konertz&rsquo;s criticism is that Wilks was fitted to the data available at the time, and with
+          today&rsquo;s results it favours very light and very heavy men and very light women.</li>
+        <li><strong>IPF points</strong> replaced Wilks in the IPF from 2019. The IPF still uses its own
+          points formula, not DOTS.</li>
+        <li><strong>DOTS</strong> was fitted to newer raw and equipped results with a smooth curve that keeps
+          rising across the whole bodyweight range, and was designed so men&rsquo;s and women&rsquo;s scores
+          can be compared in mixed teams. Its author set the scale so that typical scores are close to
+          Wilks scores.</li>
+      </ul>
+      <p>
+        No formula is &ldquo;correct&rdquo;: each is a model fitted to competition data. Use the one your
+        federation or competition uses, and compare scores only within the same formula.
+      </p>
     </section>
 
     <section aria-labelledby="formula-dots-heading">
@@ -66,8 +97,8 @@ const jsonLd = [
       <p>
         The curves are fitted for bodyweights of {DOTS_BODYWEIGHT_RANGE.male.min}–{DOTS_BODYWEIGHT_RANGE.male.max} kg
         for men and {DOTS_BODYWEIGHT_RANGE.female.min}–{DOTS_BODYWEIGHT_RANGE.female.max} kg for women. Outside that
-        range the calculator uses the nearest limit and tells you, because the curve stops making sense
-        beyond it. Pound inputs are converted to kilograms (1 kg = 2.20462 lb) before scoring.
+        range the calculator uses the nearest limit and tells you, as the formula&rsquo;s author
+        specifies, because the curve stops making sense beyond it. Pound inputs are converted to kilograms (1 kg = 2.20462 lb) before scoring.
       </p>
     </section>
 
@@ -100,4 +131,5 @@ const jsonLd = [
   <AdSlot />
 
   <RelatedLinks items={[LINKS.home, LINKS.squat, LINKS.bench, LINKS.deadlift]} />
+  <SourceList ids={['konertz', 'bvdkdots']} />
 </BaseLayout>

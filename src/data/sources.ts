@@ -66,6 +66,16 @@ export const SOURCES: Record<string, Source> = {
     text: 'Helms, E. R., Byrnes, R. K., Cooke, D. M., et al. (2018). RPE vs. percentage 1RM loading in periodized programs matched for sets and repetitions. Frontiers in Physiology, 9, 247.',
     url: 'https://doi.org/10.3389/fphys.2018.00247',
   },
+  konertz: {
+    id: 'konertz',
+    text: 'Konertz, T. (2019). Die DOTS-Formeln – die neuen Wilks [The DOTS formulas – the new Wilks]. Kraftsport Colonia. (The author’s own description of the formula, in German.)',
+    url: 'https://kraftsport-colonia.de/dots',
+  },
+  bvdkdots: {
+    id: 'bvdkdots',
+    text: 'Bundesverband Deutscher Kraftdreikämpfer (BVDK). (2019). DOTS Punkte für Mannschaftswettkämpfe ab 2020 [DOTS points for team competitions from 2020]. Archived copy.',
+    url: 'https://web.archive.org/web/20191112082015/https://bvdk.de/dots-punkte-f%C3%BCr-mannschaftswettk%C3%A4mpfe-ab-2020',
+  },
   nsca: {
     id: 'nsca',
     text: 'Haff, G. G., & Triplett, N. T. (Eds.). (2016). Essentials of Strength Training and Conditioning (4th ed.). Champaign, IL: Human Kinetics.',
