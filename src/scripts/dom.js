@@ -85,6 +85,7 @@ export function bindUnitToggle(group, onChange) {
 
 /** Convert a typed weight in an input from one unit to another, keeping its meaning. */
 export function convertInput(input, from, to) {
+  syncExample(input, to);
   const text = input.value.trim();
   if (text === '' || !Number.isFinite(Number(text)) || from === to) return;
   input.value = num(fromKg(toKg(Number(text), from), to));
@@ -106,4 +107,11 @@ export function scrollToEl(el, block = 'start') {
 /** Sync every [data-unit-label] inside root with the current unit. */
 export function paintUnitLabels(root, unit) {
   root.querySelectorAll('[data-unit-label]').forEach((el) => { el.textContent = unit; });
+  root.querySelectorAll('input[data-ph-kg]').forEach((el) => syncExample(el, unit));
+}
+
+/** Show the example value ("e.g. 225") for the unit, from data-ph-kg / data-ph-lb. */
+function syncExample(input, unit) {
+  const example = input.dataset[unit === 'kg' ? 'phKg' : 'phLb'];
+  if (example) input.placeholder = example;
 }

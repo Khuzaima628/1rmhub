@@ -21,7 +21,7 @@ const unit = SITE.defaultUnit;
       <UnitToggle id="dots-unit" unit={unit} />
       <div class="field">
         <label for="dots-bw">Bodyweight (<span data-unit-label>{unit}</span>)</label>
-        <input id="dots-bw" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 83' : 'e.g. 183'} autocomplete="off" aria-describedby="dots-error" />
+        <input id="dots-bw" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 83' : 'e.g. 183'} data-ph-kg="e.g. 83" data-ph-lb="e.g. 183" autocomplete="off" aria-describedby="dots-error" />
       </div>
     </div>
     <fieldset class="plate-fieldset">

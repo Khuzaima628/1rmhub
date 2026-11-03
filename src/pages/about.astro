@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactEmail from '../components/ContactEmail.astro';
 import { webPageNode } from '../lib/schema';
 import { SITE, EDITOR } from '../config/site';
+import { ADS_ENABLED } from '../config/ads';
 
 const title = 'About StrengthCalc — Free, Transparent 1RM Calculators';
 const description =
@@ -46,13 +47,21 @@ const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, descript
     </p>
 
     <h2>How the site is funded</h2>
-    <p>
-      {SITE.name} currently shows no advertising and earns no money. In future it may display
-      advertising (such as Google AdSense) to cover its costs. If it does, ads will be clearly
-      labelled, kept away from the calculators&rsquo; inputs and results, and will never influence
-      how anything is calculated. The <a href="/privacy/">privacy policy</a> will be updated before
-      any ads appear.
-    </p>
+    {ADS_ENABLED ? (
+      <p>
+        {SITE.name} is funded by advertising from Google AdSense. Ads are clearly labelled, kept away
+        from the calculators&rsquo; inputs and results, and never influence how anything is calculated.
+        The <a href="/privacy/#advertising">privacy policy</a> explains how ads use cookies.
+      </p>
+    ) : (
+      <p>
+        {SITE.name} currently shows no advertising and earns no money. In future it may display
+        advertising (such as Google AdSense) to cover its costs. If it does, ads will be clearly
+        labelled, kept away from the calculators&rsquo; inputs and results, and will never influence
+        how anything is calculated. The <a href="/privacy/">privacy policy</a> will be updated before
+        any ads appear.
+      </p>
+    )}
 
     <h2>Contact</h2>
     <p>Questions, corrections and suggestions are welcome: <ContactEmail />. See the <a href="/contact/">contact page</a> for details.</p>

@@ -27,7 +27,7 @@ const gid = gearId ?? `${id}-gear`;
       <div class="field">
         <label for={`${id}-target`}>Target weight (<span data-unit-label>{unit}</span>)</label>
         <input id={`${id}-target`} type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} autocomplete="off" data-target />
+          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} data-ph-kg="e.g. 100" data-ph-lb="e.g. 225" autocomplete="off" data-target />
       </div>
     </div>
     {!gearId && <GearFields id={gid} unit={unit} />}

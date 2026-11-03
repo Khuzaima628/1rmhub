@@ -256,6 +256,27 @@ describe('sitemap, robots and 404', () => {
     expect(urls.sort()).toEqual(indexable().map((p) => `${SITE}${p.route}`).sort());
   });
 
+  it('every sitemap URL has a lastmod matching the date the page itself shows', () => {
+    const index = readFileSync(join(DIST, 'sitemap-index.xml'), 'utf8');
+    const files = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(SITE, ''));
+    const entries = files.flatMap((f) => [...readFileSync(join(DIST, f), 'utf8').matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => m[1]));
+    expect(entries.length).toBe(indexable().length);
+    for (const e of entries) {
+      const loc = e.match(/<loc>([^<]+)<\/loc>/)[1];
+      const lastmod = e.match(/<lastmod>([^<]+)<\/lastmod>/)?.[1];
+      expect(lastmod, loc).toMatch(/^\d{4}-\d{2}-\d{2}/);
+      const page = pages.find((p) => `${SITE}${p.route}` === loc);
+      // Guides show their date in article:modified_time; it must agree.
+      const modified = page.html.match(/property="article:modified_time" content="([^"]+)"/)?.[1];
+      if (modified) expect(lastmod.slice(0, 10), loc).toBe(modified.slice(0, 10));
+    }
+  });
+
+  it('/sitemap.xml redirects to the sitemap index', () => {
+    const redirects = readFileSync(join(DIST, '_redirects'), 'utf8');
+    expect(redirects).toMatch(/^\/sitemap\.xml \/sitemap-index\.xml 301$/m);
+  });
+
   it('robots.txt allows crawling and points to the sitemap on the configured site', () => {
     const robots = readFileSync(join(DIST, 'robots.txt'), 'utf8');
     expect(robots).toMatch(/User-agent: \*\nAllow: \//);
@@ -271,7 +292,43 @@ describe('sitemap, robots and 404', () => {
     expect(p.html).not.toContain('application/ld+json');
   });
 
-  it('no ad code ships while ads are disabled', () => {
-    for (const p of pages) expect(p.html, p.route).not.toMatch(/adsbygoogle|pagead2\.googlesyndication/);
+});
+
+// Ads are switched by PUBLIC_ADSENSE_CLIENT at build time (src/config/ads.ts);
+// these checks follow the same variable, so they hold in both modes.
+describe('advertising switch', () => {
+  const client = (process.env.PUBLIC_ADSENSE_CLIENT ?? '').trim();
+  const privacy = () => pages.find((p) => p.route === '/privacy/').html;
+
+  it('the privacy policy description does not deny the analytics the site uses', () => {
+    expect(privacy()).not.toMatch(/name="description" content="[^"]*no analytics/i);
   });
+
+  if (!client) {
+    it('no ad code and no ads.txt ship while ads are disabled', () => {
+      for (const p of pages) expect(p.html, p.route).not.toMatch(/adsbygoogle|pagead2\.googlesyndication/);
+      expect(existsSync(join(DIST, 'ads.txt'))).toBe(false);
+      expect(privacy()).not.toContain('Advertising and cookies');
+    });
+  } else {
+    it('ads.txt holds exactly Google\'s line for this publisher', () => {
+      expect(readFileSync(join(DIST, 'ads.txt'), 'utf8'))
+        .toBe(`google.com, ${client.replace(/^ca-/, '')}, DIRECT, f08c47fec0942fa0\n`);
+    });
+
+    it('the AdSense loader is on every page exactly once, for this publisher', () => {
+      for (const p of pages) {
+        const loaders = p.html.match(/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=([\w-]+)/g) ?? [];
+        expect(loaders, p.route).toEqual([`pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`]);
+      }
+    });
+
+    it('the privacy policy carries Google\'s required advertising disclosures', () => {
+      const t = text(privacy());
+      expect(t).toContain('Third-party vendors, including Google, use cookies to serve ads based on your prior visits');
+      expect(privacy()).toContain('https://adssettings.google.com/');
+      expect(privacy()).toContain('https://policies.google.com/technologies/partner-sites');
+      expect(t).not.toContain('shows no ads');
+    });
+  }
 });

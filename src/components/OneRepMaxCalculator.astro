@@ -35,7 +35,7 @@ const unit = SITE.defaultUnit;
       <div class="field">
         <label for="weight">Weight lifted</label>
         <input id="weight" name="weight" type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} autocomplete="off" aria-describedby="form-error" />
+          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} data-ph-kg="e.g. 100" data-ph-lb="e.g. 225" autocomplete="off" aria-describedby="form-error" />
       </div>
       <UnitToggle id="calc-unit" unit={unit} />
       <div class="field">

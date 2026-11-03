@@ -17,7 +17,7 @@ const rpeLabel = (r: number) => `RPE ${r} — ${10 - r} rep${10 - r === 1 ? '' :
       <div class="field">
         <label for="rpe-weight">Weight lifted</label>
         <input id="rpe-weight" type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} autocomplete="off" aria-describedby="rpe-error" />
+          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} data-ph-kg="e.g. 100" data-ph-lb="e.g. 225" autocomplete="off" aria-describedby="rpe-error" />
       </div>
       <UnitToggle id="rpe-unit" unit={unit} />
       <div class="field">

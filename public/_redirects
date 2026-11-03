@@ -1,0 +1,3 @@
+# Cloudflare Pages redirects (https://developers.cloudflare.com/pages/configuration/redirects/)
+# Astro's sitemap lives at /sitemap-index.xml; many tools look for /sitemap.xml first.
+/sitemap.xml /sitemap-index.xml 301

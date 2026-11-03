@@ -16,7 +16,7 @@ const unit = SITE.defaultUnit;
       <div class="field">
         <label for="tm-orm">Your 1RM <span class="hint">(tested or estimated)</span></label>
         <input id="tm-orm" type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? 'e.g. 140' : 'e.g. 315'} autocomplete="off" aria-describedby="tm-error" />
+          placeholder={unit === 'kg' ? 'e.g. 140' : 'e.g. 315'} data-ph-kg="e.g. 140" data-ph-lb="e.g. 315" autocomplete="off" aria-describedby="tm-error" />
       </div>
       <UnitToggle id="tm-unit" unit={unit} />
       <div class="field">

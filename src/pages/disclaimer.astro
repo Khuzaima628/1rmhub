@@ -1,6 +1,7 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
 import { SITE } from '../config/site';
+import { ADS_ENABLED } from '../config/ads';
 ---
 <LegalLayout
   title="Disclaimer — StrengthCalc"
@@ -46,8 +47,16 @@ import { SITE } from '../config/site';
   </p>
 
   <h2>Advertising and affiliate links</h2>
-  <p>
-    {SITE.name} currently contains no advertising and no affiliate links. If that changes, ads and
-    affiliate links will be clearly identified, and they will never affect how anything is calculated.
-  </p>
+  {ADS_ENABLED ? (
+    <p>
+      {SITE.name} shows ads served by Google AdSense, labelled &ldquo;Advertisement&rdquo;. It contains
+      no affiliate links. Advertisers have no influence over the content, and ads never affect how
+      anything is calculated. See the <a href="/privacy/#advertising">privacy policy</a> for how ads use cookies.
+    </p>
+  ) : (
+    <p>
+      {SITE.name} currently contains no advertising and no affiliate links. If that changes, ads and
+      affiliate links will be clearly identified, and they will never affect how anything is calculated.
+    </p>
+  )}
 </LegalLayout>

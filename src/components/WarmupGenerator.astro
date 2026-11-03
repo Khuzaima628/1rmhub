@@ -25,7 +25,7 @@ const gid = gearId ?? `${id}-gear`;
       <div class="field">
         <label for={`${id}-top`}>Top set weight (<span data-unit-label>{unit}</span>)</label>
         <input id={`${id}-top`} type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} autocomplete="off" data-top />
+          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} data-ph-kg="e.g. 100" data-ph-lb="e.g. 225" autocomplete="off" data-top />
       </div>
       <div class="field">
         <label for={`${id}-top-reps`}>Top set reps</label>

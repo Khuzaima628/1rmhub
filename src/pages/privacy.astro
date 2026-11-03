@@ -1,23 +1,38 @@
 ---
-// Privacy policy describing the site AS IT IS TODAY: no cookies, no
-// analytics, no ads. It MUST be updated before analytics or AdSense go live
-// (see the "Changes" section and AdSlot.astro).
+// Privacy policy describing the site AS IT IS: cookie-free Cloudflare Web
+// Analytics, preferences in local storage, and — only when ads are enabled in
+// src/config/ads.ts — Google AdSense with the disclosures Google requires.
+// Changing that switch changes this page, so the policy always matches what
+// the site actually does. Bump SITE.policyDate whenever the switch changes.
 import LegalLayout from '../layouts/LegalLayout.astro';
 import ContactEmail from '../components/ContactEmail.astro';
 import { SITE, EDITOR } from '../config/site';
+import { ADS_ENABLED } from '../config/ads';
+
+const description = ADS_ENABLED
+  ? "StrengthCalc's privacy policy: no accounts, cookie-free visitor statistics, and Google AdSense advertising cookies. Calculator inputs stay in your browser."
+  : "StrengthCalc's privacy policy: no accounts, no cookies and only cookie-free visitor statistics. Calculations run in your browser; inputs are never sent to us.";
 ---
 <LegalLayout
   title="Privacy Policy — StrengthCalc"
   h1="Privacy Policy"
-  description="StrengthCalc's privacy policy: no accounts, no cookies, no analytics. Calculations run in your browser and nothing you enter is sent to us."
+  description={description}
   path="/privacy/"
   name="Privacy Policy"
 >
-  <p class="answer">
-    In short: {SITE.name} has no accounts, sets no cookies and shows no ads. We count visits with
-    cookie-free, privacy-focused analytics. The calculators run entirely in your browser — the
-    numbers you enter are not sent to us.
-  </p>
+  {ADS_ENABLED ? (
+    <p class="answer">
+      In short: {SITE.name} has no accounts. We count visits with cookie-free analytics, and we show
+      ads from Google AdSense, which uses cookies as described below. The calculators run entirely in
+      your browser — the numbers you enter are not sent to us or to advertisers.
+    </p>
+  ) : (
+    <p class="answer">
+      In short: {SITE.name} has no accounts, sets no cookies and shows no ads. We count visits with
+      cookie-free, privacy-focused analytics. The calculators run entirely in your browser — the
+      numbers you enter are not sent to us.
+    </p>
+  )}
 
   <h2>Who we are</h2>
   <p>
@@ -29,7 +44,7 @@ import { SITE, EDITOR } from '../config/site';
   <ul>
     <li>No account, signup or login exists.</li>
     <li>Weights, reps, bodyweight and other calculator inputs are processed in your browser and are not transmitted to or stored by us.</li>
-    <li>We do not use cookies, advertising, or tracking that follows you across other websites.</li>
+    {!ADS_ENABLED && <li>We do not use cookies, advertising, or tracking that follows you across other websites.</li>}
   </ul>
 
   <h2>Visitor statistics</h2>
@@ -50,6 +65,26 @@ import { SITE, EDITOR } from '../config/site';
     this site&rsquo;s data in your browser settings.
   </p>
 
+  {ADS_ENABLED && (
+    <>
+      <h2 id="advertising">Advertising and cookies</h2>
+      <p>
+        We show ads served by Google AdSense. Ads are how the site stays free; your calculator inputs
+        are never passed to Google or any advertiser.
+      </p>
+      <ul>
+        <li>Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites.</li>
+        <li>Google&rsquo;s use of advertising cookies enables it and its partners to serve ads to you based on your visits to this site and/or other sites on the Internet.</li>
+        <li>You can opt out of personalised advertising in <a href="https://adssettings.google.com/" rel="noopener">Google&rsquo;s Ads Settings</a>, and opt out of some third-party vendors&rsquo; use of cookies for personalised advertising at <a href="https://www.aboutads.info/choices/" rel="noopener">aboutads.info</a>.</li>
+        <li>Learn <a href="https://policies.google.com/technologies/partner-sites" rel="noopener">how Google uses information from sites that use its services</a>.</li>
+      </ul>
+      <p>
+        Visitors in the European Economic Area, the United Kingdom and Switzerland are asked for consent
+        before advertising cookies are used, through a consent message shown on the site, and can change
+        that choice at any time from the same message.
+      </p>
+    </>
+  )}
   <h2>Share links</h2>
   <p>
     If you use &ldquo;Copy share link&rdquo;, your inputs are placed in the page address (for example
@@ -94,10 +129,17 @@ import { SITE, EDITOR } from '../config/site';
   </p>
 
   <h2>Changes to this policy</h2>
-  <p>
-    If we add analytics or advertising in the future — for example Google AdSense, which uses cookies
-    to serve and measure ads — we will update this policy <strong>before</strong> those features go
-    live, describe what is collected and by whom, and, where the law requires it, ask for your consent
-    first. The date at the top of this page shows when the policy last changed.
-  </p>
+  {ADS_ENABLED ? (
+    <p>
+      If we change what is collected or who collects it, we will update this policy before the change
+      takes effect. The date at the top of this page shows when the policy last changed.
+    </p>
+  ) : (
+    <p>
+      If we add advertising in the future — for example Google AdSense, which uses cookies to serve
+      and measure ads — we will update this policy <strong>before</strong> it goes live, describe what
+      is collected and by whom, and, where the law requires it, ask for your consent first. The date
+      at the top of this page shows when the policy last changed.
+    </p>
+  )}
 </LegalLayout>

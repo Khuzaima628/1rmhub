@@ -2,11 +2,9 @@
 // AdSlot — reserved, clearly labelled advertising position.
 //
 // Renders NOTHING until both are true:
-//   1. PUBLIC_ADSENSE_CLIENT is set at build time (e.g. "ca-pub-1234…"), and
+//   1. ads are enabled in src/config/ads.ts (PUBLIC_ADSENSE_CLIENT set), and
 //   2. a slot id is passed for this placement.
-// The client id is a public identifier, not a secret — never put private
-// credentials in PUBLIC_ variables. The AdSense loader script itself is NOT
-// included yet: add it (once, in BaseLayout) only after approval.
+// The loader script is added once in BaseLayout by the same switch.
 //
 // Placement rules (enforced by where pages use this component):
 // - never above the calculator or between inputs and results;
@@ -14,8 +12,8 @@
 // - at most one slot per screenful of content on mobile;
 // - fixed min-height so a loading ad does not shift the layout (CLS).
 //
-// BEFORE enabling: update the Privacy Policy (Google cookies, opt-out links),
-// publish ads.txt, and set up a Google-certified CMP for EEA/UK/Swiss visitors.
+// See src/config/ads.ts for everything else the switch turns on.
+import { ADSENSE_CLIENT } from '../config/ads';
 interface Props {
   /** AdSense ad-unit slot id for this placement. */
   slot?: string;
@@ -23,7 +21,7 @@ interface Props {
   minHeight?: number;
 }
 const { slot, minHeight = 280 } = Astro.props;
-const client = import.meta.env.PUBLIC_ADSENSE_CLIENT as string | undefined;
+const client = ADSENSE_CLIENT;
 const enabled = Boolean(client && slot);
 ---
 {enabled && (

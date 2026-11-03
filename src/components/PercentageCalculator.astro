@@ -16,7 +16,7 @@ const unit = SITE.defaultUnit;
       <div class="field">
         <label for="pct-orm">Your 1RM <span class="hint">(tested or estimated)</span></label>
         <input id="pct-orm" type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? 'e.g. 120' : 'e.g. 275'} autocomplete="off" aria-describedby="pct-error" />
+          placeholder={unit === 'kg' ? 'e.g. 120' : 'e.g. 275'} data-ph-kg="e.g. 120" data-ph-lb="e.g. 275" autocomplete="off" aria-describedby="pct-error" />
       </div>
       <UnitToggle id="pct-unit" unit={unit} />
       <div class="field">
