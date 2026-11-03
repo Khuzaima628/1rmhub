@@ -63,6 +63,15 @@ export function isoDate(d: string | Date): string {
   return (typeof d === 'string' ? new Date(`${d}T00:00:00Z`) : d).toISOString().slice(0, 10);
 }
 
+/**
+ * ISO date-time with an explicit timezone (start of the day, UTC), e.g.
+ * "2026-11-02T00:00:00+00:00". Google's Article guidelines expect
+ * datePublished/dateModified with a timezone; a bare date is flagged.
+ */
+export function isoDateTime(d: string | Date): string {
+  return `${isoDate(d)}T00:00:00+00:00`;
+}
+
 /** Primary navigation and footer link groups — the single list of public pages. */
 export const NAV = [
   { href: '/', label: '1RM Calculator' },

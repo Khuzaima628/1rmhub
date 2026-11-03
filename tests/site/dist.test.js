@@ -226,6 +226,18 @@ describe('structured data', () => {
     }
   });
 
+  it('Article dates are full date-times with a timezone, matching the visible date', () => {
+    const withTz = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/;
+    for (const { p, data } of graphs()) {
+      const article = data['@graph'].find((n) => n['@type'] === 'Article');
+      if (!article) continue;
+      expect(article.datePublished, p.route).toMatch(withTz);
+      expect(article.dateModified, p.route).toMatch(withTz);
+      const visible = p.html.match(/Published <time datetime="(\d{4}-\d{2}-\d{2})"/)?.[1];
+      expect(article.datePublished.slice(0, 10), p.route).toBe(visible);
+    }
+  });
+
   it('BreadcrumbList matches the visible breadcrumb on every non-home page', () => {
     for (const { p, data } of graphs()) {
       const crumbs = data['@graph'].find((n) => n['@type'] === 'BreadcrumbList');

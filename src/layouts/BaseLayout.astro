@@ -49,6 +49,8 @@ const graph = noindex
         if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
       } catch (e) { /* storage unavailable: follow the system setting */ }
     </script>
+    <!-- .ico for crawlers and older browsers (they request /favicon.ico by default); SVG for the rest. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     {ADSENSE_CLIENT && (

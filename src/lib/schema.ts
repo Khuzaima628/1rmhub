@@ -1,7 +1,7 @@
 // schema.org JSON-LD builders. Every node describes only what is visibly on
 // the page: no ratings, no reviews, no invented authors, no prices beyond the
 // true "free". Nodes are linked by @id so one page = one coherent @graph.
-import { SITE, EDITOR } from '../config/site';
+import { SITE, EDITOR, isoDateTime } from '../config/site';
 
 export type Node = Record<string, unknown>;
 export interface Crumb { name: string; href: string }
@@ -106,8 +106,8 @@ export function articleNode(opts: {
     description: opts.description,
     url: opts.url,
     mainEntityOfPage: { '@id': `${opts.url}#webpage` },
-    datePublished: opts.published.toISOString().slice(0, 10),
-    dateModified: (opts.updated ?? opts.published).toISOString().slice(0, 10),
+    datePublished: isoDateTime(opts.published),
+    dateModified: isoDateTime(opts.updated ?? opts.published),
     author: { '@id': ids(opts.site).editor },
     publisher: { '@id': ids(opts.site).org },
     image: `${opts.site}/og-image.png`,
