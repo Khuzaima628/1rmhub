@@ -35,13 +35,13 @@ const unit = SITE.defaultUnit;
       <div class="field">
         <label for="weight">Weight lifted</label>
         <input id="weight" name="weight" type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? '100' : '225'} autocomplete="off" aria-describedby="form-error" />
+          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} autocomplete="off" aria-describedby="form-error" />
       </div>
       <UnitToggle id="calc-unit" unit={unit} />
       <div class="field">
         <label for="reps">Reps completed <span class="hint">({MIN_REPS}–{MAX_REPS})</span></label>
         <input id="reps" name="reps" type="number" inputmode="numeric" min={MIN_REPS} max={MAX_REPS} step="1"
-          placeholder="5" autocomplete="off" aria-describedby="form-error" />
+          placeholder="e.g. 5" autocomplete="off" aria-describedby="form-error" />
       </div>
     </div>
 

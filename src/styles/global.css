@@ -6,75 +6,89 @@
    ========================================================================== */
 
 :root {
-  --bg: #ffffff;
-  --bg-soft: #f4f6f8;
+  --bg: #f3f4f7;              /* page background: cards sit on it in white */
+  --bg-soft: #eceff3;         /* insets: table headers, answer boxes, secondary buttons */
   --card: #ffffff;
-  --text: #1b1e24;
-  --text-muted: #5c6470;
-  --border: #dde3ea;
+  --input: #ffffff;
+  --text: #16191f;
+  --text-muted: #545e6c;
+  --border: #d5dbe3;
   --accent: #b3233a;          /* restrained red */
   --accent-ink: #ffffff;
-  --accent-soft: #fbeef1;
+  --accent-soft: #fcecef;
   --focus: #0b6bcb;
   --ok: #1e7e34;
   --warn-bg: #fff8e6;
   --warn-border: #e0a800;
-  --radius: 10px;
+  --shadow: 0 1px 2px rgb(16 24 40 / 0.05), 0 2px 8px rgb(16 24 40 / 0.06);
+  --radius: 12px;
   --maxw: 62rem;
   --tap: 44px;                /* minimum tap target */
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
 /* Dark palette: applied by the system setting unless the visitor chose light,
    or by an explicit dark choice. CSS cannot share one block between a media
    query and a plain selector, so the palette appears twice — keep both
-   copies identical when changing a colour. */
+   copies identical when changing a colour. Every text colour is checked for
+   at least 4.5:1 contrast on --bg, --bg-soft, --card and --accent-soft. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #14161c;
-    --bg-soft: #1b1e25;
-    --card: #1b1e25;
+    --bg: #0f1116;
+    --bg-soft: #1f232b;
+    --card: #181b22;
+    --input: #0f1116;
     --text: #eceef2;
     --text-muted: #a6b0bd;
-    --border: #2d333f;
-    --accent: #ee566d;          /* brand red, lightened just enough for 4.5:1 text contrast on every dark surface */
+    --border: #2e343f;
+    --accent: #f16b80;
     --accent-ink: #14161c;
-    --accent-soft: #2b1e25;
+    --accent-soft: #2e1d24;
     --focus: #7cc4ff;
     --ok: #4caf7d;
     --warn-bg: #2a2313;
     --warn-border: #b98a1d;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+    color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #14161c;
-  --bg-soft: #1b1e25;
-  --card: #1b1e25;
+  --bg: #0f1116;
+  --bg-soft: #1f232b;
+  --card: #181b22;
+  --input: #0f1116;
   --text: #eceef2;
   --text-muted: #a6b0bd;
-  --border: #2d333f;
-  --accent: #ee566d;
+  --border: #2e343f;
+  --accent: #f16b80;
   --accent-ink: #14161c;
-  --accent-soft: #2b1e25;
+  --accent-soft: #2e1d24;
   --focus: #7cc4ff;
   --ok: #4caf7d;
   --warn-bg: #2a2313;
   --warn-border: #b98a1d;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
   color-scheme: dark;
 }
-:root[data-theme="light"] { color-scheme: light; }
 
-/* Theme button in the header. */
+/* Theme button in the header: icon + the theme it switches to. Which icon
+   and word show is decided in CSS from the same rules as the palette, so the
+   button is right before any script runs. */
 .theme-toggle {
-  min-width: var(--tap); min-height: var(--tap); border-radius: 8px;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  min-height: var(--tap); padding: 0 0.8rem; border-radius: 999px;
   border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);
-  font-size: 1.15rem; line-height: 1; cursor: pointer; flex: none;
+  font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; flex: none;
 }
-@media (min-width: 48rem) { .site-nav { margin-left: auto; } }
-@media (max-width: 47.99rem) {
-  .header-inner { position: relative; }
-  .theme-toggle { position: absolute; right: 1rem; top: 0.5rem; }
+.theme-toggle:hover { border-color: var(--text-muted); }
+.theme-toggle svg { width: 1.1rem; height: 1.1rem; flex: none; }
+.theme-toggle .when-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .when-dark { display: inline-flex; }
+  :root:not([data-theme="light"]) .theme-toggle .when-light { display: none; }
 }
+:root[data-theme="dark"] .theme-toggle .when-dark { display: inline-flex; }
+:root[data-theme="dark"] .theme-toggle .when-light { display: none; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -113,26 +127,28 @@ a:hover { text-decoration-thickness: 2px; }
 /* ---- Header / footer ---- */
 .site-header { border-bottom: 1px solid var(--border); background: var(--card); }
 .header-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 1rem; padding-top: 0.75rem; padding-bottom: 0.75rem;
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 0.5rem 1rem; padding-top: 0.6rem; padding-bottom: 0.6rem;
 }
 .brand { font-weight: 800; font-size: 1.25rem; color: var(--text); text-decoration: none; }
 .brand span { color: var(--accent); }
-.site-nav { display: flex; gap: 0.25rem; }
+.site-nav { display: flex; gap: 0.25rem; margin-left: auto; }
 .site-nav a {
   color: var(--text-muted); text-decoration: none; font-weight: 600; white-space: nowrap;
   min-height: var(--tap); display: inline-flex; align-items: center; padding: 0 0.6rem;
 }
 .site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--text); }
 .site-nav a[aria-current="page"] { box-shadow: inset 0 -3px 0 var(--accent); }
-/* Small screens: brand on its own row, nav scrolls sideways instead of wrapping. */
+/* Small screens: brand and theme button on the first row, then every nav
+   link visible on a wrapping row of its own (nothing hidden off-screen). */
 @media (max-width: 47.99rem) {
-  .header-inner { flex-direction: column; align-items: flex-start; gap: 0.25rem; padding-bottom: 0; }
-  .site-nav { width: calc(100% + 1.2rem); overflow-x: auto; margin: 0 -0.6rem; scrollbar-width: thin; }
+  .brand { margin-right: auto; }
+  .site-nav { order: 3; flex: 1 0 100%; flex-wrap: wrap; margin: 0 -0.6rem; gap: 0 0.1rem; }
+  .site-nav a { min-height: 40px; }
 }
 
 .site-footer {
-  margin-top: 3rem; border-top: 1px solid var(--border);
+  margin-top: 3rem; border-top: 1px solid var(--border); background: var(--card);
   padding: 1.5rem 0 2rem; color: var(--text-muted); font-size: 0.9rem;
 }
 .footer-links { display: grid; gap: 1rem 2rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin-bottom: 1rem; }
@@ -145,10 +161,13 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* ---- Cards & sections ---- */
 .card {
-  background: var(--card); border: 1px solid var(--border);
+  background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
   border-radius: var(--radius); padding: 1.25rem; margin: 1.25rem 0;
 }
+@media (min-width: 40rem) { .card { padding: 1.5rem 1.75rem; } }
 .card > h2:first-of-type { margin-top: 0; }
+/* Sub-sections inside a calculator card (formulas, percentages, plates…). */
+.card h3 { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
 .lead { font-size: 1.1rem; color: var(--text-muted); }
 
 /* ---- Forms ---- */
@@ -168,9 +187,13 @@ label, .field-label { display: block; font-weight: 600; margin-bottom: 0.35rem; 
 input[type="number"], input[type="text"], select {
   width: 100%; min-height: var(--tap);
   padding: 0.55rem 0.7rem; font-size: 1rem;
-  color: var(--text); background: var(--bg);
+  color: var(--text); background: var(--input);
   border: 1px solid var(--border); border-radius: 8px;
 }
+input[type="number"]:hover, input[type="text"]:hover, select:hover { border-color: var(--text-muted); }
+input[type="number"]:focus, input[type="text"]:focus, select:focus { border-color: var(--focus); }
+/* Example values are hints, not entries: keep them clearly fainter than typed text. */
+::placeholder { color: var(--text-muted); opacity: 0.75; }
 input[aria-invalid] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 
 fieldset.gear, fieldset.plate-fieldset { border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; margin: 0 0 1rem; min-width: 0; }
@@ -180,7 +203,7 @@ fieldset.gear fieldset.plate-fieldset { margin-bottom: 0; }
 .segmented { display: flex; gap: 0; }
 .segmented button {
   flex: 1; min-height: var(--tap); font-size: 1rem; font-weight: 700;
-  background: var(--bg); color: var(--text-muted);
+  background: var(--input); color: var(--text-muted);
   border: 1px solid var(--border); cursor: pointer;
 }
 .segmented button:first-child { border-radius: 8px 0 0 8px; }
@@ -195,7 +218,9 @@ fieldset.gear fieldset.plate-fieldset { margin-bottom: 0; }
   border-radius: 8px; border: 1px solid var(--border); cursor: pointer;
   background: var(--bg-soft); color: var(--text);
 }
+.btn:hover { border-color: var(--text-muted); }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { border-color: var(--accent); filter: brightness(1.08); }
 .btn-small { min-height: 0; padding: 0.3rem 0.7rem; font-size: 0.85rem; }
 
 .error {
@@ -208,9 +233,14 @@ fieldset.gear fieldset.plate-fieldset { margin-bottom: 0; }
 }
 
 /* ---- Results ---- */
-.result-headline { text-align: center; padding: 1rem 0 0.5rem; }
+/* The headline number sits in its own tinted panel so the answer is the first thing seen. */
+.result-headline {
+  text-align: center; padding: 1.25rem 1rem 1rem; margin-top: 1.25rem;
+  background: var(--accent-soft); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.result-headline > :last-child { margin-bottom: 0; }
 .result-label { color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem; }
-.result-big { font-size: 2.6rem; font-weight: 800; line-height: 1.1; }
+.result-big { font-size: 2.6rem; font-weight: 800; line-height: 1.1; color: var(--accent); }
 .result-sub { color: var(--text-muted); margin-top: 0.4rem; }
 .result-both { font-size: 1.05rem; font-weight: 600; margin-top: 0.25rem; }
 .disclaimer { font-size: 0.85rem; color: var(--text-muted); }
@@ -219,7 +249,8 @@ fieldset.gear fieldset.plate-fieldset { margin-bottom: 0; }
 table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 caption { text-align: left; font-weight: 700; padding-bottom: 0.5rem; }
 th, td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--border); text-align: left; }
-th { background: var(--bg-soft); }
+thead th { background: var(--bg-soft); font-size: 0.9rem; }
+tbody tr:hover > * { background: var(--bg-soft); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 tr.primary-row td { background: var(--accent-soft); font-weight: 700; }
 
@@ -237,7 +268,7 @@ tr.primary-row td { background: var(--accent-soft); font-weight: 700; }
 .plate-checks input { width: 1.25rem; height: 1.25rem; }
 
 /* ---- FAQ ---- */
-details.faq { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.6rem; background: var(--card); }
+details.faq { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 0.6rem; background: var(--card); }
 details.faq summary {
   cursor: pointer; font-weight: 700; padding: 0.85rem 1rem; min-height: var(--tap);
   display: flex; align-items: center; list-style: none;
@@ -264,13 +295,16 @@ ul.tight li, ol.tight li { margin-bottom: 0.4rem; }
 .tool { margin-bottom: 1.5rem; }
 /* Direct answer at the top of a section: one or two sentences that stand alone. */
 .answer { border-left: 4px solid var(--accent); background: var(--bg-soft); padding: 0.75rem 1rem; border-radius: 0 8px 8px 0; }
+.answer { margin: 0 0 1.25rem; }
+.answer > :last-child { margin-bottom: 0; }
 .page-meta { color: var(--text-muted); font-size: 0.9rem; }
 .prose { max-width: 46rem; }
 .prose h2 { margin-top: 2.25rem; }
 .prose h3 { margin-top: 1.5rem; }
 .prose li { margin-bottom: 0.4rem; }
 .link-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); padding: 0; list-style: none; }
-.link-grid li { border: 1px solid var(--border); border-radius: var(--radius); padding: 0.85rem 1rem; background: var(--card); margin: 0; }
+.link-grid li { border: 1px solid var(--border); border-radius: var(--radius); padding: 0.85rem 1rem; background: var(--card); box-shadow: var(--shadow); margin: 0; }
+.link-grid li:hover { border-color: var(--accent); }
 .link-grid a { font-weight: 700; }
 .link-grid p { margin: 0.25rem 0 0; color: var(--text-muted); font-size: 0.92rem; }
 .sources { font-size: 0.92rem; }

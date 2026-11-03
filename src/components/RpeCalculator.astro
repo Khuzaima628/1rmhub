@@ -17,13 +17,13 @@ const rpeLabel = (r: number) => `RPE ${r} — ${10 - r} rep${10 - r === 1 ? '' :
       <div class="field">
         <label for="rpe-weight">Weight lifted</label>
         <input id="rpe-weight" type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? '100' : '225'} autocomplete="off" aria-describedby="rpe-error" />
+          placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} autocomplete="off" aria-describedby="rpe-error" />
       </div>
       <UnitToggle id="rpe-unit" unit={unit} />
       <div class="field">
         <label for="rpe-reps">Reps completed <span class="hint">({MIN_REPS}–{MAX_REPS})</span></label>
         <input id="rpe-reps" type="number" inputmode="numeric" min={MIN_REPS} max={MAX_REPS} step="1"
-          placeholder="5" autocomplete="off" aria-describedby="rpe-error" />
+          placeholder="e.g. 5" autocomplete="off" aria-describedby="rpe-error" />
       </div>
     </div>
     <div class="field">

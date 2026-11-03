@@ -16,12 +16,12 @@ const unit = SITE.defaultUnit;
       <div class="field">
         <label for="pct-orm">Your 1RM <span class="hint">(tested or estimated)</span></label>
         <input id="pct-orm" type="number" inputmode="decimal" min="0" step="any"
-          placeholder={unit === 'kg' ? '120' : '275'} autocomplete="off" aria-describedby="pct-error" />
+          placeholder={unit === 'kg' ? 'e.g. 120' : 'e.g. 275'} autocomplete="off" aria-describedby="pct-error" />
       </div>
       <UnitToggle id="pct-unit" unit={unit} />
       <div class="field">
         <label for="pct-custom">Any percentage <span class="hint">(optional, 1–100)</span></label>
-        <input id="pct-custom" type="number" inputmode="decimal" min="1" max="100" step="any" placeholder="80" autocomplete="off" aria-describedby="pct-error" />
+        <input id="pct-custom" type="number" inputmode="decimal" min="1" max="100" step="any" placeholder="e.g. 80" autocomplete="off" aria-describedby="pct-error" />
       </div>
     </div>
     <div class="actions">
