@@ -40,7 +40,7 @@ export const SOURCES: Record<string, Source> = {
   hprc: {
     id: 'hprc',
     text: 'Human Performance Resources by CHAMP (HPRC), Uniformed Services University. What is a one-rep max?',
-    url: 'https://hprc-online.org/articles/what-is-a-one-rep-max',
+    url: 'https://www.hprc-online.org/physical-fitness/training-performance/what-one-rep-max',
   },
   zourdos: {
     id: 'zourdos',
@@ -50,7 +50,7 @@ export const SOURCES: Record<string, Source> = {
   sbsrir: {
     id: 'sbsrir',
     text: 'Stronger by Science. Reps in reserve (RIR): research review and practical guide.',
-    url: 'https://www.strongerbyscience.com/reps-in-reserve',
+    url: 'https://www.strongerbyscience.com/reps-in-reserve/',
   },
   wendler: {
     id: 'wendler',
