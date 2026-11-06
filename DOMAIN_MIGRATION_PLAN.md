@@ -29,13 +29,13 @@
 - [x] Custom domain on project `1rmhub`, status Active
 - [x] HTTPS works and `http://` redirects to `https://` (tested directly against Cloudflare, before the code change)
 - [ ] `1rmhub.com` opens on your own Wi-Fi: **not confirmed**; your router still had no address on the last check
-- [ ] `www.1rmhub.com`: not set up; the name doesn't resolve yet
-- [ ] Web Analytics on the new project: not turned on; no beacon found on `1rmhub.pages.dev`
-- [x] Old-address redirect: **decided: no redirect, fully new start** (2026-11-07)
-- [ ] Old project deleted: not done; delete only after the new code is live
+- [x] `www.1rmhub.com`: 301 to `https://1rmhub.com`, keeping path and query (tested live)
+- [~] Web Analytics on `1rmhub`: enabled in the dashboard; check for the beacon after the next deployment
+- [x] Old-address redirect: **final decision: no redirect, new start** (C1 answered 2026-11-07)
+- [ ] Old project deleted: not done; allowed now that C1 is answered, after you confirm
 - [ ] Google Search Console, new site: not done
 - [ ] Bing Webmaster Tools, new site: not done
-- [ ] IndexNow for the new domain: not run
+- [x] IndexNow for the new domain: accepted 22 URLs (HTTP 202)
 
 **Code (branch `migration/1rmhub`, local tag `pre-1rmhub-migration`)**
 - [x] Public brand changed to `1RMHub`
@@ -45,13 +45,13 @@
 - [x] Test added: no built file may contain the old brand or production address
 - [x] `npm run verify`: 95 unit tests and 28 site tests pass
 - [x] Real-browser test on the local build: 22 pages at 2 widths
-- [ ] **Merged to `main` and live: not done, needs your approval**
+- [x] **Merged to `main` and live** (commit `c9d0d38`, tested on the live site)
 
 ### Still open
 
-1. **Approve the push to `main`.**
-2. **Old address: no redirect, by your decision.** The old project keeps its old pages until you delete it. After deletion, old links stop working and Google drops those pages over time. Sections 7.5 and Stage 3 of the original plan no longer apply.
-3. **Contact email.** `strengthcalc.team@outlook.com` is the only old name left. It appears on the site and in Google data, and stays until you give me a new working address.
+1. **Cloudflare checklist:** see [section 20](#20-cloudflare-checklist-for-1rmhubcom).
+2. **Old address: final decision is no redirect (C1).** The old project keeps its old pages until you delete it. After deletion, old links stop working and Google drops those pages over time. Sections 7.5 and Stage 3 of the original plan no longer apply.
+3. **Contact email.** Changed to `contact@1rmhub.com`, forwarded by Cloudflare Email Routing to the existing Outlook inbox. Replies still send from the Outlook address.
 
 ---
 
@@ -1012,3 +1012,281 @@ Use the **same Google account** for the old and new properties. Google requires 
 - [ ] Domain auto-renew or reminder set
 - [ ] Old properties removed only after approval
 - [ ] This plan updated with final results
+
+---
+
+## 20. Cloudflare checklist for `1rmhub.com`
+
+**Written:** 2026-11-07. **Preferred address:** `https://1rmhub.com/`.
+**Nothing in this section has been changed by Claude.** We do it one step at a time, with your approval.
+
+### How this section relates to your latest instructions
+
+| Your instruction | Current state | How this section handles it |
+|---|---|---|
+| "Connect to our existing Pages project" | There are 2 projects: `1rmhub` (live, connected to Git) and `strengthcalc` (old, disconnected from Git). `1rmhub.com` is on `1rmhub` | **`1rmhub` is the project to use** |
+| "Do not rename or delete the existing Pages project" | I had told you to delete `strengthcalc` | **On hold: don't delete `strengthcalc`** until you answer Decision C1 |
+| "Permanent 301 redirects from `strengthcalc.pages.dev`" | You decided on 2026-11-07: no redirect, fully new | **Conflict: needs your final answer (C1).** Steps are in 20.5 but are not active |
+| "Connect `www.1rmhub.com`" | Cloudflare's documented method redirects `www` instead of attaching it as a custom domain | **Follow Cloudflare's method (20.6).** It covers both `www` items in your list |
+| "Preserve existing email records" | There are none: live DNS shows no MX or TXT records | **Nothing to preserve.** Confirm with Q-C2 |
+
+### Status key
+
+| Label | Meaning |
+|---|---|
+| **VERIFIED LIVE** | I tested it from outside on 2026-11-07 |
+| **SEEN** | Shown in a screenshot you sent; may have changed since |
+| **UNVERIFIED** | I can't see this dashboard setting; needs your screenshot |
+| **NOT DONE** | Not set up yet |
+
+### 20.1 Domain activation and nameservers
+
+| Check | Value | Status |
+|---|---|---|
+| Nameservers | `giancarlo.ns.cloudflare.com`, `liz.ns.cloudflare.com` | VERIFIED LIVE |
+| Domain status | Active | SEEN |
+| DNSSEC | No DS record found | VERIFIED LIVE |
+| Plan | Free | SEEN |
+
+**To check:** **Domains → `1rmhub.com` → Overview.**
+
+- [x] Nameservers changed at Hostinger
+- [x] Domain Active
+- [ ] Screenshot S1 confirms this today
+
+**Don't** change the nameservers at Hostinger again. Your site depends on them.
+
+### 20.2 DNS records
+
+**To check:** **Domains → `1rmhub.com` → DNS → Records.**
+
+| Name | Type | Expected value | Proxy | Status |
+|---|---|---|---|---|
+| `1rmhub.com` | CNAME | `1rmhub.pages.dev` | Proxied | Confirm screen SEEN; site resolves through Cloudflare; final record **UNVERIFIED** until S2 |
+| `www` | A | `192.0.2.1` | Proxied | **NOT DONE**; `www.1rmhub.com` doesn't resolve |
+| MX, email TXT | – | None | – | None found: VERIFIED LIVE |
+| CAA | – | None | – | None found: VERIFIED LIVE |
+
+**Email:** the two records I had you delete were Hostinger's parking records (an A record and a `www` CNAME), so no email records were removed. If you add email later, its records go here, not at Hostinger.
+
+- [ ] S2 shows only the expected records
+
+### 20.3 Connect the domain to Pages
+
+**To check:** **Workers & Pages → `1rmhub` → Custom domains.**
+
+| Custom domain | Project | Status |
+|---|---|---|
+| `1rmhub.com` | `1rmhub` | Status SEEN as you reported Active; site answers: VERIFIED LIVE |
+| `www.1rmhub.com` | – | Not attached, on purpose. See 20.6 |
+
+- [x] `1rmhub.com` on `1rmhub`
+- [ ] S3 confirms it's listed there, and S4 shows `strengthcalc` has no custom domain
+
+**Don't** add a CNAME by hand for a domain that isn't set up under Custom domains. Cloudflare warns this causes a `522` error.
+
+### 20.4 SSL certificate and HTTPS
+
+| Check | Result | Status |
+|---|---|---|
+| `https://1rmhub.com/` | 200, with no certificate error | VERIFIED LIVE |
+| `http://1rmhub.com/` | 301 to `https://1rmhub.com/` | VERIFIED LIVE |
+| Universal SSL certificate | Full DNS setups get it automatically. It covers `1rmhub.com` and first-level subdomains, including `www` | Docs checked; your certificate details **UNVERIFIED** until S5 |
+| Always Use HTTPS | – | **UNVERIFIED** |
+| SSL/TLS encryption mode | Must not be **Off** | **UNVERIFIED** |
+
+**Navigation:** **Domains → `1rmhub.com` → SSL/TLS → Edge Certificates**, then find **Always Use HTTPS**.
+
+- [ ] S5 and S6 reviewed
+- [ ] Turn on **Always Use HTTPS** if it's off (needs your approval)
+
+**Leave alone for now:** HSTS, which is hard to undo, and the encryption mode, unless S6 shows **Off**.
+
+### 20.5 301 redirects from the old address: NOT USED (C1 answered: no redirect)
+
+**Final decision: no redirect.** Kept for reference only. Do these steps only if you change that decision. They need `strengthcalc` to stay undeleted.
+
+`_redirects` can't do this, because Cloudflare doesn't support domain-level redirects there. The documented method is Bulk Redirects, which is on the Free plan.
+
+**Navigation:** left menu → **Bulk redirects** → **Create Bulk Redirect List** → enter a name → **Next** → **Or, manually add URL redirects** → expand **Edit parameters**.
+
+| Source URL | Target URL | Status | Parameters on |
+|---|---|---|---|
+| `strengthcalc.pages.dev` | `https://1rmhub.com` | 301 | Preserve query string, Subpath matching, Preserve path suffix |
+
+Then **Next → Next → Continue to Redirect Rules**, and create a rule using that list.
+
+**Include subdomains:** Cloudflare's example has it on. I'd leave it off so that any `*.strengthcalc.pages.dev` preview links aren't caught. That's my inference from how the setting is defined.
+
+- [x] C1 answered: no redirect
+- [ ] Only if yes: list and rule created
+- [ ] Only if yes: all 22 URLs from section 6 tested
+
+**The trade-off for C1:**
+
+| | Redirect | No redirect |
+|---|---|---|
+| Old links | Reach the new site | Stop working once the old project is deleted |
+| Google | Strongest signal; Change of Address can be tried | Old pages drop over time; new site builds from near zero |
+| Old project | Must stay, though visitors won't see it | Can be deleted |
+| Old pages meanwhile | Not served | Still say StrengthCalc and point Google to the old address until deleted |
+
+### 20.6 Redirect `www` to `1rmhub.com`: NOT DONE
+
+Cloudflare's documented order is: list, then rule, then DNS record.
+
+**Step 1: Create the list.** Left menu → **Bulk redirects** → **Create Bulk Redirect List** → enter a name → **Next** → **Or, manually add URL redirects** → expand **Edit parameters**.
+
+| Source URL | Target URL | Status | Parameters on |
+|---|---|---|---|
+| `www.1rmhub.com` | `https://1rmhub.com` | 301 | Preserve query string, Subpath matching, Preserve path suffix, Include subdomains |
+
+**Step 2: Create the rule.** **Next → Next → Continue to Redirect Rules**, and create a rule using that list.
+
+**Step 3: Add the DNS record.** **Domains → `1rmhub.com` → DNS → Records → Add record.**
+
+| Type | Name | IPv4 address | Proxy status |
+|---|---|---|---|
+| A | `www` | `192.0.2.1` | Proxied |
+
+`192.0.2.1` is the value in Cloudflare's guide. It has to be **Proxied** for the redirect to run.
+
+- [x] List created
+- [x] Rule created
+- [x] DNS record added
+- [x] Tested live
+
+### 20.7 Bot Preference Sync and AI crawler policies
+
+**Navigation:** **Domains → `1rmhub.com` → Security → Settings.** Filter by **Bot traffic**, then select **AI Crawler and Agent access policies**. **Enable Bot Preference Sync** is one of the settings for this feature.
+
+| Setting | Recommended | Status |
+|---|---|---|
+| Search | Allow (do not block) | Allow on the onboarding screen; saved state **UNVERIFIED** |
+| Agents and Personal Agents | Allow (do not block) | Same |
+| Training | Allow (do not block), your choice | Same |
+| Enable Bot Preference Sync | On | I advised on, but never saw the saved state: **UNVERIFIED** |
+| Live `robots.txt` | No Cloudflare content added | VERIFIED LIVE |
+
+**What Cloudflare says:**
+- With every policy on Allow, nothing is added and `robots.txt` stays unchanged.
+- If any policy is **Block**, **Block on pages with ads** or **Disallow**, Cloudflare adds its rules before yours.
+
+Allowing crawlers doesn't guarantee citations or rankings. It only avoids blocking them.
+
+- [ ] S7 reviewed
+
+### 20.8 Final verification
+
+Run these in Git Bash, or I can run them after each step.
+
+```bash
+# DNS
+nslookup -type=NS 1rmhub.com 1.1.1.1
+nslookup -type=A www.1rmhub.com 1.1.1.1
+
+# HTTPS and www
+curl -sI http://1rmhub.com/ | grep -iE "^(HTTP|location)"
+curl -sI "https://www.1rmhub.com/bench-press-calculator/?x=1" | grep -iE "^(HTTP|location)"
+
+# robots.txt and sitemap
+curl -s https://1rmhub.com/robots.txt
+curl -s https://1rmhub.com/sitemap-index.xml
+
+# Every sitemap URL: status and canonical
+for u in $(curl -s https://1rmhub.com/sitemap-0.xml | grep -oE "<loc>[^<]*" | sed 's/<loc>//'); do
+  printf "%s %s\n" "$(curl -s -o /dev/null -w '%{http_code}' "$u")" "$u"
+  curl -s "$u" | grep -oE '<link rel="canonical" href="[^"]*"'
+done
+```
+
+| Check | Expected | Today |
+|---|---|---|
+| Nameservers | `giancarlo`, `liz` | ✅ |
+| `http://1rmhub.com/` | 301 to `https://1rmhub.com/` | ✅ |
+| `https://www.1rmhub.com/bench-press-calculator/?x=1` | 301 to `https://1rmhub.com/bench-press-calculator/?x=1` | ✅ Same pattern tested live |
+| `robots.txt` | `Allow: /` and `Sitemap: https://1rmhub.com/sitemap-index.xml` | ✅ |
+| Sitemap | 22 URLs on `1rmhub.com`, all 200 | ✅ Tested after the push |
+| Canonical | Matches each page's own URL | ✅ Tested after the push |
+| Old address, only if C1 is yes | 301 to the same path | Not applicable; it returns 200 today |
+
+**If something fails:**
+
+| Problem | What to do |
+|---|---|
+| `www` redirect is wrong | Disable the rule. The main domain isn't affected |
+| `www` still fails after the DNS record is added | Wait a few minutes, then check for a saved "not found" answer, as happened earlier |
+| Redirect loop | Disable the newest rule and send a screenshot |
+| `robots.txt` shows extra content | Check S7 for a Block or Disallow setting |
+
+### 20.9 Screenshots I need
+
+| # | Where | What it confirms |
+|---|---|---|
+| **S1** | **Domains → `1rmhub.com` → Overview** | Active, Free plan |
+| **S2** | **Domains → `1rmhub.com` → DNS → Records** | Exact records |
+| **S3** | **Workers & Pages → `1rmhub` → Custom domains** | Domain and status |
+| **S4** | **Workers & Pages → `strengthcalc` → Custom domains** | No domain attached |
+| **S5** | **`1rmhub.com` → SSL/TLS → Edge Certificates** | Certificate and Always Use HTTPS |
+| **S6** | **`1rmhub.com` → SSL/TLS → Overview** | Encryption mode |
+| **S7** | **`1rmhub.com` → Security → Settings → Bot traffic → AI Crawler and Agent access policies** | Policies and Bot Preference Sync |
+| **S8** | Left menu → **Bulk redirects** | Existing lists and rules; should be empty |
+| **S9** | **Workers & Pages → `1rmhub` → Metrics** | Web Analytics status |
+
+Hide any API tokens or secret values if they appear.
+
+### 20.9a Screenshot review, 2026-11-07
+
+| Item | Result |
+|---|---|
+| S1 Overview | Protected by Cloudflare, Free plan, registrar Hostinger, Bot Preference Sync on |
+| S2 DNS | Only one record: `1rmhub.com` CNAME `1rmhub.pages.dev`, Proxied |
+| S3 `1rmhub` Custom domains | `1rmhub.com`, Active, SSL enabled |
+| S4 `strengthcalc` Custom domains | None |
+| S5 Edge Certificates | Universal certificate Active for `1rmhub.com` and `*.1rmhub.com`, expires 2027-02-04 (Managed); Always Use HTTPS on |
+| S6 SSL/TLS Overview | Encryption mode Full |
+| S7 AI policies | The inner page wasn't opened. Bot Preference Sync is on and `robots.txt` is unchanged, so per Cloudflare's docs no policy should be set to Block or Disallow (inferred) |
+| S8 Bulk redirects | No lists |
+| S9 Metrics | Requests data only; Web Analytics section not visible in the screenshot, and no beacon on the live site |
+
+**New findings in Security → Settings:**
+
+| Setting | State | Finding | Recommendation |
+|---|---|---|---|
+| Bot Fight Mode | **Now off** (was on in Settings; the Overview quick-start card showed off) | Cloudflare says it can't be skipped with rules and may challenge some automated traffic. Test requests using Googlebot and bingbot names returned 200, but those weren't the real crawlers | Turn off, with your approval. This site has no logins or forms that send data to a server, so it gains little |
+| AI Labyrinth | **Now off** (was on) | Adds a hidden link for bots; a `cdn-cgi/content` link was found on live pages. Cloudflare says it doesn't affect SEO | Turn off, with your approval, because you're allowing AI crawlers. Lower priority |
+| Email Address Obfuscation | On | Rewrites the visible email link; the visitor's browser decodes it | Keep on |
+
+
+
+### 20.10 Questions for you
+
+| # | Question | My recommendation |
+|---|---|---|
+| **C1** | Redirect `strengthcalc.pages.dev` to `1rmhub.com`? | **Answered 2026-11-07: no. New start** |
+| **Q-C2** | Email at `@1rmhub.com`? | I suggested free Cloudflare Email Routing, forwarding `contact@1rmhub.com` to your current inbox. Waiting for your answer. Its records would be added to DNS, so check 20.2 after setup |
+
+### 20.11 Order when you approve
+
+- [ ] 1. Send screenshots S1–S9
+- [x] 2. Answer C1: no redirect
+- [x] 3. Set up `www` (20.6), tested live
+- [x] 4. Always Use HTTPS confirmed on (20.4)
+- [ ] 6. Delete `strengthcalc` when you confirm
+- [~] 7. Web Analytics enabled; confirm after the next deployment
+- [ ] 8. Run the final checks (20.8)
+
+### 20.12 Sources
+
+- [Pages custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/)
+- [Redirecting `*.pages.dev` to a custom domain](https://developers.cloudflare.com/pages/how-to/redirect-to-custom-domain/)
+- [Redirecting `www` to the apex domain](https://developers.cloudflare.com/pages/how-to/www-redirect/)
+- [Create Bulk Redirects in the dashboard](https://developers.cloudflare.com/rules/url-forwarding/bulk-redirects/create-dashboard/)
+- [Bulk Redirect parameters](https://developers.cloudflare.com/rules/url-forwarding/bulk-redirects/reference/parameters/)
+- [Pages `_redirects` limits](https://developers.cloudflare.com/pages/configuration/redirects/)
+- [Primary (full) DNS setup](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/)
+- [Manage DNS records](https://developers.cloudflare.com/dns/manage-dns-records/how-to/create-dns-records/)
+- [Universal SSL](https://developers.cloudflare.com/ssl/edge-certificates/universal-ssl/enable-universal-ssl/)
+- [Always Use HTTPS](https://developers.cloudflare.com/ssl/edge-certificates/additional-options/always-use-https/)
+- [AI Crawler and Agent access policies](https://developers.cloudflare.com/bots/additional-configurations/block-ai-bots/)
+- [robots.txt setting and Bot Preference Sync](https://developers.cloudflare.com/bots/additional-configurations/managed-robots-txt/)

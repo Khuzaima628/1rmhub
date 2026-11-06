@@ -9,7 +9,7 @@ export const SITE = {
    * Public contact address shown on Contact, About, Privacy and Terms.
    * If ever emptied, pages show a visible notice and the build prints a warning.
    */
-  contactEmail: 'strengthcalc.team@outlook.com',
+  contactEmail: 'contact@1rmhub.com',
   /** Unit the calculators start in (visitors can always switch). */
   defaultUnit: 'lb' as 'kg' | 'lb',
   /** Effective / last-updated date for Privacy, Terms and Disclaimer. */
