@@ -1,5 +1,5 @@
 /**
- * StrengthCalc formula verification suite.
+ * 1RMHub formula verification suite.
  *
  * Rule one of the project: never display an incorrect calculation. These tests
  * lock the formula math to hand-verified examples, so a future edit can never

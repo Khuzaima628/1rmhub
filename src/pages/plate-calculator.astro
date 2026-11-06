@@ -19,7 +19,7 @@ const lbRows = [95, 135, 185, 225, 275, 315, 365, 405].map((t) => ({ t, ...solve
 const kgRows = [40, 60, 80, 100, 120, 140, 160, 180].map((t) => ({ t, ...solvePlates(t, 20, KG_PLATES) }));
 const jsonLd = [
   webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
-  webAppNode({ site, url, name: 'StrengthCalc Plate Calculator', description,
+  webAppNode({ site, url, name: '1RMHub Plate Calculator', description,
     features: ['Per-side plate breakdown', 'Custom bar weight', 'Choose available plate sizes', 'Never exceeds the target weight'] }),
 ];
 ---
@@ -48,7 +48,7 @@ const jsonLd = [
       <p>
         When you untick plates you don&rsquo;t have, the &ldquo;largest first&rdquo; shortcut can miss
         a better answer. With only 20 kg and 15 kg plates, 30 kg per side is two 15s — but largest-first
-        stops at one 20. StrengthCalc searches every combination of the sizes you selected, so it always
+        stops at one 20. 1RMHub searches every combination of the sizes you selected, so it always
         finds the heaviest load that does not exceed your target, using the fewest plates.
       </p>
     </section>

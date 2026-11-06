@@ -1,4 +1,6 @@
-# strengthcalc
+# 1RMHub
+
+Live site: https://1rmhub.com/
 
 Free, transparent one rep max (1RM) calculator — six published formulas, training percentages, a plate loader and a warm-up generator. Static site built with [Astro](https://astro.build), hosted on Cloudflare Pages.
 

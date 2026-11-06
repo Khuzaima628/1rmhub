@@ -1,5 +1,5 @@
 /* ==========================================================================
-   StrengthCalc — hand-written, mobile-first, no CSS frameworks.
+   1RMHub — hand-written, mobile-first, no CSS frameworks.
    Light/dark mode follows the visitor's system setting via CSS variables,
    unless they chose one with the theme button: <html data-theme="light|dark">
    (set before first paint by the inline script in BaseLayout.astro).

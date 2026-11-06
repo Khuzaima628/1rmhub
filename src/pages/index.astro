@@ -1,5 +1,5 @@
 ---
-// StrengthCalc homepage: the 1RM calculator plus the explanations that make
+// 1RMHub homepage: the 1RM calculator plus the explanations that make
 // its numbers trustworthy. Calculator UI: src/components/OneRepMaxCalculator.astro.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import OneRepMaxCalculator from '../components/OneRepMaxCalculator.astro';
@@ -11,7 +11,7 @@ import { webAppNode, webPageNode, faqNode } from '../lib/schema';
 import { LINKS } from '../data/links';
 import { SITE, reviewedFor } from '../config/site';
 
-const title = 'One Rep Max Calculator — Free 1RM Calculator | StrengthCalc';
+const title = 'One Rep Max Calculator — Free 1RM Calculator | 1RMHub';
 const description =
   'Free one rep max calculator using 6 published formulas. See every estimate, the range between them, training percentages, plate loading and warm-up sets.';
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
@@ -31,7 +31,7 @@ const faqs = [
   },
   {
     q: 'Which 1RM formula is most accurate?',
-    a: 'No single formula is most accurate for everyone. Research has found that accuracy depends on the lift, the lifter and the rep count — in one study comparing seven equations, every one underestimated the deadlift. That is why StrengthCalc shows all six results and the spread instead of a single number.',
+    a: 'No single formula is most accurate for everyone. Research has found that accuracy depends on the lift, the lifter and the rep count — in one study comparing seven equations, every one underestimated the deadlift. That is why 1RMHub shows all six results and the spread instead of a single number.',
   },
   {
     q: 'How many reps should I use for a 1RM estimate?',
@@ -66,7 +66,7 @@ const faqs = [
 const jsonLd = [
   webPageNode({ site, url, name: title, description, reviewed: reviewedFor('/') }),
   webAppNode({
-    site, url, name: 'StrengthCalc One Rep Max Calculator', description,
+    site, url, name: '1RMHub One Rep Max Calculator', description,
     features: [
       'Six-formula 1RM estimates with range and spread',
       'Kilogram/pound unit toggle',
@@ -83,7 +83,7 @@ const jsonLd = [
 
 <BaseLayout title={title} description={description} path="/" jsonLd={jsonLd}>
   <div class="print-header">
-    <strong>StrengthCalc — One Rep Max Calculator</strong><br />
+    <strong>1RMHub — One Rep Max Calculator</strong><br />
     <span class="disclaimer">Estimates only. Not guaranteed results, not medical advice.</span>
   </div>
 

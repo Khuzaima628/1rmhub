@@ -198,7 +198,7 @@ const unit = SITE.defaultUnit;
         : ` · the six formulas differ by <strong>${f1(est.spreadPct)}%</strong> on this set`;
 
       coreEl.innerHTML = `
-        <div class="print-header"><strong>StrengthCalc result — ${esc(exLabel())}, ${esc(num(weight))} ${u} × ${reps}</strong></div>
+        <div class="print-header"><strong>1RMHub result — ${esc(exLabel())}, ${esc(num(weight))} ${u} × ${reps}</strong></div>
         ${notices}
         <div class="result-headline">
           <div class="result-label">Estimated 1RM — ${esc(head.name)}</div>
@@ -253,7 +253,7 @@ const unit = SITE.defaultUnit;
       const { weight, reps, est } = last;
       const u = unit(), o = other();
       return [
-        'StrengthCalc 1RM estimate',
+        '1RMHub estimate',
         `${exLabel()} — ${num(weight)} ${u} × ${reps} reps`,
         `Average Estimate: ${f1(fromKg(est.average, u))} ${u} (${f1(fromKg(est.average, o))} ${o})`,
         `Formula range: ${f1(fromKg(est.min, u))}–${f1(fromKg(est.max, u))} ${u}`,

@@ -1,4 +1,4 @@
-// StrengthCalc site configuration.
+// 1RMHub site configuration.
 // The `site` value is the single source of truth for the live URL:
 // canonical tags, the sitemap, robots.txt and social-share tags are all built
 // from it. If the brand or domain ever changes, change it here and rebuild.
@@ -29,8 +29,8 @@ function lastmodFor(url) {
 }
 
 export default defineConfig({
-  // Free Cloudflare Pages subdomain for launch (no custom domain yet).
-  site: 'https://strengthcalc.pages.dev',
+  // Production custom domain on Cloudflare Pages.
+  site: 'https://1rmhub.com',
   // Every page is a directory (/plate-calculator/index.html). Cloudflare Pages
   // redirects /plate-calculator → /plate-calculator/, so canonical URLs, the
   // sitemap and internal links all use the trailing slash.

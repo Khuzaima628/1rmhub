@@ -5,9 +5,9 @@ import { webPageNode } from '../lib/schema';
 import { SITE, EDITOR } from '../config/site';
 import { ADS_ENABLED } from '../config/ads';
 
-const title = 'About StrengthCalc — Free, Transparent 1RM Calculators';
+const title = 'About 1RMHub — Free, Transparent 1RM Calculators';
 const description =
-  'Who runs StrengthCalc, why it exists, how it is funded, and the principles behind its free one rep max calculators.';
+  'Who runs 1RMHub, why it exists, how it is funded, and the principles behind its free one rep max calculators.';
 const path = '/about/';
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, type: 'AboutPage' })];

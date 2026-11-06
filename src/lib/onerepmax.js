@@ -1,5 +1,5 @@
 /**
- * StrengthCalc 1RM formula engine.
+ * 1RMHub 1RM formula engine.
  *
  * Pure functions only: no DOM, no network, no side effects.
  * All six formulas below are published estimation equations. They disagree

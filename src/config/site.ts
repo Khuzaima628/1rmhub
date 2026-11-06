@@ -3,7 +3,7 @@
 // built from Astro.site, never hard-coded.
 
 export const SITE = {
-  name: 'StrengthCalc',
+  name: '1RMHub',
   tagline: 'Free, transparent one rep max calculators',
   /**
    * Public contact address shown on Contact, About, Privacy and Terms.
@@ -13,7 +13,7 @@ export const SITE = {
   /** Unit the calculators start in (visitors can always switch). */
   defaultUnit: 'lb' as 'kg' | 'lb',
   /** Effective / last-updated date for Privacy, Terms and Disclaimer. */
-  policyDate: '2026-11-02',
+  policyDate: '2026-11-07',
   /** Default date the calculator pages and methodology were last reviewed. */
   contentReviewed: '2026-11-02',
 };
@@ -43,13 +43,13 @@ export const EDITOR = {
   /** Anchor on the About page where the bio lives. */
   href: '/about/#editor',
   bio:
-    'Muhammad Khuzaima is the creator and editor of StrengthCalc. He built the site to give lifters one rep max ' +
+    'Muhammad Khuzaima is the creator and editor of 1RMHub. He built the site to give lifters one rep max ' +
     'calculators that show their working: every formula is checked against its published source and covered by ' +
     'automated tests before it goes live. He is responsible for the site’s content and corrects any error readers report.',
 };
 
 if (!SITE.contactEmail) {
-  console.warn('[StrengthCalc] SITE.contactEmail is empty — set it in src/config/site.ts before launch.');
+  console.warn('[1RMHub] SITE.contactEmail is empty — set it in src/config/site.ts before launch.');
 }
 
 /** Human-readable date, e.g. "November 2, 2026" (fixed locale, UTC). */
@@ -109,7 +109,7 @@ export const FOOTER_GROUPS = [
     ],
   },
   {
-    title: 'StrengthCalc',
+    title: '1RMHub',
     links: [
       { href: '/about/', label: 'About' },
       { href: '/contact/', label: 'Contact' },

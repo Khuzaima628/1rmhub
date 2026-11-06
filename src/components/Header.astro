@@ -8,7 +8,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
 ---
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="/" aria-label="StrengthCalc home">Strength<span>Calc</span></a>
+    <a class="brand" href="/" aria-label="1RMHub home">1RM<span>Hub</span></a>
     <nav class="site-nav" aria-label="Primary">
       {NAV.map((item) => (
         <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>

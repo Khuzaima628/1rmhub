@@ -4,11 +4,11 @@
     "@astrojs/sitemap": "^3.7.4",
     "astro": "~7.3.8"
   },
-  "description": "StrengthCalc — free one rep max (1RM) calculator. Astro static site, no backend.",
+  "description": "1RMHub — free one rep max (1RM) calculator. Astro static site, no backend.",
   "devDependencies": {
     "vitest": "^5.0.5"
   },
-  "name": "strengthcalc",
+  "name": "1rmhub",
   "private": true,
   "scripts": {
     "astro": "astro",

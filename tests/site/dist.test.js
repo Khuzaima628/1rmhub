@@ -11,7 +11,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
 const DIST = join(process.cwd(), 'dist');
-const SITE = 'https://strengthcalc.pages.dev';
+const SITE = 'https://1rmhub.com';
 
 function walk(dir) {
   return readdirSync(dir).flatMap((name) => {
@@ -355,4 +355,14 @@ describe('advertising switch', () => {
       expect(t).not.toContain('shows no ads');
     });
   }
+});
+
+describe('brand and domain', () => {
+  it('no built file carries the previous brand or production address', () => {
+    const offenders = walk(DIST)
+      .filter((f) => /\.(html|xml|txt|svg|js|css|json)$/.test(f))
+      .filter((f) => /StrengthCalc|strengthcalc\.pages\.dev/.test(readFileSync(f, 'utf8')))
+      .map((f) => relative(DIST, f));
+    expect(offenders).toEqual([]);
+  });
 });
