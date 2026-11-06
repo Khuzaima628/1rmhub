@@ -31,8 +31,8 @@
 - [ ] `1rmhub.com` opens on your own Wi-Fi: **not confirmed**; your router still had no address on the last check
 - [ ] `www.1rmhub.com`: not set up; the name doesn't resolve yet
 - [ ] Web Analytics on the new project: not turned on; no beacon found on `1rmhub.pages.dev`
-- [ ] Old-address redirect: **not set up, waiting for your decision**
-- [ ] Old project deleted: not done; do not delete before the code is live
+- [x] Old-address redirect: **decided: no redirect, fully new start** (2026-11-07)
+- [ ] Old project deleted: not done; delete only after the new code is live
 - [ ] Google Search Console, new site: not done
 - [ ] Bing Webmaster Tools, new site: not done
 - [ ] IndexNow for the new domain: not run
@@ -50,7 +50,7 @@
 ### Still open
 
 1. **Approve the push to `main`.**
-2. **Old-address redirect.** Because the old project is disconnected, the new code will never reach it. Its pages keep telling Google that `strengthcalc.pages.dev` is the main address. A Cloudflare Bulk Redirect (section 7.5) is the documented way to fix this. You said no redirect earlier, while the implementation brief asks for one, so this needs your final answer.
+2. **Old address: no redirect, by your decision.** The old project keeps its old pages until you delete it. After deletion, old links stop working and Google drops those pages over time. Sections 7.5 and Stage 3 of the original plan no longer apply.
 3. **Contact email.** `strengthcalc.team@outlook.com` is the only old name left. It appears on the site and in Google data, and stays until you give me a new working address.
 
 ---
