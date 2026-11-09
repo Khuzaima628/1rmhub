@@ -36,6 +36,8 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/incline-bench-press-calculator/': '2026-11-09',
   '/hip-thrust-calculator/': '2026-11-09',
   '/strength-percentile-calculator/': '2026-11-09',
+  '/deadlift-calculator/': '2026-11-12',
+  '/squat-calculator/': '2026-11-12',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
