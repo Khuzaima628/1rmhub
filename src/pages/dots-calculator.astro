@@ -5,13 +5,14 @@ import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { DOTS_COEFFICIENTS, DOTS_BODYWEIGHT_RANGE, dotsScore } from '../lib/dots.js';
+import { WILKS_COEFFICIENTS, WILKS_BODYWEIGHT_RANGE, IPF_GL_PARAMETERS, wilksScore, ipfGlScore } from '../lib/points.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
 import { SITE, formatDate, reviewedFor } from '../config/site';
 
-const title = 'DOTS Calculator — Powerlifting Score by Bodyweight';
+const title = 'DOTS, Wilks and IPF GL Calculator — Powerlifting Scores';
 const description =
-  'Calculate your DOTS score: compare a powerlifting total across bodyweights for men and women. Enter your lifts or total in kg or lb.';
+  'Calculate your DOTS, Wilks and IPF GL points: compare a powerlifting total across bodyweights for men and women. Enter your lifts or total in kg or lb.';
 const path = '/dots-calculator/';
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const url = `${site}${path}`;
@@ -22,19 +23,24 @@ const examples = [
   { sex: 'male' as const, bw: 110, total: 700 },
   { sex: 'female' as const, bw: 60, total: 300 },
   { sex: 'female' as const, bw: 75, total: 380 },
-].map((e) => ({ ...e, score: dotsScore(e.total, e.bw, e.sex).score }));
+].map((e) => ({
+  ...e,
+  score: dotsScore(e.total, e.bw, e.sex).score,
+  wilks: wilksScore(e.total, e.bw, e.sex).score,
+  gl: ipfGlScore(e.total, e.bw, e.sex, 'classic').score as number,
+}));
 const fmt = (c: number) => String(c);
 const jsonLd = [
   webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: '1RMHub DOTS Calculator', description,
-    features: ['DOTS score for men and women', 'Total from squat, bench and deadlift', 'kg and lb'] }),
+    features: ['DOTS score for men and women', 'Wilks score', 'IPF GL points (classic and equipped)', 'Total from squat, bench and deadlift', 'kg and lb'] }),
 ];
 ---
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'DOTS Calculator', href: path }]} jsonLd={jsonLd}>
-  <h1>DOTS Calculator</h1>
+  <h1>DOTS, Wilks and IPF GL Calculator</h1>
   <p class="lead">
-    Score your powerlifting total against your bodyweight with the DOTS formula, so lifters of
-    different sizes can be compared on one scale.
+    Score your powerlifting total against your bodyweight with the DOTS, Wilks and IPF GL formulas,
+    so lifters of different sizes can be compared on one scale.
   </p>
   <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
 
@@ -102,15 +108,61 @@ const jsonLd = [
       </p>
     </section>
 
+    <section aria-labelledby="wilks-heading">
+      <h2 id="wilks-heading">The Wilks formula</h2>
+      <p><code>Wilks = total × 500 ÷ (a + b·x + c·x² + d·x³ + e·x⁴ + f·x⁵)</code>, where <em>x</em> is bodyweight in kilograms.</p>
+      <div class="table-wrap">
+        <table>
+          <caption>Wilks coefficients (original formula)</caption>
+          <thead><tr><th scope="col">Coefficient</th><th scope="col" class="num">Men</th><th scope="col" class="num">Women</th></tr></thead>
+          <tbody>
+            {['a', 'b', 'c', 'd', 'e', 'f'].map((name, i) => (
+              <tr><th scope="row">{name}</th><td class="num"><code>{fmt(WILKS_COEFFICIENTS.male[i])}</code></td><td class="num"><code>{fmt(WILKS_COEFFICIENTS.female[i])}</code></td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        These are the original Wilks coefficients, the ones most calculators and many federations
+        still use. A revised version (sometimes called Wilks 2020 or Wilks2) uses different numbers and
+        is not included here. Bodyweight is limited to {WILKS_BODYWEIGHT_RANGE.male.min}–{WILKS_BODYWEIGHT_RANGE.male.max} kg
+        for men and {WILKS_BODYWEIGHT_RANGE.female.min}–{WILKS_BODYWEIGHT_RANGE.female.max} kg for women, where the curve
+        stays sensible; outside it the calculator uses the nearest limit and tells you. The values match
+        OpenPowerlifting&rsquo;s implementation and its test results.
+      </p>
+    </section>
+
+    <section aria-labelledby="gl-heading">
+      <h2 id="gl-heading">The IPF GL formula</h2>
+      <p><code>IPF GL = total × 100 ÷ (A − B · e<sup>−C·x</sup>)</code>, where <em>x</em> is bodyweight in kilograms and <em>e</em> is the base of the natural logarithm.</p>
+      <div class="table-wrap">
+        <table>
+          <caption>IPF GL parameters for full powerlifting</caption>
+          <thead><tr><th scope="col">Category</th><th scope="col" class="num">A</th><th scope="col" class="num">B</th><th scope="col" class="num">C</th></tr></thead>
+          <tbody>
+            {([['Men, classic', IPF_GL_PARAMETERS.male.classic], ['Men, equipped', IPF_GL_PARAMETERS.male.equipped], ['Women, classic', IPF_GL_PARAMETERS.female.classic], ['Women, equipped', IPF_GL_PARAMETERS.female.equipped]] as const).map(([label, p]) => (
+              <tr><th scope="row">{label}</th>{p.map((v) => <td class="num"><code>{fmt(v)}</code></td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        IPF GL (also called GOODLIFT) points are the IPF&rsquo;s own formula, introduced in 2020. The
+        parameters are from the IPF&rsquo;s published document <em>The IPF GL Coefficients for Relative
+        Scoring</em>, which uses separate values for classic (raw) and equipped lifting.
+        The formula is not defined below 35 kg bodyweight.
+      </p>
+    </section>
+
     <section aria-labelledby="examples-heading">
       <h2 id="examples-heading">Example DOTS scores</h2>
       <div class="table-wrap">
         <table>
-          <caption>DOTS scores for example totals</caption>
-          <thead><tr><th scope="col">Category</th><th scope="col" class="num">Bodyweight</th><th scope="col" class="num">Total</th><th scope="col" class="num">DOTS</th></tr></thead>
+          <caption>DOTS, Wilks and IPF GL (classic) scores for example totals</caption>
+          <thead><tr><th scope="col">Category</th><th scope="col" class="num">Bodyweight</th><th scope="col" class="num">Total</th><th scope="col" class="num">DOTS</th><th scope="col" class="num">Wilks</th><th scope="col" class="num">IPF GL</th></tr></thead>
           <tbody>
             {examples.map((e) => (
-              <tr><th scope="row">{e.sex === 'male' ? 'Men' : 'Women'}</th><td class="num">{e.bw} kg</td><td class="num">{e.total} kg</td><td class="num">{e.score.toFixed(1)}</td></tr>
+              <tr><th scope="row">{e.sex === 'male' ? 'Men' : 'Women'}</th><td class="num">{e.bw} kg</td><td class="num">{e.total} kg</td><td class="num">{e.score.toFixed(1)}</td><td class="num">{e.wilks.toFixed(1)}</td><td class="num">{e.gl.toFixed(1)}</td></tr>
             ))}
           </tbody>
         </table>
@@ -152,5 +204,5 @@ const jsonLd = [
   <AdSlot />
 
   <RelatedLinks items={[LINKS.strength, LINKS.sinclair, LINKS.home, LINKS.squat]} />
-  <SourceList ids={['konertz', 'bvdkdots']} />
+  <SourceList ids={['konertz', 'bvdkdots', 'ipfgl', 'oplwilks']} />
 </BaseLayout>

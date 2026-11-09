@@ -1,13 +1,13 @@
 ---
-// DOTS score calculator. Total can be typed directly or built from the three
-// lifts. One instance per page. Math: src/lib/dots.js (tested).
+// DOTS, Wilks and IPF GL score calculator. Total can be typed directly or built from the three
+// lifts. One instance per page. Math: src/lib/dots.js and src/lib/points.js (tested).
 import { SITE } from '../config/site';
 import UnitToggle from './UnitToggle.astro';
 
 const unit = SITE.defaultUnit;
 ---
 <section class="card calculator" aria-labelledby="dots-heading" data-dots-calculator>
-  <h2 id="dots-heading">DOTS calculator</h2>
+  <h2 id="dots-heading">DOTS, Wilks and IPF GL calculator</h2>
   <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
   <form id="dots-form" novalidate>
     <div class="field-row">
@@ -16,6 +16,13 @@ const unit = SITE.defaultUnit;
         <select id="dots-sex">
           <option value="male">Men</option>
           <option value="female">Women</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="dots-equipment">Equipment <span class="hint">(IPF GL only)</span></label>
+        <select id="dots-equipment">
+          <option value="classic">Classic (raw)</option>
+          <option value="equipped">Equipped</option>
         </select>
       </div>
       <UnitToggle id="dots-unit" unit={unit} />
@@ -45,7 +52,7 @@ const unit = SITE.defaultUnit;
         <input id="dots-total" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" aria-describedby="dots-error" />
       </div>
     </fieldset>
-    <div class="actions"><button type="submit" class="btn btn-primary">Calculate DOTS</button></div>
+    <div class="actions"><button type="submit" class="btn btn-primary">Calculate scores</button></div>
     <p class="error" id="dots-error" role="alert" hidden></p>
   </form>
   <div id="dots-result" aria-live="polite"></div>
@@ -53,13 +60,14 @@ const unit = SITE.defaultUnit;
 
 <script>
   import { dotsScore } from '../lib/dots.js';
+  import { wilksScore, ipfGlScore } from '../lib/points.js';
   import { toKg, fromKg, validateWeight } from '../lib/onerepmax.js';
   import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, showFieldError, clearFieldError } from '../scripts/dom.js';
 
   const root = document.querySelector<HTMLElement>('[data-dots-calculator]');
   if (root) {
     const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
-    const form = $<HTMLFormElement>('dots-form'), sexEl = $<HTMLSelectElement>('dots-sex');
+    const form = $<HTMLFormElement>('dots-form'), sexEl = $<HTMLSelectElement>('dots-sex'), equipEl = $<HTMLSelectElement>('dots-equipment');
     const bwEl = $('dots-bw'), totalEl = $('dots-total'), errorEl = $('dots-error'), out = $('dots-result');
     const lifts = [...root.querySelectorAll<HTMLInputElement>('[data-lift]')];
 
@@ -74,6 +82,7 @@ const unit = SITE.defaultUnit;
     // (never scored stale). A total the visitor typed themselves is left alone.
     let totalFromLifts = false;
     totalEl.addEventListener('input', () => { totalFromLifts = false; });
+    [sexEl, equipEl].forEach((el) => el.addEventListener('change', () => { out.innerHTML = ''; }));
     lifts.forEach((el) => el.addEventListener('input', () => {
       const values = lifts.map((l) => Number(l.value));
       if (lifts.every((l) => l.value.trim() !== '') && values.every((v) => Number.isFinite(v) && v > 0)) {
@@ -107,16 +116,33 @@ const unit = SITE.defaultUnit;
       if (total.value > 4000) return fail('That total is above any recorded result — please check the number and the unit.', totalEl);
       errorEl.hidden = true;
       const sex = sexEl.value as 'male' | 'female';
-      const result = dotsScore(toKg(total.value, u), toKg(bw.value, u), sex);
-      const clampNote = result.clamped
-        ? `<p class="notice">Your bodyweight is outside the range the DOTS formula was fitted for, so it was scored as
-           ${esc(num(fromKg(result.usedBodyweight, u), 1))} ${u} (the nearest limit). Treat the score with caution.</p>`
+      const equipment = equipEl.value as 'classic' | 'equipped';
+      const totalKg = toKg(total.value, u), bwKg = toKg(bw.value, u);
+      const result = dotsScore(totalKg, bwKg, sex);
+      const wilks = wilksScore(totalKg, bwKg, sex);
+      const gl = ipfGlScore(totalKg, bwKg, sex, equipment);
+      const notes: string[] = [];
+      if (result.clamped) notes.push(`DOTS: scored at ${esc(num(fromKg(result.usedBodyweight, u), 1))} ${u}, the nearest limit of its fitted bodyweight range.`);
+      if (wilks.clamped) notes.push(`Wilks: scored at ${esc(num(fromKg(wilks.usedBodyweight, u), 1))} ${u}, the nearest limit of its fitted bodyweight range.`);
+      if (gl.score === null) notes.push('IPF GL: not defined below 35 kg bodyweight.');
+      const notesHtml = notes.length
+        ? `<p class="notice">Your bodyweight is outside a formula's range, so treat those scores with caution. ${notes.join(' ')}</p>`
         : '';
       out.innerHTML = `<div class="result-headline">
           <div class="result-label">DOTS score</div>
           <div class="result-big">${f1(result.score)}</div>
-          <p class="result-sub">${esc(num(total.value))} ${u} total at ${esc(num(bw.value))} ${u} bodyweight (${sex === 'male' ? 'men' : 'women'}’s formula)</p>
-        </div>${clampNote}`;
+          <p class="result-sub">${esc(num(total.value))} ${u} total at ${esc(num(bw.value))} ${u} bodyweight (${sex === 'male' ? 'men' : 'women'}’s formulas)</p>
+        </div>
+        <div class="table-wrap"><table>
+          <caption>Your total scored with three formulas</caption>
+          <thead><tr><th scope="col">Formula</th><th scope="col" class="num">Score</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">DOTS</th><td class="num">${f1(result.score)}</td></tr>
+            <tr><th scope="row">Wilks (original)</th><td class="num">${f1(wilks.score)}</td></tr>
+            <tr><th scope="row">IPF GL (${equipment === 'classic' ? 'classic' : 'equipped'})</th><td class="num">${gl.score === null ? '—' : f1(gl.score)}</td></tr>
+          </tbody>
+        </table></div>
+        <p class="disclaimer">Each formula uses its own scale, so compare scores only within the same formula.</p>${notesHtml}`;
     });
   }
 </script>

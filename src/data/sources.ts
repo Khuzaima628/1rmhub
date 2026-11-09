@@ -76,6 +76,16 @@ export const SOURCES: Record<string, Source> = {
     text: 'Bundesverband Deutscher Kraftdreikämpfer (BVDK). (2019). DOTS Punkte für Mannschaftswettkämpfe ab 2020 [DOTS points for team competitions from 2020]. Archived copy.',
     url: 'https://web.archive.org/web/20191112082015/https://bvdk.de/dots-punkte-f%C3%BCr-mannschaftswettk%C3%A4mpfe-ab-2020',
   },
+  ipfgl: {
+    id: 'ipfgl',
+    text: 'International Powerlifting Federation (IPF). (2020). The IPF GL coefficients for relative scoring (Table 1: parameters of the equation).',
+    url: 'https://www.powerlifting.sport/fileadmin/ipf/data/ipf-formula/IPF_GL_Coefficients-2020.pdf',
+  },
+  oplwilks: {
+    id: 'oplwilks',
+    text: 'The OpenPowerlifting Project. Wilks and GOODLIFT points source code and test values (crates/coefficients).',
+    url: 'https://gitlab.com/openpowerlifting/opl-data/-/tree/main/crates/coefficients/src',
+  },
   nsca: {
     id: 'nsca',
     text: 'Haff, G. G., & Triplett, N. T. (Eds.). (2016). Essentials of Strength Training and Conditioning (4th ed.). Champaign, IL: Human Kinetics.',
