@@ -100,10 +100,36 @@ const jsonLd = [
         <a href="/">standard 1RM calculator</a> for sets taken close to failure.
       </p>
     </section>
+
+    <section aria-labelledby="rpe-faq-heading">
+      <h2 id="rpe-faq-heading">RPE calculator: common questions</h2>
+      <h3>What does 5 reps at RPE 8 mean?</h3>
+      <p>
+        You did 5 reps and could have done about 2 more, so roughly 7 reps to failure. For 100 kg × 5
+        at RPE 8, the calculator estimates a 1RM of about 121.7 kg (range 117.5–124.0 kg).
+      </p>
+      <h3>Is RPE 10 the same as failure?</h3>
+      <p>
+        On the reps-in-reserve scale, RPE 10 means you could not have done another rep with good form —
+        no reps left. It does not mean grinding out a rep with broken technique.
+      </p>
+      <h3>Can I use half RPEs like 8.5?</h3>
+      <p>
+        Yes. The reps-in-reserve scale includes half steps, and so does this calculator: RPE 8.5 means
+        you might have managed 1 or 2 more reps, so it counts as 1.5 reps in reserve.
+      </p>
+      <h3>Is training by RPE better than percentages?</h3>
+      <p>
+        Both work. In an 8-week study of trained men, the group that chose weights by RPE and the group
+        that used fixed percentages both gained strength in the squat and bench press, with a small
+        advantage for RPE that was not statistically significant (Helms et al., 2018). Many programs
+        combine the two.
+      </p>
+    </section>
   </div>
 
   <AdSlot />
 
   <RelatedLinks items={[LINKS.rpeGuide, LINKS.home, LINKS.percent, LINKS.trainingMax]} />
-  <SourceList ids={['zourdos', 'sbsrir', 'epley']} />
+  <SourceList ids={['zourdos', 'sbsrir', 'helms2018', 'epley']} />
 </BaseLayout>

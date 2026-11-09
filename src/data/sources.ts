@@ -80,4 +80,42 @@ export const SOURCES: Record<string, Source> = {
     id: 'nsca',
     text: 'Haff, G. G., & Triplett, N. T. (Eds.). (2016). Essentials of Strength Training and Conditioning (4th ed.). Champaign, IL: Human Kinetics.',
   },
+  shimano2006: {
+    id: 'shimano2006',
+    text: 'Shimano, T., Kraemer, W. J., Spiering, B. A., et al. (2006). Relationship between the number of repetitions and selected percentages of one repetition maximum in free weight exercises in trained and untrained men. Journal of Strength and Conditioning Research, 20(4), 819–823.',
+  },
+  ralston2017: {
+    id: 'ralston2017',
+    text: 'Ralston, G. W., Kilgore, L., Wyatt, F. B., & Baker, J. S. (2017). The effect of weekly set volume on strength gain: a meta-analysis. Sports Medicine, 47(12), 2585–2601.',
+    url: 'https://doi.org/10.1007/s40279-017-0762-7',
+  },
+  grgic2018: {
+    id: 'grgic2018',
+    text: 'Grgic, J., Schoenfeld, B. J., Davies, T. B., et al. (2018). Effect of resistance training frequency on gains in muscular strength: a systematic review and meta-analysis. Sports Medicine, 48(5), 1207–1220.',
+  },
+  schoenfeld2017: {
+    id: 'schoenfeld2017',
+    text: 'Schoenfeld, B. J., Grgic, J., Ogborn, D., & Krieger, J. W. (2017). Strength and hypertrophy adaptations between low- vs. high-load resistance training: a systematic review and meta-analysis. Journal of Strength and Conditioning Research, 31(12), 3508–3523.',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/28834797/',
+  },
+  morton2018: {
+    id: 'morton2018',
+    text: 'Morton, R. W., Murphy, K. T., McKellar, S. R., et al. (2018). A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength in healthy adults. British Journal of Sports Medicine, 52(6), 376–384.',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5867436/',
+  },
+  knowles2018: {
+    id: 'knowles2018',
+    text: 'Knowles, O. E., Drinkwater, E. J., Urwin, C. S., Lamon, S., & Aisbett, B. (2018). Inadequate sleep and muscle strength: implications for resistance training. Journal of Science and Medicine in Sport, 21(9), 959–968.',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/29422383/',
+  },
+  acsm2026: {
+    id: 'acsm2026',
+    text: 'American College of Sports Medicine. (2026). ACSM Position Stand: Resistance training prescription for muscle function, hypertrophy, and physical performance in healthy adults: an overview of reviews. Medicine & Science in Sports & Exercise, 58(4), 851–872.',
+    url: 'https://doi.org/10.1249/MSS.0000000000003897',
+  },
+  acsm2009: {
+    id: 'acsm2009',
+    text: 'American College of Sports Medicine. (2009). Position stand: Progression models in resistance training for healthy adults. Medicine & Science in Sports & Exercise, 41(3), 687–708.',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/19204579/',
+  },
 };

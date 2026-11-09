@@ -24,7 +24,14 @@ export const SITE = {
  * its sitemap <lastmod> (astro.config.mjs) all read from reviewedFor().
  */
 const PAGE_REVIEWED: Record<string, string> = {
-  '/dots-calculator/': '2026-11-03',
+  '/dots-calculator/': '2026-11-09',
+  '/bench-press-calculator/': '2026-11-09',
+  '/overhead-press-calculator/': '2026-11-09',
+  '/barbell-row-calculator/': '2026-11-09',
+  '/rpe-calculator/': '2026-11-09',
+  '/1rm-percentage-calculator/': '2026-11-09',
+  '/warm-up-calculator/': '2026-11-09',
+  '/plate-calculator/': '2026-11-09',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */

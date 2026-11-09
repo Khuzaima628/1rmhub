@@ -11,15 +11,27 @@ const description =
 const path = '/guides/';
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const guides = (await getCollection('guides')).sort((a, b) => a.data.published.getTime() - b.data.published.getTime());
+const calculators = [LINKS.home, LINKS.percent, LINKS.rpe, LINKS.plates, LINKS.warmup, LINKS.dots];
 const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, type: 'CollectionPage' })];
 ---
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Guides', href: path }]} jsonLd={jsonLd}>
   <h1>Guides</h1>
   <p class="lead">Short, sourced explanations of the numbers behind the calculators.</p>
+  <p>
+    Every guide is written in plain language, cites the published research or official documents it
+    relies on, and links to the calculator that puts it into practice. New to estimating your max?
+    Start with what a 1RM is, then read how the formulas work.
+  </p>
   <ul class="link-grid">
     {guides.map((g) => (
       <li><a href={`/guides/${g.id}/`}>{g.data.shortTitle}</a><p>{g.data.description}</p></li>
     ))}
     <li><a href={LINKS.methodology.href}>{LINKS.methodology.title}</a><p>{LINKS.methodology.text}</p></li>
+  </ul>
+  <h2>Calculators</h2>
+  <ul class="link-grid">
+    {calculators.map((c) => (
+      <li><a href={c.href}>{c.title}</a><p>{c.text}</p></li>
+    ))}
   </ul>
 </BaseLayout>
