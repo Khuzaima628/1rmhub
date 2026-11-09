@@ -1,0 +1,68 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Leg Press One Rep Max Calculator — Estimate Your Leg Press 1RM"
+  description="Estimate your leg press one rep max from a set of 1–12 reps. Six formulas, how sled weight and machine type change the number, and loadable training weights."
+  path="/leg-press-calculator/"
+  name="Leg Press Calculator"
+  h1="Leg Press One Rep Max (1RM) Calculator"
+  lead="Estimate your leg press max from a recent hard set. Leg press numbers depend heavily on the machine, so the estimate is most useful for tracking yourself on the same machine."
+  exercise="leg-press"
+  lift="Leg press"
+  example={{ weight: 400, reps: 6, unit: 'lb' }}
+  related={[LINKS.squat, LINKS.percent, LINKS.home, LINKS.warmup]}
+  sources={['reynolds', 'epley', 'brzycki']}
+>
+  <section aria-labelledby="lp-estimate-heading">
+    <h2 id="lp-estimate-heading">How to estimate your leg press max</h2>
+    <p class="answer">
+      Leg press a weight you can move for 3–6 full-range reps, stop before your lower back lifts off
+      the pad, and enter the weight and reps above. For example, 400 lb × 6 estimates a leg press max
+      of roughly 460–486 lb. Use the same machine, seat position and foot placement every time you compare.
+    </p>
+    <p>
+      The leg press is one of the lifts used in research on rep-max prediction: in a study of 70
+      adults using the chest press and leg press, a 5-rep max predicted the 1RM more accurately than
+      a 10- or 20-rep max (Reynolds et al., 2006). The six formulas themselves were not built for the
+      leg press, so treat the result as an estimate.
+    </p>
+  </section>
+
+  <section aria-labelledby="lp-sled-heading">
+    <h2 id="lp-sled-heading">Do I count the sled weight?</h2>
+    <p>
+      Either way works, as long as you are <strong>consistent</strong>. The estimate is a multiple of
+      the number you enter, so if you enter plates only, the result is in plates only; if you add the
+      sled (carriage) weight, the result includes it.
+    </p>
+    <ul>
+      <li><strong>Plates only</strong> is simplest when the sled weight is unknown — which it often is.</li>
+      <li><strong>Plates + sled</strong> is closer to the real load. If you know the sled weight, enter it as a custom bar weight in the plate loader so the plates per side come out right.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="lp-machine-heading">
+    <h2 id="lp-machine-heading">Why leg press numbers differ between machines</h2>
+    <ul>
+      <li><strong>Sled angle:</strong> on a common 45° sled you push only part of the weight on the plates; a horizontal or vertical machine works differently.</li>
+      <li><strong>Sled weight and friction</strong> vary from one machine to the next.</li>
+      <li><strong>Range of motion:</strong> stopping higher makes the lift much easier, just like a shallow squat.</li>
+    </ul>
+    <p>
+      Because of this, a leg press max is only comparable on the same machine — not between gyms,
+      and not with your squat.
+    </p>
+  </section>
+
+  <section aria-labelledby="lp-rep-heading">
+    <h2 id="lp-rep-heading">What counts as a full leg press rep</h2>
+    <ul>
+      <li>Lower the sled until your knees are well bent, without your hips rolling up off the seat.</li>
+      <li>Press to almost straight legs; do not slam the knees into lockout.</li>
+      <li>Keep the same seat setting and foot position for every set you compare.</li>
+      <li>Use the safety stops, and set them so a failed rep can be rested on them.</li>
+    </ul>
+  </section>
+</ExerciseLayout>
