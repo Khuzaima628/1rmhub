@@ -1,0 +1,85 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Incline Bench Press 1RM Calculator — Estimate Your Incline Max"
+  description="Estimate your incline bench press one rep max from a set of 1–12 reps. Six formulas with the range between them, why bench angle matters, and clean-rep rules."
+  path="/incline-bench-press-calculator/"
+  name="Incline Bench Press Calculator"
+  h1="Incline Bench Press One Rep Max (1RM) Calculator"
+  lead="Estimate your incline bench press max from a recent set — no max attempt needed. Enter the weight and the clean reps you completed at your usual bench angle."
+  exercise="incline-bench"
+  lift="Incline bench press"
+  example={{ weight: 155, reps: 5, unit: 'lb' }}
+  related={[LINKS.bench, LINKS.ohp, LINKS.percent, LINKS.increase]}
+  sources={['mayhew', 'lesuer', 'reynolds', 'epley']}
+>
+  <section aria-labelledby="ib-estimate-heading">
+    <h2 id="ib-estimate-heading">How to estimate your incline bench max</h2>
+    <p class="answer">
+      Press a weight you can lift for 3–6 clean reps on an incline bench, stop when the next rep
+      would be a grind or a miss, and enter the weight and reps above. For example, 155 lb × 5
+      estimates an incline bench max of roughly 174–185 lb.
+    </p>
+    <p>
+      The 1RM formulas were mostly built and checked on the flat bench press, squat and deadlift
+      (Mayhew et al., 1992; LeSuer et al., 1997). The incline press is a similar pressing movement,
+      so the estimate is a reasonable guide, but treat it as less certain than a flat bench estimate.
+    </p>
+  </section>
+
+  <section aria-labelledby="ib-angle-heading">
+    <h2 id="ib-angle-heading">Why the bench angle matters</h2>
+    <p>
+      Incline benches are set anywhere from a low incline to a steep one. The steeper the bench, the
+      more the lift shifts towards an overhead press and the less weight most people can lift. An
+      estimate only applies to the angle you used, so write the angle down with your sets and keep
+      it the same when you compare numbers.
+    </p>
+    <p>
+      For the same reason, do not predict your flat bench from your incline, or the other way round.
+      Estimate your flat bench with the <a href="/bench-press-calculator/">bench press calculator</a>.
+    </p>
+  </section>
+
+  <section aria-labelledby="ib-rep-heading">
+    <h2 id="ib-rep-heading">What counts as a clean incline rep</h2>
+    <ul>
+      <li><strong>Touch the upper chest every rep.</strong> Stopping short shortens the range of motion and inflates the estimate.</li>
+      <li><strong>No bouncing</strong> off the chest.</li>
+      <li><strong>Hips stay on the seat.</strong> Lifting the hips flattens the angle and turns the lift into a flat bench.</li>
+      <li><strong>Same grip width</strong> as your heavy sets.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="ib-safety-heading">
+    <h2 id="ib-safety-heading">Incline bench safety for heavy sets</h2>
+    <ul>
+      <li>Use a spotter, or an incline bench inside a rack with the safety arms set just below the lowest point of the bar.</li>
+      <li>Use a full grip with the thumb wrapped around the bar.</li>
+      <li>Check the bench is locked at its angle before you load the bar.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="ib-faq-heading">
+    <h2 id="ib-faq-heading">Incline bench max: common questions</h2>
+    <h3>How do I calculate my incline bench max by hand?</h3>
+    <p>
+      Use the Epley formula: <strong>1RM = weight × (1 + reps ÷ 30)</strong>. For 155 lb × 5:
+      155 × (1 + 5 ÷ 30) = <strong>180.8 lb</strong>. The calculator runs five more published
+      formulas and shows the range between them.
+    </p>
+    <h3>Does it work for the incline dumbbell press?</h3>
+    <p>
+      Only to estimate an incline dumbbell max. Enter the weight the way you track it — one dumbbell
+      or both together — and the estimate comes out the same way. Do not compare it with a barbell
+      incline max.
+    </p>
+    <h3>How often should I update my incline max?</h3>
+    <p>
+      Whenever you complete a new hard set of 3–6 reps at the same angle — for many lifters every
+      few weeks, or at the end of each training block.
+    </p>
+  </section>
+</ExerciseLayout>

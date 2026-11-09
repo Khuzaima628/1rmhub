@@ -1,0 +1,85 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Front Squat 1RM Calculator — Estimate Your Front Squat Max"
+  description="Estimate your front squat one rep max from a set of 1–12 reps. Six formulas with the range between them, what counts as a clean rep, and how to fail safely."
+  path="/front-squat-calculator/"
+  name="Front Squat Calculator"
+  h1="Front Squat One Rep Max (1RM) Calculator"
+  lead="Estimate your front squat max from a recent set — no max attempt needed. Enter the weight and the clean reps you completed with the bar held on your shoulders."
+  exercise="front-squat"
+  lift="Front squat"
+  example={{ weight: 185, reps: 3, unit: 'lb' }}
+  related={[LINKS.squat, LINKS.percent, LINKS.warmup, LINKS.increase]}
+  sources={['lesuer', 'reynolds', 'epley']}
+>
+  <section aria-labelledby="fs-estimate-heading">
+    <h2 id="fs-estimate-heading">How to estimate your front squat max</h2>
+    <p class="answer">
+      Front squat a weight you can lift for 2–5 clean reps, stop when the next rep would lose your
+      upper-back position, and enter the weight and reps above. For example, 185 lb × 3 estimates a
+      front squat max of roughly 196–211 lb.
+    </p>
+    <p>
+      The validation studies we cite tested the back squat, not the front squat, so expect more
+      individual variation. Short, heavy sets work best: front squat sets often end because the
+      upper back rounds and the bar starts to roll forward, not because the legs are done, and
+      that happens sooner as sets get longer.
+    </p>
+  </section>
+
+  <section aria-labelledby="fs-vs-heading">
+    <h2 id="fs-vs-heading">Front squat vs back squat</h2>
+    <p>
+      The front squat is a different lift, not a lighter version of the back squat. The bar sits
+      on the front of the shoulders, the torso stays more upright, and the upper back has to hold
+      the position. Most lifters front squat less than they back squat, but how much less varies a
+      lot from person to person.
+    </p>
+    <p>
+      Because the gap is so individual, do not predict one from the other. Estimate your front squat
+      from front squat sets, and your back squat with the <a href="/squat-calculator/">squat calculator</a>.
+    </p>
+  </section>
+
+  <section aria-labelledby="fs-rep-heading">
+    <h2 id="fs-rep-heading">What counts as a clean front squat rep</h2>
+    <ul>
+      <li><strong>Same depth every rep.</strong> Cutting depth on the last reps inflates the estimate.</li>
+      <li><strong>Elbows stay up.</strong> If the elbows drop and the bar slides forward, the rep is not clean.</li>
+      <li><strong>The bar stays on the shoulders</strong> from start to finish, with the torso upright.</li>
+      <li><strong>Same rack position as your heavy sets</strong> — clean grip, cross-arm or straps — throughout the set.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="fs-safety-heading">
+    <h2 id="fs-safety-heading">Front squat safety for heavy sets</h2>
+    <ul>
+      <li>Squat inside a rack with the safety arms set just below your lowest position.</li>
+      <li>If a rep fails, let the bar roll forward off your shoulders onto the safeties and step back. Do not try to hold on to a bar that is falling forward.</li>
+      <li>For a true max attempt, follow a structured protocol: see <a href="/guides/how-to-test-1rm/">how to test your 1RM safely</a>.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="fs-faq-heading">
+    <h2 id="fs-faq-heading">Front squat max: common questions</h2>
+    <h3>How do I calculate my front squat max by hand?</h3>
+    <p>
+      Use the Epley formula: <strong>1RM = weight × (1 + reps ÷ 30)</strong>. For 185 lb × 3:
+      185 × (1 + 3 ÷ 30) = <strong>203.5 lb</strong>. The calculator runs five more published
+      formulas and shows the range between them.
+    </p>
+    <h3>Does the clean grip or cross-arm grip change the estimate?</h3>
+    <p>
+      The formulas do not know your grip. The estimate applies to the rack position you used for
+      the set, so keep the same grip when you use the number to plan training.
+    </p>
+    <h3>Can I use my front squat to predict my back squat?</h3>
+    <p>
+      Not reliably. The difference between the two lifts varies a lot between lifters, so test or
+      estimate each one from its own sets.
+    </p>
+  </section>
+</ExerciseLayout>

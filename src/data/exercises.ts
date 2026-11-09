@@ -10,7 +10,8 @@ export const EXERCISES: Exercise[] = [
   { id: 'overhead-press', label: 'Overhead Press', page: '/overhead-press-calculator/' },
   { id: 'barbell-row', label: 'Barbell Row', page: '/barbell-row-calculator/' },
   { id: 'dumbbell-bench', label: 'Dumbbell Bench Press' },
-  { id: 'incline-bench', label: 'Incline Bench Press' },
-  { id: 'front-squat', label: 'Front Squat' },
+  { id: 'incline-bench', label: 'Incline Bench Press', page: '/incline-bench-press-calculator/' },
+  { id: 'front-squat', label: 'Front Squat', page: '/front-squat-calculator/' },
+  { id: 'hip-thrust', label: 'Hip Thrust', page: '/hip-thrust-calculator/' },
   { id: 'custom', label: 'Other / Custom Exercise' },
 ];

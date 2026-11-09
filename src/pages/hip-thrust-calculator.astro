@@ -1,0 +1,82 @@
+---
+import ExerciseLayout from '../layouts/ExerciseLayout.astro';
+import { LINKS } from '../data/links';
+---
+<ExerciseLayout
+  title="Hip Thrust 1RM Calculator — Estimate Your Hip Thrust Max"
+  description="Estimate your barbell hip thrust one rep max from a set of 1–12 reps. Six formulas with the range between them, what counts as a full rep, and setup tips."
+  path="/hip-thrust-calculator/"
+  name="Hip Thrust Calculator"
+  h1="Hip Thrust One Rep Max (1RM) Calculator"
+  lead="Estimate your barbell hip thrust max to set training weights. Hip thrusts are rarely tested as a single, so treat the number as a programming tool rather than a target."
+  exercise="hip-thrust"
+  lift="Hip thrust"
+  example={{ weight: 225, reps: 8, unit: 'lb' }}
+  related={[LINKS.squat, LINKS.deadlift, LINKS.percent, LINKS.plates]}
+  sources={['lesuer', 'reynolds', 'epley']}
+>
+  <section aria-labelledby="ht-estimate-heading">
+    <h2 id="ht-estimate-heading">How to estimate your hip thrust max</h2>
+    <p class="answer">
+      Hip thrust a weight you can lift for 5–8 reps that each reach full lockout, and enter the
+      weight and reps above. For example, 225 lb × 8 estimates a hip thrust max of roughly
+      270–287 lb.
+    </p>
+    <p>
+      None of the six formulas was tested on the hip thrust — the studies we cite used the bench
+      press, squat, deadlift and leg press. Hip thrusts are also usually trained with higher reps,
+      where every formula is less accurate. Use the estimate to choose working weights, not as an
+      exact max.
+    </p>
+  </section>
+
+  <section aria-labelledby="ht-rep-heading">
+    <h2 id="ht-rep-heading">What counts as a full hip thrust rep</h2>
+    <ul>
+      <li><strong>Full lockout at the top:</strong> hips fully extended, with the torso roughly parallel to the floor. Reps that stop short of lockout inflate the estimate.</li>
+      <li><strong>Same range every rep:</strong> lower the bar to the same point each time.</li>
+      <li><strong>No bouncing</strong> off the floor or the plates between reps.</li>
+      <li><strong>Same setup</strong> — bench height, foot position and bar position — as the sets you compare with.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="ht-setup-heading">
+    <h2 id="ht-setup-heading">Setup changes the number</h2>
+    <p>
+      Bench height, how far your feet are from your hips, and whether you pause at the top all
+      change how hard a hip thrust is. A machine hip thrust or a glute bridge from the floor is a
+      different lift again. An estimate only applies to the setup you used, so keep it the same
+      when you track progress.
+    </p>
+  </section>
+
+  <section aria-labelledby="ht-safety-heading">
+    <h2 id="ht-safety-heading">Hip thrust safety and comfort</h2>
+    <ul>
+      <li>Brace the bench against a wall or rack so it cannot slide away from you.</li>
+      <li>Use a thick bar pad and place the bar over the crease of the hips, not on the stomach.</li>
+      <li>Use full-size plates if you can, so the bar is high enough to roll over your legs.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="ht-faq-heading">
+    <h2 id="ht-faq-heading">Hip thrust max: common questions</h2>
+    <h3>How do I calculate my hip thrust max by hand?</h3>
+    <p>
+      Use the Epley formula: <strong>1RM = weight × (1 + reps ÷ 30)</strong>. For 225 lb × 8:
+      225 × (1 + 8 ÷ 30) = <strong>285 lb</strong>. The calculator runs five more published
+      formulas and shows the range between them.
+    </p>
+    <h3>Should I test a true 1RM on the hip thrust?</h3>
+    <p>
+      Usually not. The hip thrust is mostly a training exercise rather than a tested lift, and the
+      range of motion tends to shorten with very heavy weights. An estimate from a set of full reps
+      is enough to set training percentages.
+    </p>
+    <h3>Does the estimate work for a hip thrust machine?</h3>
+    <p>
+      Only for that machine. Machines differ in resistance curves and starting weight, so a machine
+      estimate cannot be compared with a barbell hip thrust or with a different machine.
+    </p>
+  </section>
+</ExerciseLayout>

@@ -32,6 +32,9 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/1rm-percentage-calculator/': '2026-11-09',
   '/warm-up-calculator/': '2026-11-09',
   '/plate-calculator/': '2026-11-09',
+  '/front-squat-calculator/': '2026-11-09',
+  '/incline-bench-press-calculator/': '2026-11-09',
+  '/hip-thrust-calculator/': '2026-11-09',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
@@ -98,6 +101,9 @@ export const FOOTER_GROUPS = [
       { href: '/deadlift-calculator/', label: 'Deadlift Calculator' },
       { href: '/overhead-press-calculator/', label: 'Overhead Press Calculator' },
       { href: '/barbell-row-calculator/', label: 'Barbell Row Calculator' },
+      { href: '/front-squat-calculator/', label: 'Front Squat Calculator' },
+      { href: '/incline-bench-press-calculator/', label: 'Incline Bench Press Calculator' },
+      { href: '/hip-thrust-calculator/', label: 'Hip Thrust Calculator' },
       { href: '/1rm-percentage-calculator/', label: '1RM Percentage Calculator' },
       { href: '/plate-calculator/', label: 'Plate Calculator' },
       { href: '/warm-up-calculator/', label: 'Warm-up Calculator' },
