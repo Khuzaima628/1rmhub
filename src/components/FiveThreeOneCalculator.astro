@@ -1,0 +1,122 @@
+---
+// 5/3/1 calculator: training max from a 1RM (or entered directly) and the four
+// weeks of main-lift sets for up to four lifts. One instance per page.
+// Math: src/lib/program531.js (tested).
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+const lifts = [
+  { id: 'squat', label: 'Squat', ph: { kg: '140', lb: '315' } },
+  { id: 'bench', label: 'Bench press', ph: { kg: '100', lb: '225' } },
+  { id: 'deadlift', label: 'Deadlift', ph: { kg: '180', lb: '405' } },
+  { id: 'press', label: 'Overhead press', ph: { kg: '60', lb: '135' } },
+];
+---
+<section class="card calculator" aria-labelledby="w531-heading" data-531-calculator>
+  <h2 id="w531-heading">5/3/1 calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="w531-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="w531-basis">I am entering</label>
+        <select id="w531-basis">
+          <option value="90" selected>My 1RM — use a 90% training max</option>
+          <option value="85">My 1RM — use an 85% training max</option>
+          <option value="100">My training max (use it as entered)</option>
+        </select>
+      </div>
+      <UnitToggle id="w531-unit" unit={unit} />
+    </div>
+    <fieldset class="plate-fieldset">
+      <legend>Your lifts <span class="hint">(fill in any you train; leave the rest empty)</span></legend>
+      <div class="field-row">
+        {lifts.map((l) => (
+          <div class="field">
+            <label for={`w531-${l.id}`}>{l.label} (<span data-unit-label>{unit}</span>)</label>
+            <input id={`w531-${l.id}`} type="number" inputmode="decimal" min="0" step="any" autocomplete="off"
+              placeholder={`e.g. ${l.ph[unit]}`} data-ph-kg={`e.g. ${l.ph.kg}`} data-ph-lb={`e.g. ${l.ph.lb}`}
+              data-lift={l.id} data-label={l.label} aria-describedby="w531-error" />
+          </div>
+        ))}
+      </div>
+    </fieldset>
+    <div class="actions"><button type="submit" class="btn btn-primary">Build my 5/3/1 cycle</button></div>
+    <p class="error" id="w531-error" role="alert" hidden></p>
+  </form>
+  <p class="disclaimer">No tested max? <a href="/">Estimate your 1RM</a> from a recent heavy set first.</p>
+  <p class="visually-hidden" aria-live="polite" id="w531-status"></p>
+  <div id="w531-result"></div>
+</section>
+
+<script>
+  import { plan531, tmIncrease } from '../lib/program531.js';
+  import { validateWeight, loadStep } from '../lib/onerepmax.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, scrollToEl } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-531-calculator]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('w531-form'), basisEl = $<HTMLSelectElement>('w531-basis');
+    const errorEl = $('w531-error'), statusEl = $('w531-status'), out = $('w531-result');
+    const liftEls = [...root.querySelectorAll<HTMLInputElement>('[data-lift]')];
+    let shown = false;
+
+    const toggle = bindUnitToggle(root.querySelector('#w531-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      liftEls.forEach((el) => convertInput(el, prev, next));
+      paintUnitLabels(root, next);
+      if (shown) calculate(false);
+    });
+    basisEl.addEventListener('change', () => { if (shown) calculate(false); });
+
+    function fail(message: string, el?: HTMLInputElement) {
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      el?.setAttribute('aria-invalid', 'true');
+      out.innerHTML = '';
+      statusEl.textContent = '';
+      shown = false;
+    }
+
+    function calculate(scroll: boolean) {
+      liftEls.forEach((el) => el.removeAttribute('aria-invalid'));
+      const filled = liftEls.filter((el) => el.value.trim() !== '');
+      if (filled.length === 0) return fail('Enter a weight for at least one lift.', liftEls[0]);
+      const entries: { el: HTMLInputElement; value: number }[] = [];
+      for (const el of filled) {
+        const v = validateWeight(el.value, `your ${el.dataset.label!.toLowerCase()}`);
+        if (!v.ok) return fail(`${el.dataset.label}: ${v.error}`, el);
+        entries.push({ el, value: v.value });
+      }
+      errorEl.hidden = true;
+      const u = toggle.get();
+      const step = loadStep(u);
+      const pct = Number(basisEl.value);
+      const sections = entries.map(({ el, value }) => {
+        const tm = (value * pct) / 100;
+        const plan = plan531(tm, step);
+        const rows = plan.map((w) => `<tr><th scope="row">${esc(w.name)}</th>${w.sets.map((s) =>
+          `<td class="num">${esc(num(s.loadable))} ${u} × ${s.reps}${s.amrap ? '+' : ''}<br><span class="hint">${s.pct}% · ${f1(s.weight)}</span></td>`).join('')}</tr>`).join('');
+        const tmLine = pct === 100
+          ? `Training max ${esc(num(value))} ${u} (as entered)`
+          : `Training max ${f1(tm)} ${u} (${pct}% of ${esc(num(value))} ${u})`;
+        const inc = tmIncrease(el.dataset.lift!, u);
+        return `<h3>${esc(el.dataset.label!)}</h3>
+          <p class="result-sub">${tmLine} · next cycle: ${f1(tm + inc)} ${u} (+${num(inc)} ${u})</p>
+          <div class="table-wrap"><table>
+            <caption>${esc(el.dataset.label!)}: 5/3/1 main sets (loadable, rounded down to ${num(step)} ${u})</caption>
+            <thead><tr><th scope="col">Week</th><th scope="col" class="num">Set 1</th><th scope="col" class="num">Set 2</th><th scope="col" class="num">Set 3</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>`;
+      }).join('');
+      out.innerHTML = `${sections}
+        <p class="disclaimer">+ means as many reps as possible, at least the number shown, stopping before your form breaks down.
+          Percentages are of the training max. Loadable weights are rounded down to ${num(step)} ${u}; the smaller number under each is the exact weight.</p>`;
+      statusEl.textContent = `5/3/1 cycle built for ${entries.length} lift${entries.length > 1 ? 's' : ''}.`;
+      shown = true;
+      if (scroll) scrollToEl(out);
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
+  }
+</script>

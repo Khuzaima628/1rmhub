@@ -1,0 +1,132 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FiveThreeOneCalculator from '../components/FiveThreeOneCalculator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { WEEKS_531, plan531 } from '../lib/program531.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor } from '../config/site';
+
+const title = '5/3/1 Calculator — Training Max and Weekly Sets';
+const description =
+  'Build a 5/3/1 cycle: enter your 1RM or training max and get all four weeks of main sets for squat, bench, deadlift and press, rounded to loadable weights.';
+const path = '/531-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+// Worked example from the calculator's own tested code: 300 lb 1RM, 90% TM.
+const exOrm = 300;
+const exTm = exOrm * 0.9;
+const exPlan = plan531(exTm, 5);
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub 5/3/1 Calculator', description,
+    features: ['Training max at 90% or 85% of 1RM', 'Four weeks of 5/3/1 main sets', 'Up to four lifts', 'Loadable weights in kg or lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: '5/3/1 Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>5/3/1 Calculator</h1>
+  <p class="lead">
+    Enter your one rep max (or your training max) for each lift and get every main set of a 5/3/1
+    cycle, rounded down to weights you can load.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
+
+  <FiveThreeOneCalculator />
+
+  <div class="prose">
+    <section aria-labelledby="what-531-heading">
+      <h2 id="what-531-heading">What is 5/3/1?</h2>
+      <p class="answer">
+        5/3/1 is a strength program created by Jim Wendler. Each cycle lasts four weeks: a week of
+        5s, a week of 3s, a week of 5/3/1, then a lighter deload week. Every weight is a percentage of
+        your <strong>training max</strong> — usually 90% of your 1RM — not of your full max.
+      </p>
+      <p>
+        The program is built on the squat, bench press, deadlift and overhead press. The last set of
+        each of the first three weeks is done for as many good reps as you can, which is how you push
+        progress without testing a max.
+      </p>
+    </section>
+
+    <section aria-labelledby="pct-531-heading">
+      <h2 id="pct-531-heading">5/3/1 percentages</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>5/3/1 main sets as a percentage of training max (+ = as many reps as possible)</caption>
+          <thead><tr><th scope="col">Week</th><th scope="col" class="num">Set 1</th><th scope="col" class="num">Set 2</th><th scope="col" class="num">Set 3</th></tr></thead>
+          <tbody>
+            {WEEKS_531.map((w) => (
+              <tr><th scope="row">{w.name}</th>{w.sets.map((s) => <td class="num">{s.pct}% × {s.reps}{s.amrap ? '+' : ''}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="ex-531-heading">
+      <h2 id="ex-531-heading">Worked example</h2>
+      <p>
+        Your squat 1RM is <strong>{exOrm} lb</strong>. A 90% training max is {exOrm} × 0.90 =
+        <strong>{exTm} lb</strong>. Week 1 is then:
+      </p>
+      <ul>
+        {exPlan[0].sets.map((s) => (
+          <li>{s.pct}% of {exTm} = {s.weight.toFixed(1)} lb → load <strong>{s.loadable} lb</strong> for {s.reps}{s.amrap ? '+ reps (as many as possible)' : ' reps'}</li>
+        ))}
+      </ul>
+      <p>
+        Week 3&rsquo;s top set is {exPlan[2].sets[2].pct}% of {exTm} = <strong>{exPlan[2].sets[2].loadable} lb</strong> for at least one rep —
+        still below your {exOrm} lb max, which is the point of the training max.
+      </p>
+    </section>
+
+    <section aria-labelledby="tm-531-heading">
+      <h2 id="tm-531-heading">90% or 85% training max?</h2>
+      <p>
+        Wendler&rsquo;s original program uses 90% of your 1RM. In his later book, <em>5/3/1 Forever</em>,
+        he often recommends a lower training max, around 85%, so that the weights stay manageable and
+        progress lasts longer. If you are unsure, start at 85%: a training max that is a little low costs
+        you a few easy weeks, while one that is too high leads to missed reps. The
+        <a href="/guides/training-max/">training max guide</a> explains the trade-off in more detail.
+      </p>
+    </section>
+
+    <section aria-labelledby="prog-531-heading">
+      <h2 id="prog-531-heading">How to progress after each cycle</h2>
+      <ul>
+        <li><strong>Squat and deadlift:</strong> add 10 lb (5 kg) to the training max.</li>
+        <li><strong>Bench press and overhead press:</strong> add 5 lb (2.5 kg).</li>
+        <li><strong>Missed the reps on a + set?</strong> Keep the training max the same, or lower it, for the next cycle.</li>
+      </ul>
+      <p>The calculator shows each lift&rsquo;s training max for the next cycle under its table.</p>
+    </section>
+
+    <section aria-labelledby="faq-531-heading">
+      <h2 id="faq-531-heading">Common questions</h2>
+      <h3>Can I use an estimated 1RM?</h3>
+      <p>
+        Yes. Most lifters do. Estimate it from a recent hard set with the
+        <a href="/">one rep max calculator</a>, then enter that number here. Because the training max is
+        set below your 1RM, a small error in the estimate is absorbed.
+      </p>
+      <h3>Why are the weights rounded down?</h3>
+      <p>
+        So that a loadable weight is never heavier than the exact percentage. Every calculator on
+        1RMHub rounds the same way. The exact weight is shown under each set if you want to round
+        differently.
+      </p>
+      <h3>Does this include assistance work or warm-ups?</h3>
+      <p>
+        No — it covers the three main sets of each lift. For warm-up sets before your first work set,
+        use the <a href="/warm-up-calculator/">warm-up calculator</a>.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.trainingMax, LINKS.home, LINKS.warmup, LINKS.percent]} />
+  <SourceList ids={['wendler', 'liftvaulttm']} />
+</BaseLayout>

@@ -18,6 +18,7 @@ export const LINKS = {
   rpe: { href: '/rpe-calculator/', title: 'RPE Calculator', text: 'Estimate your 1RM from a set rated by RPE, and plan weights by reps in reserve.' },
   dots: { href: '/dots-calculator/', title: 'DOTS Calculator', text: 'Score a powerlifting total against bodyweight with the DOTS formula.' },
   weighted: { href: '/weighted-pull-up-calculator/', title: 'Weighted Pull-Up Calculator', text: 'Estimate a weighted pull-up, chin-up or dip max from bodyweight plus added weight.' },
+  fiveThreeOne: { href: '/531-calculator/', title: '5/3/1 Calculator', text: 'All four weeks of 5/3/1 main sets from your training max, in loadable weights.' },
   trainingMax: { href: '/guides/training-max/', title: 'What Is a Training Max?', text: 'Why programs use ~90% of your 1RM, how to calculate it, and when to raise it.' },
   formulas: { href: '/guides/1rm-formulas/', title: '1RM Formula Guide', text: 'All six equations compared rep by rep, and which to trust when.' },
   test: { href: '/guides/how-to-test-1rm/', title: 'How to Test Your 1RM Safely', text: 'A step-by-step protocol for a true max — and when not to test.' },
