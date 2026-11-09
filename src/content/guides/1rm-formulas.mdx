@@ -3,12 +3,13 @@ title: '1RM Formulas Compared: Epley, Brzycki and 4 More'
 shortTitle: '1RM Formula Guide'
 description: 'The six one rep max formulas side by side, rep by rep: where each reads high or low, why they disagree, and when an estimate stops being reliable.'
 published: 2026-11-02
-updated: 2026-11-16
+updated: 2026-12-06
 sources: ['epley', 'brzycki', 'lombardi', 'mayhew', 'oconner', 'wathan', 'lesuer', 'reynolds']
 related: ['home', 'percent', 'test', 'methodology']
 ---
 import FormulaTable from '../../components/FormulaTable.astro';
 import FormulaGridTable from '../../components/FormulaGridTable.astro';
+import FormulaChart from '../../components/FormulaChart.astro';
 import { FORMULAS } from '../../lib/onerepmax.js';
 
 export const fx = Object.fromEntries(FORMULAS.map((f) => [f.id, f]));
@@ -93,6 +94,8 @@ from 7 to 10 reps. 100 kg × 5 → **{at('wathan', 5)} kg**.
 
 The table below shows each formula's estimate as a percentage of the weight you lifted. It is
 generated from the same code the [calculator](/) runs, so the two always match.
+
+<FormulaChart />
 
 <FormulaGridTable />
 
