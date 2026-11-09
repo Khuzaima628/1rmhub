@@ -377,3 +377,16 @@ describe('internal links', () => {
     expect(missing).toEqual([]);
   });
 });
+
+describe('contact email links', () => {
+  it('every mailto link is wrapped in email_off, so Cloudflare does not rewrite it to a 404', () => {
+    const bad = walk(DIST)
+      .filter((f) => f.endsWith('.html'))
+      .flatMap((f) => {
+        const html = readFileSync(f, 'utf8');
+        const links = html.match(/<a href="mailto:[^"]*">[^<]*<\/a>/g) ?? [];
+        return links.filter((a) => !html.includes(`<!--email_off-->${a}<!--/email_off-->`)).map((a) => `${relative(DIST, f)}: ${a}`);
+      });
+    expect(bad).toEqual([]);
+  });
+});
