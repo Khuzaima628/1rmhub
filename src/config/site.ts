@@ -37,7 +37,6 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/rpe-calculator/': '2026-11-17',
   '/1rm-percentage-calculator/': '2026-11-09',
   '/warm-up-calculator/': '2026-11-20',
-  '/plate-calculator/': '2026-11-09',
   '/front-squat-calculator/': '2026-11-19',
   '/incline-bench-press-calculator/': '2026-11-19',
   '/hip-thrust-calculator/': '2026-11-19',
