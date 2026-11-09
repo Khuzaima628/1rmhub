@@ -1,0 +1,113 @@
+---
+// Reverse plate calculator: "what's on the bar?" — bar + plates on one side
+// → total. Has its own kg/lb toggle; each unit has its own plate sizes and bar
+// presets. Math: src/lib/bartotal.js (tested).
+import { KG_PLATES, LB_PLATES, BAR_PRESETS } from '../lib/onerepmax.js';
+import UnitToggle from './UnitToggle.astro';
+
+interface Props { unit: 'kg' | 'lb' }
+const { unit } = Astro.props;
+const sets = [
+  { unit: 'kg', plates: KG_PLATES, bars: BAR_PRESETS.filter((b) => b.unit === 'kg') },
+  { unit: 'lb', plates: LB_PLATES, bars: BAR_PRESETS.filter((b) => b.unit === 'lb') },
+];
+---
+<section class="card calculator" aria-labelledby="rev-heading" data-bar-total>
+  <h2 id="rev-heading">What&rsquo;s on the bar? (reverse plate calculator)</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="rev-form" novalidate>
+    <div class="field-row two">
+      <UnitToggle id="rev-unit" unit={unit} />
+      {sets.map((s) => (
+        <div class="field" data-for-unit={s.unit} hidden={s.unit !== unit}>
+          <label for={`rev-bar-${s.unit}`}>Bar weight</label>
+          <select id={`rev-bar-${s.unit}`} data-bar>
+            {s.bars.map((b, i) => <option value={b.value} selected={i === 0}>{b.label}</option>)}
+            <option value="0">No bar (0 {s.unit})</option>
+          </select>
+        </div>
+      ))}
+    </div>
+    {sets.map((s) => (
+      <fieldset class="plate-fieldset" data-for-unit={s.unit} hidden={s.unit !== unit}>
+        <legend>Plates on <strong>one side</strong> of the bar</legend>
+        <div class="field-row">
+          {s.plates.map((p) => (
+            <div class="field">
+              <label for={`rev-${s.unit}-${String(p).replace('.', '_')}`}>{p} {s.unit} plates</label>
+              <input id={`rev-${s.unit}-${String(p).replace('.', '_')}`} type="number" inputmode="numeric" min="0" max="20" step="1"
+                placeholder="0" autocomplete="off" data-plate={p} aria-describedby="rev-error" />
+            </div>
+          ))}
+        </div>
+      </fieldset>
+    ))}
+    <div class="actions"><button type="submit" class="btn">Add it up</button></div>
+    <p class="error" id="rev-error" role="alert" hidden></p>
+  </form>
+  <div id="rev-result" aria-live="polite"></div>
+</section>
+
+<script>
+  import { validatePlateCounts, barTotal } from '../lib/bartotal.js';
+  import { bindUnitToggle, esc, num } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-bar-total]');
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('#rev-form')!;
+    const errorEl = root.querySelector<HTMLElement>('#rev-error')!;
+    const out = root.querySelector<HTMLElement>('#rev-result')!;
+    let shown = false;
+
+    const showUnit = (u: string) => {
+      root.querySelectorAll<HTMLElement>('[data-for-unit]').forEach((el) => { el.hidden = el.dataset.forUnit !== u; });
+    };
+    // Plate sizes differ between kg and lb, so switching units shows that unit's
+    // own plates and bar instead of converting counts.
+    const toggle = bindUnitToggle(root.querySelector('#rev-form [data-unit-toggle]')!, (next: string) => {
+      showUnit(next);
+      out.innerHTML = '';
+      errorEl.hidden = true;
+      shown = false;
+    });
+    showUnit(toggle.get());
+
+    function calculate() {
+      const u = toggle.get();
+      const inputs = [...root!.querySelectorAll<HTMLInputElement>(`fieldset[data-for-unit="${u}"] [data-plate]`)];
+      inputs.forEach((el) => el.removeAttribute('aria-invalid'));
+      const raw = Object.fromEntries(inputs.map((el) => [el.dataset.plate!, el.value]));
+      const v = validatePlateCounts(raw);
+      if (!v.ok) {
+        errorEl.textContent = `${v.error}`;
+        errorEl.hidden = false;
+        inputs.find((el) => Number(el.dataset.plate) === v.size)?.setAttribute('aria-invalid', 'true');
+        out.innerHTML = '';
+        shown = false;
+        return;
+      }
+      errorEl.hidden = true;
+      const bar = Number(root!.querySelector<HTMLSelectElement>(`[data-for-unit="${u}"] [data-bar]`)!.value);
+      const result = barTotal(bar, v.counts);
+      const used = v.counts.filter((c) => c.count > 0).sort((a, b) => b.size - a.size);
+      const list = used.length
+        ? used.map((c) => `${c.count} × ${num(c.size)} ${u}`).join(' + ')
+        : 'no plates';
+      out.innerHTML = `<div class="result-headline">
+          <div class="result-label">Total on the bar</div>
+          <div class="result-big">${esc(num(result.total))} ${u}</div>
+          <p class="result-sub">${esc(num(bar))} ${u} bar + 2 × ${esc(num(result.perSide))} ${u} per side (${esc(list)} on each side)</p>
+        </div>
+        <p class="disclaimer">Assumes both sides are loaded the same. Collars are not counted — add their weight if yours are heavy.</p>`;
+      shown = true;
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(); });
+    root.querySelectorAll('[data-bar]').forEach((el) => el.addEventListener('change', () => { if (shown) calculate(); }));
+  }
+</script>
+
+<style>
+  /* Only the current unit's bar and plates are shown; [hidden] must win over field layout. */
+  [data-bar-total] [hidden] { display: none !important; }
+</style>

@@ -55,6 +55,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/squat-standards/': '2026-11-23',
   '/leg-press-calculator/': '2026-11-24',
   '/deadlift-standards/': '2026-11-25',
+  '/plate-calculator/': '2026-11-25',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
