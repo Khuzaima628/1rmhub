@@ -366,3 +366,14 @@ describe('brand and domain', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe('internal links', () => {
+  it('every page is linked from the homepage (header, body or footer)', () => {
+    const home = readFileSync(join(DIST, 'index.html'), 'utf8');
+    const missing = walk(DIST)
+      .filter((f) => f.endsWith('index.html') && !f.includes('404'))
+      .map((f) => '/' + relative(DIST, f).split(sep).join('/').replace(/index\.html$/, ''))
+      .filter((p) => !home.includes(`href="${p}"`));
+    expect(missing).toEqual([]);
+  });
+});

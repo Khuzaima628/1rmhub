@@ -15,5 +15,6 @@ export const LINKS = {
   trainingMax: { href: '/guides/training-max/', title: 'What Is a Training Max?', text: 'Why programs use ~90% of your 1RM, how to calculate it, and when to raise it.' },
   formulas: { href: '/guides/1rm-formulas/', title: '1RM Formula Guide', text: 'All six equations compared rep by rep, and which to trust when.' },
   test: { href: '/guides/how-to-test-1rm/', title: 'How to Test Your 1RM Safely', text: 'A step-by-step protocol for a true max — and when not to test.' },
+  rpeGuide: { href: '/guides/rpe-scale/', title: 'RPE Scale Explained', text: 'The RPE 6–10 scale with reps in reserve, how to rate a set, and an RPE chart.' },
   methodology: { href: '/methodology/', title: 'Methodology', text: 'Exactly how every number on 1RMHub is calculated and rounded.' },
 };

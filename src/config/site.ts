@@ -101,9 +101,11 @@ export const FOOTER_GROUPS = [
   {
     title: 'Learn',
     links: [
+      { href: '/guides/what-is-1rm/', label: 'What Is 1RM?' },
       { href: '/guides/1rm-formulas/', label: '1RM Formula Guide' },
       { href: '/guides/how-to-test-1rm/', label: 'How to Test Your 1RM Safely' },
       { href: '/guides/training-max/', label: 'What Is a Training Max?' },
+      { href: '/guides/rpe-scale/', label: 'RPE Scale Explained' },
       { href: '/methodology/', label: 'Methodology' },
       { href: '/guides/', label: 'All guides' },
     ],
