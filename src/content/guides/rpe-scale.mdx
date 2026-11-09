@@ -1,0 +1,142 @@
+---
+title: 'RPE Scale and Chart Explained: RIR and % of 1RM'
+shortTitle: 'RPE Scale Explained'
+description: 'What RPE means in lifting, the RPE 6–10 scale with reps in reserve, how to rate a set honestly, and an RPE chart that converts reps and RPE to % of 1RM.'
+published: 2026-11-09
+sources: ['zourdos', 'sbsrir', 'helms2018', 'epley']
+related: ['rpe', 'home', 'percent', 'trainingMax']
+---
+import { rirFromRpe, rpeFraction, estimateFromRpe, loadableDown } from '../../lib/onerepmax.js';
+
+export const chartRpes = [10, 9, 8, 7, 6];
+export const chartReps = [1, 2, 3, 4, 5, 6, 8, 10];
+export const pct = (f) => (f === null ? '—' : `${(f * 100).toFixed(1)}%`);
+export const f1 = (v) => v.toFixed(1);
+export const ex = estimateFromRpe(100, 5, 8);
+export const next = ex.average * rpeFraction(3, 8);
+
+<div class="answer">
+  <strong>RPE (rating of perceived exertion) rates how hard a set was on a scale of 1 to 10.</strong>
+  In strength training it is tied to <strong>reps in reserve (RIR)</strong> — how many more reps you
+  could have done. RPE 10 means no reps left, RPE 9 means one rep left, RPE 8 means two left, and
+  so on down to RPE 6 with about four left.
+</div>
+
+This reps-in-reserve version of the scale was described by Zourdos and colleagues in 2016. It lets
+you train hard without going to failure on every set, and it adjusts your weights to how strong
+you are on the day.
+
+## The RPE scale (RPE 6–10)
+
+<div class="table-wrap">
+  <table>
+    <caption>RPE and reps in reserve (RIR)</caption>
+    <thead><tr><th scope="col">RPE</th><th scope="col" class="num">Reps in reserve</th><th scope="col">What it feels like</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">10</th><td class="num">{rirFromRpe(10)}</td><td>Maximal. You could not have done another rep.</td></tr>
+      <tr><th scope="row">9</th><td class="num">{rirFromRpe(9)}</td><td>Very hard. One more rep was possible.</td></tr>
+      <tr><th scope="row">8</th><td class="num">{rirFromRpe(8)}</td><td>Hard. Two more reps were possible.</td></tr>
+      <tr><th scope="row">7</th><td class="num">{rirFromRpe(7)}</td><td>Fairly hard, bar speed still good. Three reps left.</td></tr>
+      <tr><th scope="row">6</th><td class="num">{rirFromRpe(6)}</td><td>Moderate. About four reps left.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+**Half steps** such as RPE 8.5 or 9.5 are used when you are unsure between two ratings — for
+example, RPE 8.5 means "maybe one more rep, maybe two". Ratings below 6 describe light work such as
+warm-ups and are rarely used to plan training.
+
+## How to rate a set
+
+1. **Finish the set, then ask one question:** "How many more clean reps could I have done?"
+2. **Turn that number into RPE:** RPE = 10 − reps in reserve. Two reps left is RPE 8.
+3. **Count only good reps.** A rep with broken technique, a bounce or help from a spotter does not
+   count towards reps in reserve.
+4. **Rate straight away.** Your memory of how hard a set felt fades within minutes.
+5. **Be honest, not brave.** Rating a hard set as easy will push your next weights too high.
+
+Ratings tend to be more accurate when the set is close to failure. On sets that stop far from
+failure, many lifters underestimate how many reps they had left. A review of the research by
+Stronger by Science reports that lifters misjudge their reps in reserve by about one rep on
+average, so treat each rating as a close guess, not an exact count.
+
+## RPE chart: % of 1RM by reps and RPE
+
+Each cell is the percentage of your one rep max for that many reps at that RPE. It is calculated
+with the Epley equation on **reps to failure** (reps done + reps in reserve) — the same method the
+[RPE calculator](/rpe-calculator/) uses. A single at RPE 10 is your 1RM, so it is 100%.
+
+<div class="table-wrap">
+  <table>
+    <caption>Estimated percentage of 1RM by reps and RPE (Epley, reps to failure)</caption>
+    <thead>
+      <tr><th scope="col">Reps</th>{chartRpes.map((r) => <th scope="col" class="num">RPE {r}</th>)}</tr>
+    </thead>
+    <tbody>
+      {chartReps.map((reps) => (
+        <tr>
+          <th scope="row">{reps}</th>
+          {chartRpes.map((rpe) => <td class="num">{pct(rpeFraction(reps, rpe))}</td>)}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+— means more than 12 reps to failure. Estimates that far from a max are not reliable, so they are
+not shown. Real lifters vary: some can do more reps at a given percentage than the chart suggests,
+and some fewer, so use it as a starting point and adjust from your own ratings.
+
+## How RPE connects to your 1RM
+
+RPE works in both directions:
+
+- **From a set to a 1RM.** Add your reps in reserve to the reps you did, then estimate your 1RM as
+  if you had gone to failure.
+- **From a 1RM to a weight.** Choose your target reps and RPE, then find the weight from the chart.
+
+**Worked example:** you squat **100 kg for 5 reps at RPE 8**.
+
+1. Reps in reserve at RPE 8: {rirFromRpe(8)}. Reps to failure: 5 + {rirFromRpe(8)} = **{ex.effectiveReps}**.
+2. The six formulas on this site, run on {ex.effectiveReps} reps, estimate a 1RM of
+   **{f1(ex.min)}–{f1(ex.max)} kg**, with an average of about **{f1(ex.average)} kg**.
+3. For your next set of **3 reps at RPE 8**, the chart gives {pct(rpeFraction(3, 8))} of 1RM:
+   {f1(ex.average)} × {pct(rpeFraction(3, 8))} ≈ {f1(next)} kg, rounded down to
+   **{loadableDown(next, 2.5)} kg** so it can be loaded on the bar.
+
+The [RPE calculator](/rpe-calculator/) does both steps for you, in kg or lb.
+
+## Why lifters use RPE
+
+- **It adjusts to the day.** If you slept badly, the same RPE gives a lighter weight; on a good
+  day it lets you go heavier. A fixed percentage cannot do that.
+- **You do not need to test a max.** Hard sets with a rating are enough to keep your estimate
+  up to date.
+- **It controls fatigue.** Stopping at RPE 7–9 keeps most sets hard but short of failure.
+
+Research comparing the two approaches has found that programs using RPE and programs using fixed
+percentages of 1RM can both build strength well (Helms and colleagues, 2018). Many lifters use
+both: a percentage to pick a starting weight, and RPE to adjust it.
+
+## Common questions
+
+### What is RPE 8 in reps in reserve?
+
+RPE 8 means you finished the set with about **two reps in reserve** — two more clean reps were
+possible.
+
+### Is RPE the same as RIR?
+
+They describe the same thing from opposite ends. RIR counts the reps you had left; RPE is 10 minus
+that number. RPE 9 is 1 RIR, RPE 7 is 3 RIR.
+
+### Is RPE good for beginners?
+
+Beginners often find RPE hard to judge, because they have rarely taken sets close to failure. It
+helps to practise rating sets, and occasionally take a set to a safe failure (for example on a
+machine or with safeties set) to check your ratings.
+
+### What RPE should I train at?
+
+Most strength programs keep working sets around RPE 7–9, with RPE 10 used sparingly. The right
+range depends on your program and goals.
