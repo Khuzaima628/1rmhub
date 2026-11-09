@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WeightedCalculator from '../components/WeightedCalculator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { estimateBodyweightLift } from '../lib/bodyweight.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor } from '../config/site';
+
+const title = 'Weighted Pull-Up 1RM Calculator — Pull-Ups, Chin-Ups and Dips';
+const description =
+  'Estimate your weighted pull-up, chin-up or dip one rep max from bodyweight, added weight and reps. Six formulas, added weight for 2–10 reps, kg or lb.';
+const path = '/weighted-pull-up-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+// Worked example computed with the calculator's own tested code.
+const ex = { bw: 80, added: 20, reps: 5 };
+const exResult = estimateBodyweightLift(ex.bw, ex.added, ex.reps);
+const f1 = (v: number) => v.toFixed(1);
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub Weighted Pull-Up and Dip Calculator', description,
+    features: ['Weighted pull-up, chin-up and dip 1RM', 'Bodyweight plus added weight', 'Added weight for 2–10 reps', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Weighted Pull-Up Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>Weighted Pull-Up and Dip 1RM Calculator</h1>
+  <p class="lead">
+    Estimate the most weight you could add for one rep of a pull-up, chin-up or dip, from a set
+    you have already done — then see how much to add for any number of reps.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · <a href="/methodology/">How we calculate</a></p>
+
+  <WeightedCalculator />
+
+  <div class="prose">
+    <section aria-labelledby="how-wt-heading">
+      <h2 id="how-wt-heading">How a weighted pull-up 1RM is calculated</h2>
+      <p class="answer">
+        In a pull-up or dip you lift your bodyweight <strong>plus</strong> any added weight, so the
+        calculator adds the two together, runs the six 1RM formulas on that total load, and then takes
+        your bodyweight off again. What is left is the added weight you could use for one rep.
+      </p>
+      <ol>
+        <li><strong>Total load:</strong> bodyweight + added weight. 80 kg + 20 kg = 100 kg.</li>
+        <li><strong>1RM of the total load:</strong> the same six formulas as the <a href="/">one rep max calculator</a>.</li>
+        <li><strong>Added weight for a max:</strong> the total-load 1RM minus your bodyweight.</li>
+      </ol>
+      <p>
+        Because the formulas work on the total load, two lifters doing the same added weight for the
+        same reps get different results if their bodyweights differ — which matches how hard the set
+        really was for each of them.
+      </p>
+    </section>
+
+    <section aria-labelledby="ex-wt-heading">
+      <h2 id="ex-wt-heading">Worked example</h2>
+      <p>
+        You weigh <strong>{ex.bw} kg</strong> and do <strong>{ex.reps} pull-ups with {ex.added} kg</strong> on a dip belt.
+      </p>
+      <ul>
+        <li>Total load: {ex.bw} + {ex.added} = {ex.bw + ex.added} kg.</li>
+        <li>The six formulas estimate a total-load 1RM of about <strong>{f1(exResult.total.average)} kg</strong> (Average Estimate).</li>
+        <li>Minus bodyweight: {f1(exResult.total.average)} − {ex.bw} ≈ <strong>+{f1(exResult.addedAverage)} kg</strong> added for one rep.</li>
+        <li>Across the six formulas the added weight ranges from +{f1(exResult.addedMin)} to +{f1(exResult.addedMax)} kg.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="acc-wt-heading">
+      <h2 id="acc-wt-heading">How accurate is it for pull-ups and dips?</h2>
+      <p>
+        Less certain than for barbell lifts. The 1RM formulas were developed and studied on lifts such
+        as the bench press, squat and deadlift; they have not been validated for pull-ups or dips. Treat
+        the result as a rough guide for planning, not a promise.
+      </p>
+      <ul>
+        <li><strong>Bodyweight is an approximation.</strong> The calculator counts all of it, although the forearms (in a pull-up) or hands (in a dip) do not really move. This makes little difference when you compare your own sets over time.</li>
+        <li><strong>Use a heavy set of 3–6 reps</strong> with added weight. Long sets of bodyweight-only reps are limited by endurance and give rougher estimates.</li>
+        <li><strong>Weigh yourself on the day,</strong> in the clothes you train in. A 2 kg change in bodyweight changes the added weight by the same amount.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="rep-wt-heading">
+      <h2 id="rep-wt-heading">What counts as a clean rep</h2>
+      <ul>
+        <li><strong>Pull-ups and chin-ups:</strong> start from a dead hang with straight arms and finish with the chin over the bar. No kipping or swinging.</li>
+        <li><strong>Dips:</strong> lower until your upper arms are at least parallel to the floor, then press to straight arms. Keep the depth the same on every rep.</li>
+        <li><strong>Keep it the same as your max attempt:</strong> grip width, depth and how the weight is attached (belt, vest or dumbbell between the feet) all change the result.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="faq-wt-heading">
+      <h2 id="faq-wt-heading">Common questions</h2>
+      <h3>Can I use it without added weight?</h3>
+      <p>
+        Yes — enter 0 as the added weight. The result then tells you roughly how much you could add
+        for a single, based on how many bodyweight reps you can do. Sets of more than 12 reps are not
+        estimated, because the formulas become unreliable that far from a max.
+      </p>
+      <h3>Does it work for assisted pull-ups?</h3>
+      <p>
+        No. Band or machine assistance changes the load in ways the formulas do not handle, so the
+        calculator only accepts added weight of zero or more.
+      </p>
+      <h3>Is a chin-up 1RM the same as a pull-up 1RM?</h3>
+      <p>
+        Not necessarily. The grip changes which muscles do more of the work, so the two can differ —
+        estimate and track each grip separately.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.home, LINKS.rpe, LINKS.percent, LINKS.formulas]} />
+  <SourceList ids={['epley', 'brzycki', 'lesuer']} />
+</BaseLayout>

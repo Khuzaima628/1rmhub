@@ -1,0 +1,126 @@
+---
+// Weighted pull-up / chin-up / dip 1RM calculator. One instance per page.
+// Math: src/lib/bodyweight.js (tested) on top of the six-formula engine.
+import { MIN_REPS, MAX_REPS } from '../lib/onerepmax.js';
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="wt-heading" data-weighted-calculator>
+  <h2 id="wt-heading">Weighted pull-up and dip 1RM calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="wt-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="wt-exercise">Exercise</label>
+        <select id="wt-exercise">
+          <option value="Pull-up">Pull-up</option>
+          <option value="Chin-up">Chin-up</option>
+          <option value="Dip">Dip</option>
+        </select>
+      </div>
+      <UnitToggle id="wt-unit" unit={unit} />
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="wt-bw">Bodyweight (<span data-unit-label>{unit}</span>)</label>
+        <input id="wt-bw" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 80' : 'e.g. 175'}
+          data-ph-kg="e.g. 80" data-ph-lb="e.g. 175" autocomplete="off" aria-describedby="wt-error" />
+      </div>
+      <div class="field">
+        <label for="wt-added">Added weight (<span data-unit-label>{unit}</span>) <span class="hint">0 for bodyweight only</span></label>
+        <input id="wt-added" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 20' : 'e.g. 45'}
+          data-ph-kg="e.g. 20" data-ph-lb="e.g. 45" autocomplete="off" aria-describedby="wt-error" />
+      </div>
+      <div class="field">
+        <label for="wt-reps">Reps completed <span class="hint">({MIN_REPS}–{MAX_REPS})</span></label>
+        <input id="wt-reps" type="number" inputmode="numeric" min={MIN_REPS} max={MAX_REPS} step="1" placeholder="e.g. 5"
+          autocomplete="off" aria-describedby="wt-error" />
+      </div>
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">Estimate 1RM</button></div>
+    <p class="error" id="wt-error" role="alert" hidden></p>
+  </form>
+  <p class="visually-hidden" aria-live="polite" id="wt-status"></p>
+  <div id="wt-result"></div>
+</section>
+
+<script>
+  import { validateBodyweightSet, estimateBodyweightLift, addedForReps } from '../lib/bodyweight.js';
+  import { confidenceNote, toKg, fromKg, loadableDown, loadStep } from '../lib/onerepmax.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, scrollToEl } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-weighted-calculator]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('wt-form'), exerciseEl = $<HTMLSelectElement>('wt-exercise');
+    const bwEl = $('wt-bw'), addedEl = $('wt-added'), repsEl = $('wt-reps');
+    const errorEl = $('wt-error'), statusEl = $('wt-status'), out = $('wt-result');
+    const fields: Record<string, HTMLInputElement> = { bodyweight: bwEl, weight: bwEl, added: addedEl, reps: repsEl };
+    let shown = false;
+
+    const toggle = bindUnitToggle(root.querySelector('#wt-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      [bwEl, addedEl].forEach((el) => convertInput(el, prev, next));
+      paintUnitLabels(root, next);
+      if (shown) calculate(false);
+    });
+    exerciseEl.addEventListener('change', () => { if (shown) calculate(false); });
+
+    function calculate(scroll: boolean) {
+      Object.values(fields).forEach((el) => el.removeAttribute('aria-invalid'));
+      const v = validateBodyweightSet(bwEl.value, addedEl.value, repsEl.value);
+      if (!v.ok) {
+        errorEl.textContent = v.error;
+        errorEl.hidden = false;
+        fields[v.field]?.setAttribute('aria-invalid', 'true');
+        out.innerHTML = '';
+        statusEl.textContent = '';
+        shown = false;
+        return;
+      }
+      errorEl.hidden = true;
+      const u = toggle.get();
+      const lift = exerciseEl.value;
+      const bwKg = toKg(v.bodyweight, u);
+      const est = estimateBodyweightLift(bwKg, toKg(v.added, u), v.reps);
+      const show = (kg: number) => f1(fromKg(kg, u));
+      const plus = (kg: number) => (kg >= 0 ? `+${show(kg)}` : show(kg));
+      const step = loadStep(u);
+      const repRows = addedForReps(est.total.average, bwKg).map((r) => {
+        const added = fromKg(r.added, u);
+        const cell = added <= 0
+          ? 'Bodyweight only'
+          : `+${f1(added)} ${u} <span class="hint">(load +${esc(num(loadableDown(added, step)))} ${u})</span>`;
+        return `<tr><th scope="row">${r.reps}</th><td class="num">${cell}</td></tr>`;
+      }).join('');
+      const formulaRows = est.total.rows.map((r) => `<tr><th scope="row">${esc(r.name)}</th>
+        <td class="num">${plus(r.value - bwKg)} ${u}</td><td class="num">${show(r.value)} ${u}</td></tr>`).join('');
+
+      statusEl.textContent = `Estimated ${lift.toLowerCase()} 1RM: ${plus(est.addedAverage)} ${u} added weight.`;
+      out.innerHTML = `
+        <div class="result-headline">
+          <div class="result-label">Estimated ${esc(lift.toLowerCase())} 1RM — added weight (Average Estimate)</div>
+          <div class="result-big">${plus(est.addedAverage)} ${u}</div>
+          <p class="result-sub">Total load ${show(est.total.average)} ${u} (bodyweight ${esc(num(v.bodyweight))} ${u} + added weight)
+            · range ${plus(est.addedMin)} to ${plus(est.addedMax)} ${u} added</p>
+          <p class="result-sub">${esc(confidenceNote(v.reps))}</p>
+          <p class="disclaimer">These formulas were developed on barbell lifts and have not been validated for bodyweight exercises — treat this as a rough estimate.</p>
+        </div>
+        <div class="table-wrap"><table>
+          <caption>Each formula's estimate for ${esc(num(v.bodyweight))} ${u} + ${esc(num(v.added))} ${u} × ${v.reps}</caption>
+          <thead><tr><th scope="col">Formula</th><th scope="col" class="num">Added weight</th><th scope="col" class="num">Total load</th></tr></thead>
+          <tbody>${formulaRows}</tbody>
+        </table></div>
+        <div class="table-wrap"><table>
+          <caption>Added weight for 2–10 reps (Epley, from the Average Estimate; loadable rounded down)</caption>
+          <thead><tr><th scope="col">Reps</th><th scope="col" class="num">Added weight</th></tr></thead>
+          <tbody>${repRows}</tbody>
+        </table></div>`;
+      shown = true;
+      if (scroll) scrollToEl(out);
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
+  }
+</script>
