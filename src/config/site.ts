@@ -113,6 +113,7 @@ export const FOOTER_GROUPS = [
       { href: '/guides/how-to-test-1rm/', label: 'How to Test Your 1RM Safely' },
       { href: '/guides/training-max/', label: 'What Is a Training Max?' },
       { href: '/guides/rpe-scale/', label: 'RPE Scale Explained' },
+      { href: '/guides/increase-1rm/', label: 'How to Increase Your 1RM' },
       { href: '/methodology/', label: 'Methodology' },
       { href: '/guides/', label: 'All guides' },
     ],
