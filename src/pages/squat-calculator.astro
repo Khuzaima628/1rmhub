@@ -1,6 +1,10 @@
 ---
 import ExerciseLayout from '../layouts/ExerciseLayout.astro';
 import { LINKS } from '../data/links';
+import { estimateAll } from '../lib/onerepmax.js';
+const chartWeights = [135,185,225,275,315];
+const chartReps = [3, 5, 6];
+const chartRows = chartWeights.map((weight) => ({ weight, cells: chartReps.map((r) => estimateAll(weight, r).average) }));
 ---
 <ExerciseLayout
   title="Squat One Rep Max Calculator — Estimate Your Squat 1RM"
@@ -13,7 +17,7 @@ import { LINKS } from '../data/links';
   lift="Squat"
   example={{ weight: 225, reps: 5, unit: 'lb' }}
   related={[LINKS.warmup, LINKS.trainingMax, LINKS.deadlift, LINKS.dots]}
-  sources={['lesuer', 'hprc', 'nsca']}
+  sources={['lesuer', 'reynolds', 'epley', 'hprc', 'nsca']}
 >
   <section aria-labelledby="squat-estimate-heading">
     <h2 id="squat-estimate-heading">How to estimate your squat max</h2>
@@ -29,6 +33,32 @@ import { LINKS } from '../data/links';
       not the same as an exact match, and individual lifters can still land well above or below any
       formula.
     </p>
+  </section>
+
+  <section aria-labelledby="squat-range-heading">
+    <h2 id="squat-range-heading">Best rep range for a squat max estimate</h2>
+    <p>
+      Use a set of <strong>3–6 reps</strong> taken close to failure. Estimates are generally closer to
+      a tested max when the set is heavy and short: in a study using the chest press and leg press, a 5-rep max predicted the 1RM more
+      accurately than a 10- or 20-rep max (Reynolds et al., 2006). Long squat sets are also limited by
+      breathing and leg fatigue, not only strength.
+    </p>
+    <h3>Squat 1RM chart</h3>
+    <p>
+      Find the weight you squatted and the reps you got. Each number is the Average Estimate of the
+      six formulas, rounded to the nearest pound. The calculator above also works in kg and shows the full range.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <caption>Estimated squat 1RM (Average Estimate, lb) by weight and reps</caption>
+        <thead><tr><th scope="col">Weight lifted</th>{chartReps.map((r) => <th scope="col" class="num">{r} reps</th>)}</tr></thead>
+        <tbody>
+          {chartRows.map((row) => (
+            <tr><th scope="row">{row.weight} lb</th>{row.cells.map((v) => <td class="num">{v.toFixed(0)} lb</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <section aria-labelledby="squat-depth-heading">
@@ -60,6 +90,30 @@ import { LINKS } from '../data/links';
       Squat programs often prescribe percentages such as 75–85% for sets of 3–6. Plan those from
       the Average Estimate or slightly below; an estimate from a set with shallow reps will make every
       percentage too heavy. When in doubt, re-estimate from a fresh, strict set rather than testing.
+    </p>
+  </section>
+  <section aria-labelledby="squat-faq-heading">
+    <h2 id="squat-faq-heading">Squat max: common questions</h2>
+    <h3>How do I calculate my squat 1RM by hand?</h3>
+    <p>
+      Use the Epley formula: <strong>1RM = weight × (1 + reps ÷ 30)</strong>. For 225 lb × 5:
+      225 × (1 + 5 ÷ 30) = 225 × 1.167 = <strong>262.5 lb</strong>. The calculator runs five more
+      formulas and shows the range.
+    </p>
+    <h3>Does high-bar or low-bar change my max?</h3>
+    <p>
+      It can. Many lifters lift more with a low-bar position, so an estimate only applies to the bar
+      position you used for the set. Keep it the same for the max you want to predict.
+    </p>
+    <h3>Can I use this for a front squat?</h3>
+    <p>
+      Yes, the calculator works with any weight and reps. But the research comparing these formulas
+      used the back squat, so treat a front squat estimate as a rougher guide.
+    </p>
+    <h3>Does a belt or knee sleeves change the estimate?</h3>
+    <p>
+      Equipment can change how much you lift, so the estimate matches the equipment you wore for the
+      set. Wear the same for any max you compare it with.
     </p>
   </section>
 </ExerciseLayout>

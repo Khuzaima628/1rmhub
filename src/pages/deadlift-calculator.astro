@@ -1,6 +1,10 @@
 ---
 import ExerciseLayout from '../layouts/ExerciseLayout.astro';
 import { LINKS } from '../data/links';
+import { estimateAll } from '../lib/onerepmax.js';
+const chartWeights = [225,275,315,405,495];
+const chartReps = [2, 3, 5];
+const chartRows = chartWeights.map((weight) => ({ weight, cells: chartReps.map((r) => estimateAll(weight, r).average) }));
 ---
 <ExerciseLayout
   title="Deadlift One Rep Max Calculator — Estimate Your Deadlift 1RM"
@@ -13,7 +17,7 @@ import { LINKS } from '../data/links';
   lift="Deadlift"
   example={{ weight: 315, reps: 3, unit: 'lb' }}
   related={[LINKS.squat, LINKS.row, LINKS.dots, LINKS.test]}
-  sources={['lesuer', 'reynolds', 'hprc']}
+  sources={['lesuer', 'reynolds', 'epley', 'hprc']}
 >
   <section aria-labelledby="dl-estimate-heading">
     <h2 id="dl-estimate-heading">How to estimate your deadlift max</h2>
@@ -23,6 +27,32 @@ import { LINKS } from '../data/links';
       334–359 lb — though your true max may be higher, because formulas have been found to
       underestimate the deadlift.
     </p>
+  </section>
+
+  <section aria-labelledby="dl-range-heading">
+    <h2 id="dl-range-heading">Best rep range for a deadlift max estimate</h2>
+    <p>
+      Use a set of <strong>2–5 reps</strong>. Estimates are generally closer to a tested max when the
+      set is heavy and short: in a study using the chest press and leg press, a 5-rep max predicted the 1RM more accurately than a 10- or
+      20-rep max (Reynolds et al., 2006). Long deadlift sets also tend to end from grip or lower-back
+      fatigue, which makes the estimate read even lower.
+    </p>
+    <h3>Deadlift 1RM chart</h3>
+    <p>
+      Find the weight you pulled and the reps you got. Each number is the Average Estimate of the six
+      formulas, rounded to the nearest pound. The calculator above also works in kg and shows the full range.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <caption>Estimated deadlift 1RM (Average Estimate, lb) by weight and reps</caption>
+        <thead><tr><th scope="col">Weight lifted</th>{chartReps.map((r) => <th scope="col" class="num">{r} reps</th>)}</tr></thead>
+        <tbody>
+          {chartRows.map((row) => (
+            <tr><th scope="row">{row.weight} lb</th>{row.cells.map((v) => <td class="num">{v.toFixed(0)} lb</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <section aria-labelledby="dl-low-heading">
@@ -60,5 +90,31 @@ import { LINKS } from '../data/links';
       <li>Use plates of standard diameter so the bar starts at a consistent height.</li>
       <li>Leave a rep or two in reserve on high-rep sets; deadlift fatigue accumulates quickly.</li>
     </ul>
+  </section>
+  <section aria-labelledby="dl-faq-heading">
+    <h2 id="dl-faq-heading">Deadlift max: common questions</h2>
+    <h3>How do I calculate my deadlift 1RM by hand?</h3>
+    <p>
+      Use the Epley formula: <strong>1RM = weight × (1 + reps ÷ 30)</strong>. For 315 lb × 3:
+      315 × (1 + 3 ÷ 30) = 315 × 1.1 = <strong>346.5 lb</strong>. The calculator runs five more
+      formulas and shows the range.
+    </p>
+    <h3>Does sumo or conventional change the estimate?</h3>
+    <p>
+      The formulas do not know your stance, so the estimate only applies to the stance you used for
+      the set. Many lifters are stronger in one style than the other, so do not use a sumo set to
+      predict a conventional max, or the other way round.
+    </p>
+    <h3>Should I test or estimate my deadlift max?</h3>
+    <p>
+      For planning training, an estimate from a hard set of 2–5 reps is usually enough and is much
+      less tiring than a true max. If you need an exact number, for example before a competition,
+      follow a structured protocol such as <a href="/guides/how-to-test-1rm/">how to test your 1RM safely</a>.
+    </p>
+    <h3>How often should I update my deadlift max?</h3>
+    <p>
+      Whenever you complete a new hard set in the 2–5 rep range. For many lifters that is every few
+      weeks, or at the end of each training block.
+    </p>
   </section>
 </ExerciseLayout>
