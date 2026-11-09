@@ -8,6 +8,10 @@ related: ['home', 'percent', 'test', 'methodology']
 ---
 import FormulaTable from '../../components/FormulaTable.astro';
 import FormulaGridTable from '../../components/FormulaGridTable.astro';
+import { FORMULAS } from '../../lib/onerepmax.js';
+
+export const fx = Object.fromEntries(FORMULAS.map((f) => [f.id, f]));
+export const at = (id, reps) => fx[id].fn(100, reps).toFixed(1);
 
 <div class="answer">
   <strong>Which 1RM formula is most accurate?</strong> None is best for everyone. The six common
@@ -28,6 +32,61 @@ an estimated 1RM. The difference between them is the *shape* of the relationship
 - **Mayhew** and **Wathan** are exponential curves fitted to measured data.
 
 <FormulaTable />
+
+## Each formula explained
+
+Every example below uses the same set — **100 kg for 5 reps** — so you can compare them directly.
+
+### Epley formula
+
+**{fx.epley.equation}**
+
+The most widely used formula, and the default on many calculators. It adds 1/30 of the weight
+(about 3.3%) for every rep. It comes from a coaching chart by Boyd Epley (1985), not a
+peer-reviewed study. 100 kg × 5 → **{at('epley', 5)} kg**.
+
+### Brzycki formula
+
+**{fx.brzycki.equation}**
+
+Published by Matt Brzycki in 1993. It reads lower than Epley below 10 reps, gives exactly the
+same answer at 10 reps, and climbs faster above 10. Because the bottom of the fraction reaches
+zero at 37 reps, it is only meant for low-rep sets. 100 kg × 5 → **{at('brzycki', 5)} kg**.
+
+**Epley vs Brzycki:** for a typical set of 3–6 reps, Brzycki gives the lower, more cautious
+number and Epley the higher one. At 10 reps they meet ({at('epley', 10)} kg vs {at('brzycki', 10)} kg).
+
+### Lombardi formula
+
+**{fx.lombardi.equation}**
+
+From Vincent Lombardi's 1989 textbook. A power curve: it rises quickly over the first few reps
+and then flattens, so it reads high on short sets and becomes the lowest estimate at high reps.
+100 kg × 5 → **{at('lombardi', 5)} kg**.
+
+### Mayhew formula
+
+**{fx.mayhew.equation}**
+
+Fitted by Mayhew and colleagues (1992) to bench-press data from college men and women. It is an
+exponential curve that is not anchored to a single: for 1 rep it returns about 109% of the
+weight, so it reads high on very heavy sets. 100 kg × 5 → **{at('mayhew', 5)} kg**.
+
+### O'Conner formula
+
+**{fx.oconner.equation}**
+
+From O'Conner, Simmons and O'Shea's 1989 textbook. Like Epley it is linear, but it adds only
+2.5% per rep, which makes it the most conservative formula from 6 to 10 reps.
+100 kg × 5 → **{at('oconner', 5)} kg**.
+
+### Wathan (Wathen) formula
+
+**{fx.wathan.equation}**
+
+Published by Dan Wathen in an NSCA textbook chapter (1994). It is often spelled "Wathan" on
+calculators, but it is the same formula. An exponential curve, it is the most generous estimate
+from 7 to 10 reps. 100 kg × 5 → **{at('wathan', 5)} kg**.
 
 ## The formulas compared, rep by rep
 
