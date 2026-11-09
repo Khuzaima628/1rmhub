@@ -30,7 +30,7 @@ export const SITE = {
  * its sitemap <lastmod> (astro.config.mjs) all read from reviewedFor().
  */
 const PAGE_REVIEWED: Record<string, string> = {
-  '/dots-calculator/': '2026-11-09',
+  '/dots-calculator/': '2026-11-19',
   '/bench-press-calculator/': '2026-11-09',
   '/overhead-press-calculator/': '2026-11-09',
   '/barbell-row-calculator/': '2026-11-09',
