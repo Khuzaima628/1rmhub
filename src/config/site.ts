@@ -35,6 +35,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/front-squat-calculator/': '2026-11-09',
   '/incline-bench-press-calculator/': '2026-11-09',
   '/hip-thrust-calculator/': '2026-11-09',
+  '/strength-percentile-calculator/': '2026-11-09',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
@@ -109,6 +110,7 @@ export const FOOTER_GROUPS = [
       { href: '/warm-up-calculator/', label: 'Warm-up Calculator' },
       { href: '/rpe-calculator/', label: 'RPE Calculator' },
       { href: '/dots-calculator/', label: 'DOTS Calculator' },
+      { href: '/strength-percentile-calculator/', label: 'Strength Percentile Calculator' },
     ],
   },
   {

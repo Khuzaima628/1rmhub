@@ -1,0 +1,131 @@
+---
+// "How strong am I?" calculator: ranks one lift (or a total) against raw
+// full-power competition results from OpenPowerlifting, by sex and IPF weight
+// class. One instance per page. Math: src/lib/strength-percentile.js (tested);
+// data: src/data/opl-percentiles.json (scripts/opl-percentiles.mjs).
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="sp-heading" data-strength-percentile>
+  <h2 id="sp-heading">Strength percentile calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
+  <form id="sp-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="sp-sex">Category</label>
+        <select id="sp-sex">
+          <option value="M">Men</option>
+          <option value="F">Women</option>
+        </select>
+      </div>
+      <UnitToggle id="sp-unit" unit={unit} />
+      <div class="field">
+        <label for="sp-bw">Bodyweight (<span data-unit-label>{unit}</span>)</label>
+        <input id="sp-bw" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 83' : 'e.g. 183'} data-ph-kg="e.g. 83" data-ph-lb="e.g. 183" autocomplete="off" aria-describedby="sp-error" />
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="sp-lift">Lift</label>
+        <select id="sp-lift">
+          <option value="squat">Squat</option>
+          <option value="bench">Bench press</option>
+          <option value="deadlift">Deadlift</option>
+          <option value="total">Total (squat + bench + deadlift)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="sp-weight">Best single (<span data-unit-label>{unit}</span>)</label>
+        <input id="sp-weight" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 140' : 'e.g. 315'} data-ph-kg="e.g. 140" data-ph-lb="e.g. 315" autocomplete="off" aria-describedby="sp-error" />
+      </div>
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">See my percentile</button></div>
+    <p class="error" id="sp-error" role="alert" hidden></p>
+  </form>
+  <div id="sp-result" aria-live="polite"></div>
+</section>
+
+<script>
+  import data from '../data/opl-percentiles.json';
+  import { classFor, percentileOf, validateStrengthInput, LIFT_LABELS } from '../lib/strength-percentile.js';
+  import { toKg, fromKg } from '../lib/onerepmax.js';
+  import { num, esc, bindUnitToggle, convertInput, paintUnitLabels } from '../scripts/dom.js';
+
+  type Sex = 'M' | 'F';
+  type Lift = 'squat' | 'bench' | 'deadlift' | 'total';
+  const ordinal = (n: number) => {
+    const v = n % 100;
+    const s = v >= 11 && v <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th';
+    return `${n}${s}`;
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-strength-percentile]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('sp-form'), sexEl = $<HTMLSelectElement>('sp-sex'), liftEl = $<HTMLSelectElement>('sp-lift');
+    const bwEl = $('sp-bw'), weightEl = $('sp-weight'), errorEl = $('sp-error'), out = $('sp-result');
+
+    const toggle = bindUnitToggle(root.querySelector('#sp-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      [bwEl, weightEl].forEach((el) => convertInput(el, prev, next));
+      paintUnitLabels(root, next);
+      out.innerHTML = '';
+    });
+    [sexEl, liftEl].forEach((el) => el.addEventListener('change', () => { out.innerHTML = ''; }));
+
+    function fail(message: string, el: HTMLElement) {
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      el.setAttribute('aria-invalid', 'true');
+      out.innerHTML = '';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      bwEl.removeAttribute('aria-invalid');
+      weightEl.removeAttribute('aria-invalid');
+      const u = toggle.get() as 'kg' | 'lb';
+      const sex = sexEl.value as Sex;
+      const lift = liftEl.value as Lift;
+      const bwKg = bwEl.value.trim() === '' ? NaN : toKg(Number(bwEl.value), u);
+      const liftKg = weightEl.value.trim() === '' ? NaN : toKg(Number(weightEl.value), u);
+      const check = validateStrengthInput({ sex, bwKg, liftKg });
+      if (!check.ok) return fail(check.error!, check.field === 'bodyweight' ? bwEl : weightEl);
+      errorEl.hidden = true;
+
+      const cls = classFor(sex, bwKg)!;
+      const group = (data.groups as Record<Sex, Record<string, Record<string, number[] | number>>>)[sex][cls.id];
+      const q = group[lift] as number[];
+      const count = group.count as number;
+      const { pct, edge } = percentileOf(q, liftKg);
+      const who = `${sex === 'M' ? 'men' : 'women'} in the ${cls.label} class`;
+      const headline = edge === 'below'
+        ? 'Below the 1st percentile'
+        : edge === 'above' ? 'Above the 99th percentile' : `${ordinal(pct)} percentile`;
+      const sentence = edge === 'below'
+        ? `Your ${LIFT_LABELS[lift].toLowerCase()} is below almost every raw competition result for ${who}.`
+        : edge === 'above'
+          ? `Your ${LIFT_LABELS[lift].toLowerCase()} is higher than at least 99% of raw competition results for ${who}.`
+          : `Your ${LIFT_LABELS[lift].toLowerCase()} is higher than about ${pct}% of raw competition results for ${who}.`;
+      const show = (kg: number) => `${esc(num(fromKg(kg, u), 1))} ${u}`;
+      const rows = [25, 50, 75, 90]
+        .map((p) => `<tr><th scope="row">${ordinal(p)}${p === 50 ? ' (median)' : ''}</th><td class="num">${show(q[p - 1])}</td></tr>`)
+        .join('');
+
+      out.innerHTML = `<div class="result-headline">
+          <div class="result-label">${esc(LIFT_LABELS[lift])} percentile</div>
+          <div class="result-big">${headline}</div>
+          <p class="result-sub">${esc(sentence)}</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>${esc(LIFT_LABELS[lift])} percentiles: ${esc(sex === 'M' ? 'men' : 'women')}, ${esc(cls.label)} (${count.toLocaleString('en-US')} lifters)</caption>
+            <thead><tr><th scope="col">Percentile</th><th scope="col" class="num">${esc(LIFT_LABELS[lift])}</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        <p class="disclaimer">Compared with raw powerlifting competitors (best total per lifter) from OpenPowerlifting data, exported ${esc(data.exportDate)}. Competitors are stronger than typical gym-goers.</p>`;
+    });
+  }
+</script>

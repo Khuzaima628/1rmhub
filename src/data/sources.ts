@@ -113,6 +113,11 @@ export const SOURCES: Record<string, Source> = {
     text: 'American College of Sports Medicine. (2026). ACSM Position Stand: Resistance training prescription for muscle function, hypertrophy, and physical performance in healthy adults: an overview of reviews. Medicine & Science in Sports & Exercise, 58(4), 851–872.',
     url: 'https://doi.org/10.1249/MSS.0000000000003897',
   },
+  opldata: {
+    id: 'opldata',
+    text: 'OpenPowerlifting. Powerlifting competition results database, released into the public domain. Raw full-power results; see the export date on the page.',
+    url: 'https://www.openpowerlifting.org',
+  },
   acsm2009: {
     id: 'acsm2009',
     text: 'American College of Sports Medicine. (2009). Position stand: Progression models in resistance training for healthy adults. Medicine & Science in Sports & Exercise, 41(3), 687–708.',

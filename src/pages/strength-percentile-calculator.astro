@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StrengthPercentileCalculator from '../components/StrengthPercentileCalculator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import data from '../data/opl-percentiles.json';
+import { CLASSES } from '../lib/strength-percentile.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor } from '../config/site';
+
+const title = 'How Strong Am I? Strength Percentile Calculator';
+const lifters = data.lifters.toLocaleString('en-US');
+const description =
+  `See how your squat, bench press, deadlift or total ranks against ${lifters} raw powerlifters in your weight class, using public competition results.`;
+const path = '/strength-percentile-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+const exportDate = formatDate(data.exportDate);
+
+type Group = { count: number; squat: number[]; bench: number[]; deadlift: number[]; total: number[] };
+const groups = data.groups as Record<'M' | 'F', Record<string, Group>>;
+const medianRows = (sex: 'M' | 'F') =>
+  CLASSES[sex].map((c) => {
+    const g = groups[sex][c.id];
+    return { label: c.label, count: g.count, squat: g.squat[49], bench: g.bench[49], deadlift: g.deadlift[49], total: g.total[49] };
+  });
+const tables = [
+  { sex: 'M' as const, caption: 'Men: median raw competition lifts by IPF weight class (kg)', rows: medianRows('M') },
+  { sex: 'F' as const, caption: 'Women: median raw competition lifts by IPF weight class (kg)', rows: medianRows('F') },
+];
+const m83 = groups.M['83'];
+const kg = (v: number) => `${v} kg`;
+
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub Strength Percentile Calculator', description,
+    features: ['Percentile for squat, bench press, deadlift or total', 'Men and women, IPF weight classes', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Strength Percentile Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>How Strong Am I? Strength Percentile Calculator</h1>
+  <p class="lead">
+    See where your squat, bench press, deadlift or total ranks among real powerlifting competitors
+    of your sex and weight class.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Data exported {exportDate}</p>
+
+  <StrengthPercentileCalculator />
+
+  <div class="prose">
+    <section aria-labelledby="what-sp-heading">
+      <h2 id="what-sp-heading">What this calculator shows</h2>
+      <p class="answer">
+        Enter your bodyweight and your best single on a lift, and the calculator shows the percentage
+        of raw powerlifting competitors in your weight class whose result was lower than yours. It
+        uses {lifters} lifters&rsquo; results from the public OpenPowerlifting database.
+      </p>
+      <p>
+        For example, among men in the 83 kg class ({m83.count.toLocaleString('en-US')} lifters), the
+        median squat is {kg(m83.squat[49])} and the 90th percentile is {kg(m83.squat[89])}. A
+        {' '}{kg(m83.squat[49])} squat at that bodyweight is therefore about the 50th percentile.
+      </p>
+    </section>
+
+    <section aria-labelledby="who-sp-heading">
+      <h2 id="who-sp-heading">Who you are compared with</h2>
+      <p>
+        These are <strong>competition lifters</strong> — people who trained for and entered a
+        powerlifting meet. They are much stronger on average than gym-goers in general, so a result
+        that ranks in the middle here is a strong lift for most people. There are no labels such as
+        &ldquo;beginner&rdquo; or &ldquo;elite&rdquo;: the numbers are real results, not opinions.
+      </p>
+      <ul>
+        <li><strong>Raw only:</strong> bare knees or knee sleeves; no knee wraps or supportive suits and shirts.</li>
+        <li><strong>Full-power meets only:</strong> lifters who did all three lifts at the same meet, with a valid result.</li>
+        <li><strong>One result per lifter:</strong> each lifter&rsquo;s best competition total, so frequent competitors are not counted many times.</li>
+        <li><strong>Weight class by bodyweight</strong> at that meet, using the IPF classes. All ages, federations, and drug-tested and untested meets are included.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="median-heading">
+      <h2 id="median-heading">Median lifts by weight class</h2>
+      <p>
+        The median is the middle result: half of the lifters in that class lifted more and half
+        lifted less. Each column is ranked separately, so the median total is not the sum of the
+        median lifts.
+      </p>
+      {tables.map((t) => (
+        <div class="table-wrap">
+          <table>
+            <caption>{t.caption}</caption>
+            <thead>
+              <tr><th scope="col">Class</th><th scope="col" class="num">Lifters</th><th scope="col" class="num">Squat</th><th scope="col" class="num">Bench</th><th scope="col" class="num">Deadlift</th><th scope="col" class="num">Total</th></tr>
+            </thead>
+            <tbody>
+              {t.rows.map((r) => (
+                <tr><th scope="row">{r.label}</th><td class="num">{r.count.toLocaleString('en-US')}</td><td class="num">{r.squat}</td><td class="num">{r.bench}</td><td class="num">{r.deadlift}</td><td class="num">{r.total}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </section>
+
+    <section aria-labelledby="gym-sp-heading">
+      <h2 id="gym-sp-heading">Using a gym max or an estimate</h2>
+      <p>
+        Competition lifts are judged: squats must reach depth, bench presses are usually paused on the chest,
+        and every lift must be locked out. If your gym lifts are less strict, your result would
+        likely rank lower on the platform. You can enter an estimated max from the
+        <a href="/">1RM calculator</a>, but the percentile is then an estimate too.
+      </p>
+    </section>
+
+    <section aria-labelledby="sp-faq-heading">
+      <h2 id="sp-faq-heading">Common questions</h2>
+      <h3>Is this the same as strength standards?</h3>
+      <p>
+        No. Strength standards usually sort lifters into levels such as beginner or advanced. This
+        calculator only shows where your lift falls among real competition results, without labels.
+      </p>
+      <h3>Why is my percentile lower than I expected?</h3>
+      <p>
+        Because you are being compared with people who compete in powerlifting, not with everyone in
+        your gym. Ranking near the middle of a weight class of competitors is a strong result.
+      </p>
+      <h3>Why compare by weight class and not by bodyweight ratio?</h3>
+      <p>
+        Strength does not rise in a straight line with bodyweight, so a simple ratio such as
+        &ldquo;bench 1.5× bodyweight&rdquo; favours lighter lifters. Comparing within a weight class
+        avoids that. To compare across classes, use a points formula such as the
+        <a href="/dots-calculator/">DOTS calculator</a>.
+      </p>
+      <h3>How often is the data updated?</h3>
+      <p>
+        The percentiles come from an OpenPowerlifting export dated {exportDate}. They are refreshed
+        from a new export from time to time; the date above always shows which one is used.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.dots, LINKS.home, LINKS.squat, LINKS.increase]} />
+  <p class="disclaimer">
+    This page uses data from the OpenPowerlifting project, <a href="https://www.openpowerlifting.org" rel="noopener">https://www.openpowerlifting.org</a>.
+    You may download a copy of the data at <a href="https://gitlab.com/openpowerlifting/opl-data" rel="noopener">https://gitlab.com/openpowerlifting/opl-data</a>.
+  </p>
+  <SourceList ids={['opldata']} />
+</BaseLayout>
