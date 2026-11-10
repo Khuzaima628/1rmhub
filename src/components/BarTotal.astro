@@ -50,7 +50,7 @@ const sets = [
 
 <script>
   import { validatePlateCounts, barTotal } from '../lib/bartotal.js';
-  import { bindUnitToggle, esc, num } from '../scripts/dom.js';
+  import { bindUnitToggle, esc, num, showFieldError, clearFieldError } from '../scripts/dom.js';
 
   const root = document.querySelector<HTMLElement>('[data-bar-total]');
   if (root) {
@@ -67,21 +67,20 @@ const sets = [
     const toggle = bindUnitToggle(root.querySelector('#rev-form [data-unit-toggle]')!, (next: string) => {
       showUnit(next);
       out.innerHTML = '';
-      errorEl.hidden = true;
+      clearFieldError(errorEl, [...root!.querySelectorAll<HTMLInputElement>('[data-plate]')]);
       shown = false;
     });
     showUnit(toggle.get());
 
-    function calculate() {
+    // focus: only when the visitor pressed the button, not on automatic refreshes.
+    function calculate(focus = false) {
       const u = toggle.get();
       const inputs = [...root!.querySelectorAll<HTMLInputElement>(`fieldset[data-for-unit="${u}"] [data-plate]`)];
-      inputs.forEach((el) => el.removeAttribute('aria-invalid'));
+      clearFieldError(errorEl, inputs);
       const raw = Object.fromEntries(inputs.map((el) => [el.dataset.plate!, el.value]));
       const v = validatePlateCounts(raw);
       if (!v.ok) {
-        errorEl.textContent = `${v.error}`;
-        errorEl.hidden = false;
-        inputs.find((el) => Number(el.dataset.plate) === v.size)?.setAttribute('aria-invalid', 'true');
+        showFieldError(errorEl, v.error, inputs.find((el) => Number(el.dataset.plate) === v.size), { focus });
         out.innerHTML = '';
         shown = false;
         return;
@@ -102,7 +101,7 @@ const sets = [
       shown = true;
     }
 
-    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(); });
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
     root.querySelectorAll('[data-bar]').forEach((el) => el.addEventListener('change', () => { if (shown) calculate(); }));
   }
 </script>
