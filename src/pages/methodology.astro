@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import FormulaTable from '../components/FormulaTable.astro';
 import SourceList from '../components/SourceList.astro';
-import { webPageNode } from '../lib/schema';
+import { articleNode, webPageNode } from '../lib/schema';
 import { SITE, EDITOR, formatDate, reviewedFor } from '../config/site';
 import { estimateAll, LB_PER_KG, MIN_REPS, MAX_REPS, WARN_REPS, MAX_WEIGHT } from '../lib/onerepmax.js';
 
@@ -13,12 +13,18 @@ const path = '/methodology/';
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const golden = estimateAll(100, 5);
 const f2 = (v: number) => v.toFixed(2);
-const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, reviewed: reviewedFor(path) })];
+// First published with the site; dateModified follows the reviewed date.
+const PUBLISHED = '2026-11-02';
+const url = `${site}${path}`;
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  articleNode({ site, url, headline: title, description, published: new Date(`${PUBLISHED}T00:00:00Z`), updated: new Date(`${reviewedFor(path)}T00:00:00Z`) }),
+];
 ---
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Methodology', href: path }]} jsonLd={jsonLd}>
   <article class="prose">
     <h1>Methodology</h1>
-    <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Maintained by <a href={EDITOR.href} rel="author">{EDITOR.name}</a></p>
+    <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Published <time datetime={PUBLISHED}>{formatDate(PUBLISHED)}</time> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
     <p class="answer">
       1RMHub estimates a one rep max by running six published formulas on a set you lifted,
       then reports every result, their plain average (the &ldquo;Average Estimate&rdquo;) and the
