@@ -49,7 +49,7 @@ const unit = SITE.defaultUnit;
 <script>
   import { validateBodyweightSet, estimateBodyweightLift, addedForReps } from '../lib/bodyweight.js';
   import { confidenceNote, toKg, fromKg, loadableDown, loadStep } from '../lib/onerepmax.js';
-  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, scrollToEl } from '../scripts/dom.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, scrollToEl, showFieldError, clearFieldError } from '../scripts/dom.js';
 
   const root = document.querySelector<HTMLElement>('[data-weighted-calculator]');
   if (root) {
@@ -68,12 +68,10 @@ const unit = SITE.defaultUnit;
     exerciseEl.addEventListener('change', () => { if (shown) calculate(false); });
 
     function calculate(scroll: boolean) {
-      Object.values(fields).forEach((el) => el.removeAttribute('aria-invalid'));
+      clearFieldError(errorEl, [bwEl, addedEl, repsEl]);
       const v = validateBodyweightSet(bwEl.value, addedEl.value, repsEl.value);
       if (!v.ok) {
-        errorEl.textContent = v.error;
-        errorEl.hidden = false;
-        fields[v.field]?.setAttribute('aria-invalid', 'true');
+        showFieldError(errorEl, v.error, fields[v.field], { focus: scroll });
         out.innerHTML = '';
         statusEl.textContent = '';
         shown = false;
