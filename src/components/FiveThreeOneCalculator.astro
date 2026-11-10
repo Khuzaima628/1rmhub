@@ -52,7 +52,7 @@ const lifts = [
 <script>
   import { plan531, tmIncrease } from '../lib/program531.js';
   import { validateWeight, loadStep } from '../lib/onerepmax.js';
-  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, scrollToEl } from '../scripts/dom.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, scrollToEl, showFieldError, clearFieldError } from '../scripts/dom.js';
 
   const root = document.querySelector<HTMLElement>('[data-531-calculator]');
   if (root) {
@@ -69,23 +69,21 @@ const lifts = [
     });
     basisEl.addEventListener('change', () => { if (shown) calculate(false); });
 
-    function fail(message: string, el?: HTMLInputElement) {
-      errorEl.textContent = message;
-      errorEl.hidden = false;
-      el?.setAttribute('aria-invalid', 'true');
+    function fail(message: string, el: HTMLInputElement | undefined, focus: boolean) {
+      showFieldError(errorEl, message, el, { focus });
       out.innerHTML = '';
       statusEl.textContent = '';
       shown = false;
     }
 
     function calculate(scroll: boolean) {
-      liftEls.forEach((el) => el.removeAttribute('aria-invalid'));
+      clearFieldError(errorEl, liftEls);
       const filled = liftEls.filter((el) => el.value.trim() !== '');
-      if (filled.length === 0) return fail('Enter a weight for at least one lift.', liftEls[0]);
+      if (filled.length === 0) return fail('Enter a weight for at least one lift.', liftEls[0], scroll);
       const entries: { el: HTMLInputElement; value: number }[] = [];
       for (const el of filled) {
         const v = validateWeight(el.value, `your ${el.dataset.label!.toLowerCase()}`);
-        if (!v.ok) return fail(`${el.dataset.label}: ${v.error}`, el);
+        if (!v.ok) return fail(`${el.dataset.label}: ${v.error}`, el, scroll);
         entries.push({ el, value: v.value });
       }
       errorEl.hidden = true;
