@@ -54,7 +54,7 @@ const unit = SITE.defaultUnit;
 <script>
   import { dotsScore } from '../lib/dots.js';
   import { toKg, fromKg, validateWeight } from '../lib/onerepmax.js';
-  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels } from '../scripts/dom.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, showFieldError, clearFieldError } from '../scripts/dom.js';
 
   const root = document.querySelector<HTMLElement>('[data-dots-calculator]');
   if (root) {
@@ -88,16 +88,13 @@ const unit = SITE.defaultUnit;
     }));
 
     function fail(message: string, el: HTMLInputElement) {
-      errorEl.textContent = message;
-      errorEl.hidden = false;
-      el.setAttribute('aria-invalid', 'true');
+      showFieldError(errorEl, message, el);
       out.innerHTML = '';
     }
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      bwEl.removeAttribute('aria-invalid');
-      totalEl.removeAttribute('aria-invalid');
+      clearFieldError(errorEl, [bwEl, totalEl]);
       const u = toggle.get();
       const bw = validateWeight(bwEl.value, 'your bodyweight');
       if (!bw.ok) return fail(bw.error, bwEl);

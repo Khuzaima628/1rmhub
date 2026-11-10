@@ -37,7 +37,7 @@ const unit = SITE.defaultUnit;
 
 <script>
   import { validateWeight, loadableDown, loadStep } from '../lib/onerepmax.js';
-  import { f1, num, esc, bindUnitToggle, convertInput } from '../scripts/dom.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, showFieldError, clearFieldError } from '../scripts/dom.js';
 
   const root = document.querySelector<HTMLElement>('[data-tm-calculator]');
   if (root) {
@@ -51,13 +51,11 @@ const unit = SITE.defaultUnit;
       if (shown) calculate();
     });
 
-    function calculate() {
-      ormEl.removeAttribute('aria-invalid');
+    function calculate(focus = false) {
+      clearFieldError(errorEl, [ormEl]);
       const orm = validateWeight(ormEl.value, 'your one rep max');
       if (!orm.ok) {
-        errorEl.textContent = orm.error;
-        errorEl.hidden = false;
-        ormEl.setAttribute('aria-invalid', 'true');
+        showFieldError(errorEl, orm.error, ormEl, { focus });
         out.innerHTML = '';
         shown = false;
         return;
@@ -86,7 +84,7 @@ const unit = SITE.defaultUnit;
       shown = true;
     }
 
-    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(); });
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
     pctEl.addEventListener('change', () => { if (shown) calculate(); });
   }
 </script>

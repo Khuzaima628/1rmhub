@@ -71,17 +71,17 @@
   color-scheme: dark;
 }
 
-/* Theme button in the header: icon + the theme it switches to. Which icon
-   and word show is decided in CSS from the same rules as the palette, so the
+/* Theme button in the header: a round, icon-only button showing the theme it
+   switches to (its name is in aria-label and the tooltip). Which icon shows is decided in CSS from the same rules as the palette, so the
    button is right before any script runs. */
 .theme-toggle {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  min-height: var(--tap); padding: 0 0.8rem; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--tap); height: var(--tap); padding: 0; border-radius: 999px;
   border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);
   font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; flex: none;
 }
 .theme-toggle:hover { border-color: var(--text-muted); }
-.theme-toggle svg { width: 1.1rem; height: 1.1rem; flex: none; }
+.theme-toggle svg { width: 1.25rem; height: 1.25rem; flex: none; }
 .theme-toggle .when-dark { display: none; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .theme-toggle .when-dark { display: inline-flex; }
@@ -227,6 +227,8 @@ fieldset.gear fieldset.plate-fieldset { margin-bottom: 0; }
   background: var(--accent-soft); border: 1px solid var(--accent);
   border-radius: 8px; padding: 0.75rem 1rem; margin-top: 1rem; font-weight: 600;
 }
+/* Under a field (placed there by showFieldError in scripts/dom.js). */
+.field > .error { margin-top: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.9rem; }
 .notice {
   background: var(--warn-bg); border: 1px solid var(--warn-border);
   border-radius: 8px; padding: 0.75rem 1rem; margin: 1rem 0;

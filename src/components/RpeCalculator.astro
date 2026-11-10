@@ -65,7 +65,7 @@ const rpeLabel = (r: number) => `RPE ${r} — ${10 - r} rep${10 - r === 1 ? '' :
   import {
     validateRpeInput, estimateFromRpe, rpeFraction, confidenceNote, toKg, fromKg, loadableDown, loadStep, MAX_REPS,
   } from '../lib/onerepmax.js';
-  import { f1, f2, num, esc, bindUnitToggle, convertInput, scrollToEl } from '../scripts/dom.js';
+  import { f1, f2, num, esc, bindUnitToggle, convertInput, scrollToEl, showFieldError, clearFieldError, createFormError } from '../scripts/dom.js';
 
   const root = document.querySelector<HTMLElement>('[data-rpe-calculator]');
   if (root) {
@@ -85,14 +85,11 @@ const rpeLabel = (r: number) => `RPE ${r} — ${10 - r} rep${10 - r === 1 ? '' :
     const other = () => (unit() === 'kg' ? 'lb' : 'kg');
 
     function calculate(scroll: boolean) {
-      weightEl.removeAttribute('aria-invalid');
-      repsEl.removeAttribute('aria-invalid');
+      clearFieldError(errorEl, [weightEl, repsEl]);
       const v = validateRpeInput(weightEl.value, repsEl.value, rpeEl.value);
       if (!v.ok) {
-        errorEl.textContent = v.error;
-        errorEl.hidden = false;
-        if (v.field === 'weight') weightEl.setAttribute('aria-invalid', 'true');
-        if (v.field === 'reps') repsEl.setAttribute('aria-invalid', 'true');
+        const field = v.field === 'weight' ? weightEl : v.field === 'reps' ? repsEl : undefined;
+        showFieldError(errorEl, v.error, field, { focus: scroll });
         resultsEl.hidden = true;
         statusEl.textContent = '';
         e1rmKg = null;
@@ -125,18 +122,23 @@ const rpeLabel = (r: number) => `RPE ${r} — ${10 - r} rep${10 - r === 1 ? '' :
       if (scroll) scrollToEl(resultsEl);
     }
 
-    function plan() {
+    const planError = createFormError(planForm);
+
+    function plan(focus = false) {
+      clearFieldError(planError, [planReps]);
       if (e1rmKg === null) return;
+      const planFail = (message: string) => {
+        planOut.innerHTML = '';
+        showFieldError(planError, message, planReps, { focus });
+      };
       const reps = Number(planReps.value);
       const rpe = Number(planRpe.value);
       if (!Number.isInteger(reps) || reps < 1 || reps > MAX_REPS) {
-        planOut.innerHTML = `<p class="error">Target reps must be a whole number from 1 to ${MAX_REPS}.</p>`;
-        return;
+        return planFail(`Target reps must be a whole number from 1 to ${MAX_REPS}.`);
       }
       const fraction = rpeFraction(reps, rpe);
       if (fraction === null) {
-        planOut.innerHTML = `<p class="error">${reps} reps at RPE ${rpe} is more than ${MAX_REPS} reps to failure — too far from a max to plan reliably. Pick fewer reps or a higher RPE.</p>`;
-        return;
+        return planFail(`${reps} reps at RPE ${rpe} is more than ${MAX_REPS} reps to failure — too far from a max to plan reliably. Pick fewer reps or a higher RPE.`);
       }
       const u = unit();
       const raw = fromKg(e1rmKg * fraction, u);
@@ -148,7 +150,7 @@ const rpeLabel = (r: number) => `RPE ${r} — ${10 - r} rep${10 - r === 1 ? '' :
     }
 
     form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
-    planForm.addEventListener('submit', (e) => { e.preventDefault(); plan(); });
+    planForm.addEventListener('submit', (e) => { e.preventDefault(); plan(true); });
     planRpe.addEventListener('change', plan);
     // Update as target reps are typed; an empty box mid-edit waits for a value
     // instead of flashing an error (the button still validates it).

@@ -52,23 +52,23 @@ function createGear(root) {
       .join('');
   }
 
-  /** Bar weight in the current unit: { ok, value } or { ok: false, error }. */
+  /** Bar weight in the current unit: { ok, value } or { ok: false, error, input }. */
   function bar() {
     if (barSel.value !== 'custom') return { ok: true, value: Number(barSel.value) };
     const text = custom.value.trim();
     const value = Number(text);
     if (text === '' || !Number.isFinite(value) || value < 0 || value > MAX_WEIGHT) {
-      return { ok: false, error: 'Enter a custom bar weight of zero or more (use 0 for a machine or no bar).' };
+      return { ok: false, error: 'Enter a custom bar weight of zero or more (use 0 for a machine or no bar).', input: custom };
     }
     return { ok: true, value };
   }
 
-  /** Ticked + extra plate sizes in the current unit: { ok, value } or { ok: false, error }. */
+  /** Ticked + extra plate sizes in the current unit: { ok, value } or { ok: false, error, input }. */
   function plates() {
     const ticked = [...checks.querySelectorAll('input:checked')].map((c) => Number(c.value));
     const extras = parseList(extra.value);
     if (!extras || extras.some((p) => p <= 0 || p > 100)) {
-      return { ok: false, error: 'Extra plate sizes must be numbers above 0 (up to 100), separated by commas.' };
+      return { ok: false, error: 'Extra plate sizes must be numbers above 0 (up to 100), separated by commas.', input: extra };
     }
     return { ok: true, value: [...new Set([...ticked, ...extras])] };
   }
@@ -78,6 +78,8 @@ function createGear(root) {
     bar,
     plates,
     getUnit: () => unit,
+    /** The typed inputs, so a form can clear their invalid mark. */
+    inputs: [custom, extra],
     onChange: (fn) => listeners.add(fn),
   };
 }

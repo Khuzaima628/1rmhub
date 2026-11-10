@@ -51,7 +51,7 @@ const unit = SITE.defaultUnit;
   import data from '../data/opl-percentiles.json';
   import { classFor, percentileOf, validateStrengthInput, LIFT_LABELS } from '../lib/strength-percentile.js';
   import { toKg, fromKg } from '../lib/onerepmax.js';
-  import { num, esc, bindUnitToggle, convertInput, paintUnitLabels } from '../scripts/dom.js';
+  import { num, esc, bindUnitToggle, convertInput, paintUnitLabels, showFieldError, clearFieldError } from '../scripts/dom.js';
 
   type Sex = 'M' | 'F';
   type Lift = 'squat' | 'bench' | 'deadlift' | 'total';
@@ -75,23 +75,20 @@ const unit = SITE.defaultUnit;
     [sexEl, liftEl].forEach((el) => el.addEventListener('change', () => { out.innerHTML = ''; }));
 
     function fail(message: string, el: HTMLElement) {
-      errorEl.textContent = message;
-      errorEl.hidden = false;
-      el.setAttribute('aria-invalid', 'true');
+      showFieldError(errorEl, message, el);
       out.innerHTML = '';
     }
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      bwEl.removeAttribute('aria-invalid');
-      weightEl.removeAttribute('aria-invalid');
+      clearFieldError(errorEl, [bwEl, weightEl]);
       const u = toggle.get() as 'kg' | 'lb';
       const sex = sexEl.value as Sex;
       const lift = liftEl.value as Lift;
       const bwKg = bwEl.value.trim() === '' ? NaN : toKg(Number(bwEl.value), u);
       const liftKg = weightEl.value.trim() === '' ? NaN : toKg(Number(weightEl.value), u);
       const check = validateStrengthInput({ sex, bwKg, liftKg });
-      if (!check.ok) return fail(check.error!, check.field === 'bodyweight' ? bwEl : weightEl);
+      if (!check.ok) return fail(check.error!, check.field === 'bodyweight' ? bwEl : check.field === 'sex' ? sexEl : weightEl);
       errorEl.hidden = true;
 
       const cls = classFor(sex, bwKg)!;

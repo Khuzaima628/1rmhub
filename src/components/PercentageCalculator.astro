@@ -39,7 +39,7 @@ const unit = SITE.defaultUnit;
 
 <script>
   import { validateWeight, percentOf, toKg, loadStep } from '../lib/onerepmax.js';
-  import { f1, num, esc, bindUnitToggle, convertInput, scrollToEl } from '../scripts/dom.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, scrollToEl, showFieldError, clearFieldError } from '../scripts/dom.js';
   import { percentTableHtml, wirePlateButtons } from '../scripts/tables.js';
 
   const root = document.querySelector<HTMLElement>('[data-pct-calculator]');
@@ -55,24 +55,21 @@ const unit = SITE.defaultUnit;
     });
     const unit = () => toggle.get();
 
-    function fail(message: string, el: HTMLInputElement) {
-      errorEl.textContent = message;
-      errorEl.hidden = false;
-      el.setAttribute('aria-invalid', 'true');
+    function fail(message: string, el: HTMLInputElement, focus: boolean) {
+      showFieldError(errorEl, message, el, { focus });
       resultsEl.hidden = true;
       statusEl.textContent = '';
       shown = false;
     }
 
     function calculate(scroll: boolean) {
-      ormEl.removeAttribute('aria-invalid');
-      customEl.removeAttribute('aria-invalid');
+      clearFieldError(errorEl, [ormEl, customEl]);
       const orm = validateWeight(ormEl.value, 'your one rep max');
-      if (!orm.ok) return fail(orm.error, ormEl);
+      if (!orm.ok) return fail(orm.error, ormEl, scroll);
       const customText = customEl.value.trim();
       const custom = Number(customText);
       if (customText !== '' && (!Number.isFinite(custom) || custom < 1 || custom > 100)) {
-        return fail('The custom percentage must be a number from 1 to 100.', customEl);
+        return fail('The custom percentage must be a number from 1 to 100.', customEl, scroll);
       }
       errorEl.hidden = true;
       const u = unit();

@@ -98,6 +98,56 @@ export function parseList(text) {
   return values.every((v) => Number.isFinite(v)) ? values : null;
 }
 
+// Where each form's error message is declared in the HTML, so it can go back
+// there when an error is not about one particular field.
+const errorHomes = new WeakMap();
+
+/**
+ * Show a form error directly under the field it is about, mark that field
+ * invalid, and move focus to it (scrolling it into view), so the message is
+ * never off-screen below the form. With no field, the message stays where it
+ * is declared. Pass { focus: false } for errors not caused by a click or Enter
+ * (for example a shared link), so the page does not jump.
+ */
+export function showFieldError(errorEl, message, input, { focus = true } = {}) {
+  if (!errorHomes.has(errorEl)) {
+    const marker = document.createComment('error-home');
+    errorEl.before(marker);
+    errorHomes.set(errorEl, marker);
+  }
+  errorEl.textContent = message;
+  errorEl.hidden = false;
+  if (input) {
+    input.setAttribute('aria-invalid', 'true');
+    input.closest('details')?.setAttribute('open', ''); // a collapsed settings panel
+    (input.closest('.field') ?? input.parentElement).append(errorEl);
+    if (focus) {
+      input.focus({ preventScroll: true });
+      scrollToEl(input, 'center');
+    }
+  } else {
+    errorHomes.get(errorEl).after(errorEl);
+  }
+}
+
+
+/** A hidden error message for a form whose markup has none; added at the end of the form. */
+export function createFormError(form) {
+  const el = document.createElement('p');
+  el.className = 'error';
+  el.setAttribute('role', 'alert');
+  el.hidden = true;
+  form.append(el);
+  return el;
+}
+
+/** Hide a form error and clear the invalid mark from the given fields. */
+export function clearFieldError(errorEl, inputs = []) {
+  errorEl.hidden = true;
+  errorEl.textContent = '';
+  inputs.forEach((el) => el.removeAttribute('aria-invalid'));
+}
+
 /** Scroll an element into view, respecting the visitor's reduced-motion setting. */
 export function scrollToEl(el, block = 'start') {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

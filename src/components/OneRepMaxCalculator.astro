@@ -96,7 +96,7 @@ const unit = SITE.defaultUnit;
   import {
     estimateAll, confidenceNote, validateInput, validateWeight, toKg, fromKg, WARN_REPS,
   } from '../lib/onerepmax.js';
-  import { f1, f2, num, esc, copyText, flash, bindUnitToggle, convertInput, scrollToEl } from '../scripts/dom.js';
+  import { f1, f2, num, esc, copyText, flash, bindUnitToggle, convertInput, scrollToEl, showFieldError, clearFieldError } from '../scripts/dom.js';
   import { percentTableHtml, repMaxTableHtml, wirePlateButtons } from '../scripts/tables.js';
 
   const root = document.querySelector<HTMLElement>('[data-orm-calculator]');
@@ -126,11 +126,9 @@ const unit = SITE.defaultUnit;
     const hasOption = (sel: HTMLSelectElement, value: string | null) =>
       value !== null && [...sel.options].some((o) => o.value === value);
 
-    function showError(message: string, field?: string) {
-      errorEl.textContent = message;
-      errorEl.hidden = false;
-      weightEl.toggleAttribute('aria-invalid', field === 'weight');
-      repsEl.toggleAttribute('aria-invalid', field === 'reps');
+    function showError(message: string, field: string | undefined, focus: boolean) {
+      clearFieldError(errorEl, [weightEl, repsEl]);
+      showFieldError(errorEl, message, field === 'reps' ? repsEl : field === 'weight' ? weightEl : undefined, { focus });
       resultsEl.hidden = true;
       statusEl.textContent = '';
       last = null;
@@ -139,13 +137,10 @@ const unit = SITE.defaultUnit;
     function calculate({ scroll }: { scroll: boolean }) {
       const v = validateInput(weightEl.value, repsEl.value);
       if (!v.ok) {
-        showError(v.error, v.field);
-        if (scroll) (v.field === 'reps' ? repsEl : weightEl).focus();
+        showError(v.error, v.field, scroll);
         return;
       }
-      errorEl.hidden = true;
-      weightEl.removeAttribute('aria-invalid');
-      repsEl.removeAttribute('aria-invalid');
+      clearFieldError(errorEl, [weightEl, repsEl]);
       const weightKg = toKg(v.weight, unit());
       last = { weight: v.weight, weightKg, reps: v.reps, est: estimateAll(weightKg, v.reps) };
       render();
@@ -237,9 +232,7 @@ const unit = SITE.defaultUnit;
       form.reset();
       exerciseEl.value = defaultExercise;
       toggle.set(defaultUnit);
-      errorEl.hidden = true;
-      weightEl.removeAttribute('aria-invalid');
-      repsEl.removeAttribute('aria-invalid');
+      clearFieldError(errorEl, [weightEl, repsEl]);
       resultsEl.hidden = true;
       coreEl.innerHTML = '';
       statusEl.textContent = '';

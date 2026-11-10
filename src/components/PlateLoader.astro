@@ -43,7 +43,7 @@ const gid = gearId ?? `${id}-gear`;
 
 <script>
   import { solvePlates, validateWeight } from '../lib/onerepmax.js';
-  import { bindUnitToggle, convertInput, esc, num, paintUnitLabels, scrollToEl } from '../scripts/dom.js';
+  import { bindUnitToggle, convertInput, num, paintUnitLabels, scrollToEl, createFormError, showFieldError, clearFieldError } from '../scripts/dom.js';
   import { getGear } from '../scripts/gear.js';
   import { plateResultHtml } from '../scripts/plates-ui.js';
 
@@ -52,23 +52,30 @@ const gid = gearId ?? `${id}-gear`;
     const form = root.querySelector<HTMLFormElement>('[data-plate-form]')!;
     const target = root.querySelector<HTMLInputElement>('[data-target]')!;
     const out = root.querySelector<HTMLElement>('[data-plate-result]')!;
+    const errorEl = createFormError(form);
     let unit = gear.getUnit();
 
     const setUnit = (u: string) => { unit = u; gear.setUnit(u); paintUnitLabels(root, u); };
 
-    function show() {
+    // focus: only when the visitor pressed the button, not on automatic refreshes.
+    function show(focus = false) {
+      const fail = (message: string, input?: HTMLInputElement) => {
+        out.innerHTML = '';
+        showFieldError(errorEl, message, input, { focus });
+      };
+      clearFieldError(errorEl, [target, ...gear.inputs]);
       const t = validateWeight(target.value, 'a target weight');
-      if (!t.ok) { out.innerHTML = `<p class="error">${esc(t.error)}</p>`; return; }
+      if (!t.ok) return fail(t.error, target);
       const bar = gear.bar();
-      if (!bar.ok) { out.innerHTML = `<p class="error">${esc(bar.error)}</p>`; return; }
+      if (!bar.ok) return fail(bar.error, bar.input);
       const plates = gear.plates();
-      if (!plates.ok) { out.innerHTML = `<p class="error">${esc(plates.error)}</p>`; return; }
+      if (!plates.ok) return fail(plates.error, plates.input);
       const solved = solvePlates(t.value, bar.value, plates.value);
       out.innerHTML = plateResultHtml(solved, { target: t.value, bar: bar.value, unit, platesTicked: plates.value.length });
     }
 
-    form.addEventListener('submit', (e) => { e.preventDefault(); show(); });
-    gear.onChange(() => { if (out.innerHTML) show(); });
+    form.addEventListener('submit', (e) => { e.preventDefault(); show(true); });
+    gear.onChange(() => { if (out.innerHTML || !errorEl.hidden) show(); });
 
     if (root.dataset.linked) {
       document.addEventListener('sc:result', (e: Event) => {

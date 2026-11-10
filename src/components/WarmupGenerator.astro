@@ -58,7 +58,7 @@ const gid = gearId ?? `${id}-gear`;
 
 <script>
   import { warmupSets, solvePlates, validateWeight, MAX_WEIGHT } from '../lib/onerepmax.js';
-  import { bindUnitToggle, convertInput, esc, num, paintUnitLabels, parseList } from '../scripts/dom.js';
+  import { bindUnitToggle, convertInput, esc, num, paintUnitLabels, parseList, createFormError, showFieldError, clearFieldError } from '../scripts/dom.js';
   import { getGear } from '../scripts/gear.js';
 
   function init(root: HTMLElement) {
@@ -71,35 +71,41 @@ const gid = gearId ?? `${id}-gear`;
     let unit = gear.getUnit();
 
     const setUnit = (u: string) => { unit = u; gear.setUnit(u); paintUnitLabels(root, u); };
-    const fail = (msg: string) => { out.innerHTML = `<p class="error">${esc(msg)}</p>`; };
+    const errorEl = createFormError(form);
 
-    function generate() {
+    // focus: only when the visitor pressed the button, not on automatic refreshes.
+    function generate(focus = false) {
+      const fail = (msg: string, input?: HTMLInputElement) => {
+        out.innerHTML = '';
+        showFieldError(errorEl, msg, input, { focus });
+      };
+      clearFieldError(errorEl, [top, topReps, start, jumps, reps, ...gear.inputs]);
       const t = validateWeight(top.value, 'your top-set weight');
-      if (!t.ok) return fail(t.error);
+      if (!t.ok) return fail(t.error, top);
       const tr = Number(topReps.value);
-      if (!Number.isInteger(tr) || tr < 1 || tr > 20) return fail('Top-set reps must be a whole number from 1 to 20.');
+      if (!Number.isInteger(tr) || tr < 1 || tr > 20) return fail('Top-set reps must be a whole number from 1 to 20.', topReps);
       const bar = gear.bar();
-      if (!bar.ok) return fail(bar.error);
+      if (!bar.ok) return fail(bar.error, bar.input);
 
       let startWeight = bar.value;
       if (start.value.trim() !== '') {
         startWeight = Number(start.value);
         if (!Number.isFinite(startWeight) || startWeight < 0 || startWeight > MAX_WEIGHT) {
-          return fail('The starting weight must be zero or more (leave it blank to start with the empty bar).');
+          return fail('The starting weight must be zero or more (leave it blank to start with the empty bar).', start);
         }
       }
       const pcts = parseList(jumps.value);
       if (!pcts || pcts.some((p: number) => p <= 0 || p >= 100)) {
-        return fail('Jumps must be percentages between 1 and 99, separated by commas (for example 50, 70, 85).');
+        return fail('Jumps must be percentages between 1 and 99, separated by commas (for example 50, 70, 85).', jumps);
       }
       const repList = parseList(reps.value);
       if (!repList || repList.some((r: number) => !Number.isInteger(r) || r < 1 || r > 20)) {
-        return fail('Warm-up reps must be whole numbers from 1 to 20, separated by commas (for example 8, 5, 3, 1).');
+        return fail('Warm-up reps must be whole numbers from 1 to 20, separated by commas (for example 8, 5, 3, 1).', reps);
       }
 
       const sets = warmupSets({ topWeight: t.value, topReps: tr, startWeight, percents: pcts, repsPerSet: repList });
       const platesRes = gear.plates();
-      if (!platesRes.ok) return fail(platesRes.error);
+      if (!platesRes.ok) return fail(platesRes.error, platesRes.input);
       const plates = platesRes.value;
       const rows = sets.map((s: { label: string; weight: number; reps: number; pct: number }) => {
         let loadCell: string;
@@ -131,8 +137,8 @@ const gid = gearId ?? `${id}-gear`;
         <tbody>${rows}</tbody></table></div>${skippedNote}`;
     }
 
-    form.addEventListener('submit', (e) => { e.preventDefault(); generate(); });
-    gear.onChange(() => { if (out.innerHTML) generate(); });
+    form.addEventListener('submit', (e) => { e.preventDefault(); generate(true); });
+    gear.onChange(() => { if (out.innerHTML || !errorEl.hidden) generate(); });
 
     if (root.dataset.linked) {
       document.addEventListener('sc:result', (e: Event) => {
