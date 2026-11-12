@@ -47,4 +47,6 @@ const jsonLdText = jsonLd?.length
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={image} />
+{/* Pinterest website claim for 1rmhub.com. Keep: removing it unclaims the site. */}
+<meta name="p:domain_verify" content="3c96f18c7b2c9f96fe749000b28fd202" />
 {jsonLdText && <script type="application/ld+json" set:html={jsonLdText} />}
