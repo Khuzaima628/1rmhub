@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LiftStandards from '../components/LiftStandards.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import data from '../data/opl-percentiles.json';
+import { percentileOf } from '../lib/strength-percentile.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor, EDITOR } from '../config/site';
+
+const title = 'Squat Standards — Raw Lifters by Weight Class';
+const description =
+  'Squat standards for men and women by IPF weight class, in kg and lb: real percentiles from raw powerlifting competitions, plus a quick squat check.';
+const path = '/squat-standards/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+
+const g = data.groups as Record<'M' | 'F', Record<string, { squat: number[] }>>;
+const ordinal = (n: number) => { const v = n % 100; return `${n}${v >= 11 && v <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`; };
+const pctOf = (sex: 'M' | 'F', cls: string, kg: number) => ordinal(percentileOf(g[sex][cls].squat, kg).pct);
+const m93_200 = pctOf('M', '93', 200);
+const f63_100 = pctOf('F', '63', 100);
+
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub Squat Standards', description,
+    features: ['Squat percentiles by IPF weight class', 'Men and women', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Squat Standards', href: path }]} jsonLd={jsonLd}>
+  <h1>Squat Standards</h1>
+  <p class="lead">
+    How strong is your squat? See real squat results from raw powerlifting competitions
+    for every weight class, for men and women, in kg and lb.
+  </p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Data exported {formatDate(data.exportDate)}</p>
+
+  <LiftStandards lift="squat" name="squat" exampleKg={140} />
+
+  <div class="prose">
+    <section aria-labelledby="squat-comp-heading">
+      <h2 id="squat-comp-heading">A competition squat goes below parallel</h2>
+      <p>
+        Every result in these tables was judged under powerlifting rules. Under IPF rules the lifter
+        squats until the top surface of the legs at the hip joint is lower than the top of the knees,
+        then stands back up with the knees locked &mdash; one descent, no bouncing, and only after the
+        referee&rsquo;s &ldquo;Squat&rdquo; command. Many gym squats stop higher than that, and a higher
+        squat moves more weight, so a gym best that was not that deep will rank higher here than it
+        would on the platform.
+      </p>
+      <p>
+        If you only know a set of several reps, estimate your single first with the
+        {' '}<a href="/squat-calculator/">squat calculator</a>, and treat the percentile as an estimate too.
+      </p>
+    </section>
+
+    <section aria-labelledby="squat-faq-heading">
+      <h2 id="squat-faq-heading">Squat standards: common questions</h2>
+      <h3>Is a 200 kg squat good?</h3>
+      <p>
+        For a man in the 93 kg class, a 200 kg (441 lb) squat is about the {m93_200} percentile of raw
+        competitors in that class.
+      </p>
+      <h3>What is a good squat for a woman?</h3>
+      <p>
+        For a woman in the 63 kg class, a 100 kg (220 lb) squat is about the {f63_100} percentile of raw
+        competitors. Use the tables above for your own weight class.
+      </p>
+      <h3>Do knee sleeves or a belt count as raw?</h3>
+      <p>
+        Yes. These tables use the raw category, which allows knee sleeves (and a lifting belt) but not
+        knee wraps or supportive suits. Lifts in wraps are usually heavier and are left out.
+      </p>
+      <h3>Is this the average squat?</h3>
+      <p>
+        No. It is the spread of results among people who compete in raw powerlifting. There is no
+        reliable public dataset of everyday gym-goers&rsquo; maxes, so these pages do not guess one.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.squat, LINKS.strength, LINKS.benchStandards, LINKS.weightClasses]} />
+  <p class="disclaimer">
+    This page uses data from the OpenPowerlifting project, <a href="https://www.openpowerlifting.org" rel="noopener">https://www.openpowerlifting.org</a>.
+    You may download a copy of the data at <a href="https://gitlab.com/openpowerlifting/opl-data" rel="noopener">https://gitlab.com/openpowerlifting/opl-data</a>.
+  </p>
+  <SourceList ids={['opldata', 'ipfrules']} />
+</BaseLayout>

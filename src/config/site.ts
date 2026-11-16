@@ -52,6 +52,8 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/weighted-pull-up-calculator/': '2026-11-20',
   '/531-calculator/': '2026-11-20',
   '/bench-press-standards/': '2026-11-20',
+  '/bench-press-standards/': '2026-11-21',
+  '/squat-standards/': '2026-11-23',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
@@ -134,6 +136,7 @@ export const FOOTER_GROUPS = [
       { href: '/weighted-pull-up-calculator/', label: 'Weighted Pull-Up Calculator' },
       { href: '/531-calculator/', label: '5/3/1 Calculator' },
       { href: '/bench-press-standards/', label: 'Bench Press Standards' },
+      { href: '/squat-standards/', label: 'Squat Standards' },
     ],
   },
   {
