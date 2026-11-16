@@ -11,6 +11,7 @@ export const LINKS = {
   incline: { href: '/incline-bench-press-calculator/', title: 'Incline Bench Press Calculator', text: 'Estimate your incline bench max at your usual bench angle.' },
   hipThrust: { href: '/hip-thrust-calculator/', title: 'Hip Thrust Calculator', text: 'Estimate a hip thrust max for programming, with full-lockout rules.' },
   strength: { href: '/strength-percentile-calculator/', title: 'How Strong Am I?', text: 'Rank your squat, bench, deadlift or total against raw powerlifters in your weight class.' },
+  weightClasses: { href: '/powerlifting-weight-classes/', title: 'Powerlifting Weight Classes', text: 'Every IPF class for men and women in kg and lb, and which one you would lift in.' },
   percent: { href: '/1rm-percentage-calculator/', title: '1RM Percentage Calculator', text: 'Turn a known 1RM into working weights, e.g. 80% for sets of five.' },
   plates: { href: '/plate-calculator/', title: 'Plate Calculator', text: 'See which plates to load per side — never over your target.' },
   warmup: { href: '/warm-up-calculator/', title: 'Warm-up Calculator', text: 'Build a warm-up ramp to your top set, with loadable weights.' },

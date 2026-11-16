@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WeightClassFinder from '../components/WeightClassFinder.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import data from '../data/opl-percentiles.json';
+import { classList } from '../lib/strength-percentile.js';
+import { fromKg } from '../lib/onerepmax.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor } from '../config/site';
+
+const title = 'Powerlifting Weight Classes — IPF Men and Women, kg and lb';
+const description =
+  'All IPF powerlifting weight classes for men and women in kg and lb, with exact bodyweight ranges, junior classes, weigh-in rules and a class finder.';
+const path = '/powerlifting-weight-classes/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+
+type Group = { count: number; squat: number[]; bench: number[]; deadlift: number[] };
+const groups = data.groups as Record<'M' | 'F', Record<string, Group>>;
+const one = (v: number) => String(Number(v.toFixed(1)));
+const lb = (kg: number) => one(fromKg(kg, 'lb'));
+const rows = (sex: 'M' | 'F') =>
+  classList(sex, true).map((c, i) => ({
+    label: c.label,
+    youth: i === 0,
+    kg: c.max === Infinity ? `over ${c.min}` : i === 0 ? `up to ${c.max}` : `${(c.min + 0.01).toFixed(2)}–${c.max.toFixed(2)}`,
+    lb: c.max === Infinity ? `over ${lb(c.min)}` : i === 0 ? `up to ${lb(c.max)}` : `${lb(c.min + 0.01)}–${lb(c.max)}`,
+    median: groups[sex][c.id],
+  }));
+const tables = [
+  { sex: 'M' as const, caption: 'Men: IPF weight classes and bodyweight ranges', rows: rows('M') },
+  { sex: 'F' as const, caption: 'Women: IPF weight classes and bodyweight ranges', rows: rows('F') },
+];
+const exportDate = formatDate(data.exportDate);
+
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub Powerlifting Weight Class Finder', description,
+    features: ['IPF classes for men and women', 'Sub-Junior and Junior classes', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Powerlifting Weight Classes', href: path }]} jsonLd={jsonLd}>
+  <h1>Powerlifting Weight Classes</h1>
+  <p class="lead">
+    Every IPF weight class for men and women, with the exact bodyweight range in kg and lb.
+    Enter your bodyweight to see which class you would lift in.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · IPF Technical Rulebook effective 1 March 2026</p>
+
+  <WeightClassFinder />
+
+  <div class="prose">
+    <section aria-labelledby="wc-answer-heading">
+      <h2 id="wc-answer-heading">IPF weight classes at a glance</h2>
+      <p class="answer">
+        The IPF has eight weight classes for men (59, 66, 74, 83, 93, 105, 120 and 120+ kg) and eight
+        for women (47, 52, 57, 63, 69, 76, 84 and 84+ kg). Sub-Junior and Junior lifters have one extra,
+        lighter class: 53 kg for men and 43 kg for women. Each class runs from just over the limit of the
+        class below up to and including its own limit, so a lifter who weighs exactly 83.00 kg is in
+        the 83 kg class and one who weighs 83.01 kg is in the 93 kg class.
+      </p>
+    </section>
+
+    <section aria-labelledby="wc-tables-heading">
+      <h2 id="wc-tables-heading">Weight classes for men and women</h2>
+      <p>
+        The lb ranges are converted from the official kg limits and rounded to 0.1 lb; the kg limits are
+        the ones used at the weigh-in. The median lifts are from raw full-power competition results in
+        the OpenPowerlifting database (export {exportDate}).
+      </p>
+      {tables.map((t) => (
+        <div class="table-wrap">
+          <table>
+            <caption>{t.caption}</caption>
+            <thead>
+              <tr><th scope="col">Class</th><th scope="col" class="num">Bodyweight (kg)</th><th scope="col" class="num">Bodyweight (lb)</th><th scope="col" class="num">Median squat</th><th scope="col" class="num">Median bench</th><th scope="col" class="num">Median deadlift</th></tr>
+            </thead>
+            <tbody>
+              {t.rows.map((r) => (
+                <tr>
+                  <th scope="row">{r.label}{r.youth ? ' (Sub-Junior/Junior only)' : ''}</th>
+                  <td class="num">{r.kg}</td>
+                  <td class="num">{r.lb}</td>
+                  <td class="num">{r.median ? `${r.median.squat[49]} kg` : '–'}</td>
+                  <td class="num">{r.median ? `${r.median.bench[49]} kg` : '–'}</td>
+                  <td class="num">{r.median ? `${r.median.deadlift[49]} kg` : '–'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+      <p>
+        To see how your own lift compares with the lifters in your class, use the
+        <a href="/strength-percentile-calculator/">strength percentile calculator</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="wc-age-heading">
+      <h2 id="wc-age-heading">Age groups</h2>
+      <p>
+        Lifters also compete by age. Under IPF rules, the age that counts is the age you reach during
+        the calendar year:
+      </p>
+      <ul>
+        <li><strong>Sub-Junior:</strong> from the day you turn 14 until the end of the year you turn 18.</li>
+        <li><strong>Junior:</strong> the years in which you turn 19 to 23.</li>
+        <li><strong>Open:</strong> from the year you turn 19, with no upper age limit.</li>
+        <li><strong>Masters 1–4:</strong> the years in which you turn 40–49, 50–59, 60–69, and 70 or over.</li>
+      </ul>
+      <p>
+        The lighter 53 kg (men) and 43 kg (women) classes are only for Sub-Junior and Junior lifters.
+        Open and Masters lifters start at 59 kg and 47 kg.
+      </p>
+    </section>
+
+    <section aria-labelledby="wc-weighin-heading">
+      <h2 id="wc-weighin-heading">How the weigh-in works</h2>
+      <p>
+        Your class is set by your bodyweight at the official weigh-in, not on the day you enter. At IPF
+        competitions the weigh-in starts no earlier than two hours before your session and lasts one
+        and a half hours. Lifters are weighed in minimal clothing, so plan to be inside your class limit
+        on the scale at that time.
+      </p>
+    </section>
+
+    <section aria-labelledby="wc-fed-heading">
+      <h2 id="wc-fed-heading">Other federations</h2>
+      <p>
+        These are the classes of the International Powerlifting Federation (IPF) and its national
+        affiliates. Some federations outside the IPF use different classes, so check your own
+        federation&rsquo;s rulebook before a meet. To compare lifters across different classes, use a
+        points formula such as the <a href="/dots-calculator/">DOTS calculator</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="wc-faq-heading">
+      <h2 id="wc-faq-heading">Weight classes: common questions</h2>
+      <h3>What weight class am I if I weigh exactly the limit?</h3>
+      <p>
+        You are in that class. A class includes its upper limit, so 74.00 kg is the 74 kg class and
+        74.01 kg is the 83 kg class.
+      </p>
+      <h3>Is there a top limit in the heaviest class?</h3>
+      <p>
+        No. The 120+ kg class for men and the 84+ kg class for women have no upper limit.
+      </p>
+      <h3>Can I choose a heavier class than my bodyweight?</h3>
+      <p>
+        Your class is decided by the scale at the weigh-in. At international IPF events the class is
+        nominated in advance and cannot be changed after the final nomination, so check your
+        federation&rsquo;s entry rules.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.strength, LINKS.dots, LINKS.home, LINKS.increase]} />
+  <p class="disclaimer">
+    Median lifts use data from the OpenPowerlifting project, <a href="https://www.openpowerlifting.org" rel="noopener">https://www.openpowerlifting.org</a>.
+    You may download a copy of the data at <a href="https://gitlab.com/openpowerlifting/opl-data" rel="noopener">https://gitlab.com/openpowerlifting/opl-data</a>.
+  </p>
+  <SourceList ids={['ipfrules', 'opldata']} />
+</BaseLayout>

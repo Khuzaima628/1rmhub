@@ -1,0 +1,102 @@
+---
+// "Which weight class am I?" finder: IPF bodyweight classes (2026 Technical
+// Rulebook) by sex and age group, in kg or lb. One instance per page.
+// Logic: src/lib/strength-percentile.js (competitionClassFor, tested).
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="wc-heading" data-weight-class>
+  <h2 id="wc-heading">Which weight class am I in?</h2>
+  <noscript><p class="notice">This tool runs in your browser and needs JavaScript enabled. The class tables below work without it.</p></noscript>
+  <form id="wc-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="wc-sex">Category</label>
+        <select id="wc-sex">
+          <option value="M">Men</option>
+          <option value="F">Women</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="wc-age">Age group</label>
+        <select id="wc-age">
+          <option value="open">Open or Masters (19+)</option>
+          <option value="youth">Sub-Junior or Junior (14–23)</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <UnitToggle id="wc-unit" unit={unit} />
+      <div class="field">
+        <label for="wc-bw">Bodyweight (<span data-unit-label>{unit}</span>)</label>
+        <input id="wc-bw" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 82' : 'e.g. 180'} data-ph-kg="e.g. 82" data-ph-lb="e.g. 180" autocomplete="off" aria-describedby="wc-error" />
+      </div>
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">Find my class</button></div>
+    <p class="error" id="wc-error" role="alert" hidden></p>
+  </form>
+  <div id="wc-result" aria-live="polite"></div>
+</section>
+
+<script>
+  import data from '../data/opl-percentiles.json';
+  import { competitionClassFor, validateBodyweight } from '../lib/strength-percentile.js';
+  import { toKg, fromKg } from '../lib/onerepmax.js';
+  import { num, esc, bindUnitToggle, convertInput, paintUnitLabels, showFieldError, clearFieldError } from '../scripts/dom.js';
+
+  type Sex = 'M' | 'F';
+  type Group = { count: number; squat: number[]; bench: number[]; deadlift: number[]; total: number[] };
+
+  const root = document.querySelector<HTMLElement>('[data-weight-class]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('wc-form'), sexEl = $<HTMLSelectElement>('wc-sex'), ageEl = $<HTMLSelectElement>('wc-age');
+    const bwEl = $('wc-bw'), errorEl = $('wc-error'), out = $('wc-result');
+
+    const toggle = bindUnitToggle(root.querySelector('#wc-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      convertInput(bwEl, prev, next);
+      paintUnitLabels(root, next);
+      out.innerHTML = '';
+    });
+    [sexEl, ageEl].forEach((el) => el.addEventListener('change', () => { out.innerHTML = ''; }));
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearFieldError(errorEl, [bwEl]);
+      const u = toggle.get() as 'kg' | 'lb';
+      const sex = sexEl.value as Sex;
+      const youth = ageEl.value === 'youth';
+      const bwKg = bwEl.value.trim() === '' ? NaN : toKg(Number(bwEl.value), u);
+      const check = validateBodyweight(sex, bwKg);
+      if (!check.ok) {
+        showFieldError(errorEl, check.error!, check.field === 'sex' ? sexEl : bwEl);
+        out.innerHTML = '';
+        return;
+      }
+      errorEl.hidden = true;
+
+      const c = competitionClassFor(sex, bwKg, youth);
+      const kgRange = c.max === Infinity
+        ? `over ${c.min} kg`
+        : c.min === 0 ? `up to ${c.max} kg` : `${num(c.min + 0.01)}–${c.max} kg`;
+      const lb = (kg: number) => num(fromKg(kg, 'lb'), 1);
+      const lbRange = c.max === Infinity
+        ? `over ${lb(c.min)} lb`
+        : c.min === 0 ? `up to ${lb(c.max)} lb` : `${lb(c.min + 0.01)}–${lb(c.max)} lb`;
+      const name = c.label;
+      const g = (data.groups as Record<Sex, Record<string, Group>>)[sex][c.id];
+      const medians = g
+        ? `<p class="result-sub">Median raw competition lifts in this class: squat ${g.squat[49]} kg, bench ${g.bench[49]} kg, deadlift ${g.deadlift[49]} kg (${g.count.toLocaleString('en-US')} lifters, OpenPowerlifting).</p>`
+        : `<p class="result-sub">This class is only for Sub-Junior and Junior lifters.</p>`;
+
+      out.innerHTML = `<div class="result-headline">
+          <div class="result-label">Your IPF weight class</div>
+          <div class="result-big">${esc(name)} class</div>
+          <p class="result-sub">${esc(kgRange)} (${esc(lbRange)}) · ${sex === 'M' ? 'men' : 'women'}, ${youth ? 'Sub-Junior/Junior' : 'Open/Masters'}</p>
+          ${medians}
+        </div>`;
+    });
+  }
+</script>

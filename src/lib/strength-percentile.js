@@ -31,6 +31,45 @@ export const CLASSES = {
 
 export const LIFT_LABELS = { squat: 'Squat', bench: 'Bench press', deadlift: 'Deadlift', total: 'Total' };
 
+/**
+ * Extra lightest class open only to Sub-Junior (14–18) and Junior (19–23)
+ * lifters (IPF Technical Rulebook 2026, 1.2 Bodyweight categories).
+ */
+export const YOUTH_CLASS = {
+  M: { id: '53', label: '53 kg', max: 53 },
+  F: { id: '43', label: '43 kg', max: 43 },
+};
+
+/**
+ * Competition class for a bodyweight in kg. Sub-Junior and Junior lifters
+ * at or under the youth limit go in the youth class; everyone else uses the
+ * open classes (classFor). Returns { id, label, max, min } where min is the
+ * lowest bodyweight in that class (0 for the lightest class).
+ */
+export function competitionClassFor(sex, bwKg, youth = false) {
+  if (!CLASSES[sex]) throw new Error(`Unknown sex: ${sex}`);
+  const list = classList(sex, youth);
+  const i = list.findIndex((c) => bwKg <= c.max);
+  return list[i];
+}
+
+/** All classes in order with their bodyweight ranges (min is exclusive above 0: next class starts 0.01 kg over). */
+export function classList(sex, youth = false) {
+  const base = CLASSES[sex];
+  if (!base) throw new Error(`Unknown sex: ${sex}`);
+  const list = youth ? [YOUTH_CLASS[sex], ...base] : base;
+  return list.map((c, i) => ({ ...c, min: i === 0 ? 0 : list[i - 1].max }));
+}
+
+/** Validate a bodyweight for the class finder (kg). */
+export function validateBodyweight(sex, bwKg) {
+  if (sex !== 'M' && sex !== 'F') return { ok: false, field: 'sex', error: 'Choose men or women.' };
+  if (!Number.isFinite(bwKg) || bwKg < 30 || bwKg > 250) {
+    return { ok: false, field: 'bodyweight', error: 'Enter a bodyweight between 30 and 250 kg (66–551 lb).' };
+  }
+  return { ok: true };
+}
+
 /** IPF class for a bodyweight in kg. */
 export function classFor(sex, bwKg) {
   const list = CLASSES[sex];

@@ -3,7 +3,7 @@
  * and the shape of the generated OpenPowerlifting data file.
  */
 import { describe, it, expect } from 'vitest';
-import { CLASSES, classFor, percentileOf, validateStrengthInput } from '../../src/lib/strength-percentile.js';
+import { CLASSES, classFor, percentileOf, validateStrengthInput, competitionClassFor, classList, validateBodyweight } from '../../src/lib/strength-percentile.js';
 import data from '../../src/data/opl-percentiles.json';
 
 const ramp = Array.from({ length: 99 }, (_, i) => (i + 1) * 10); // p1 = 10 ... p99 = 990
@@ -83,5 +83,34 @@ describe('OpenPowerlifting percentile data', () => {
       const sum = CLASSES[sex].reduce((a, c) => a + data.groups[sex][c.id].count, 0);
       expect(sum).toBe(data.groups[sex].all.count);
     }
+  });
+});
+
+describe('competition class finder (IPF 2026 rulebook)', () => {
+  it('uses the exact IPF upper limits, with the next class starting just over', () => {
+    expect(competitionClassFor('M', 74).id).toBe('74');
+    expect(competitionClassFor('M', 74.01).id).toBe('83');
+    expect(competitionClassFor('F', 84).id).toBe('84');
+    expect(competitionClassFor('F', 84.01).id).toBe('84+');
+  });
+  it('puts light Sub-Junior/Junior lifters in the youth class, open lifters in the lightest open class', () => {
+    expect(competitionClassFor('M', 52, true).id).toBe('53');
+    expect(competitionClassFor('M', 52, false).id).toBe('59');
+    expect(competitionClassFor('M', 53.01, true).id).toBe('59');
+    expect(competitionClassFor('F', 43, true).id).toBe('43');
+    expect(competitionClassFor('F', 43, false).id).toBe('47');
+  });
+  it('lists every class with its range: 8 open classes, 9 with the youth class', () => {
+    expect(classList('M').map((c) => c.id)).toEqual(['59', '66', '74', '83', '93', '105', '120', '120+']);
+    expect(classList('F').map((c) => c.id)).toEqual(['47', '52', '57', '63', '69', '76', '84', '84+']);
+    expect(classList('M', true)).toHaveLength(9);
+    const m83 = classList('M').find((c) => c.id === '83');
+    expect([m83.min, m83.max]).toEqual([74, 83]);
+    expect(classList('F').at(-1).max).toBe(Infinity);
+  });
+  it('validates bodyweight', () => {
+    expect(validateBodyweight('M', 80).ok).toBe(true);
+    expect(validateBodyweight('M', 20).ok).toBe(false);
+    expect(validateBodyweight('X', 80).ok).toBe(false);
   });
 });

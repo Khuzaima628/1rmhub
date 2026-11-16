@@ -113,6 +113,11 @@ export const SOURCES: Record<string, Source> = {
     text: 'American College of Sports Medicine. (2026). ACSM Position Stand: Resistance training prescription for muscle function, hypertrophy, and physical performance in healthy adults: an overview of reviews. Medicine & Science in Sports & Exercise, 58(4), 851–872.',
     url: 'https://doi.org/10.1249/MSS.0000000000003897',
   },
+  ipfrules: {
+    id: 'ipfrules',
+    text: 'International Powerlifting Federation. (2026). IPF Technical Rulebook, effective 1 March 2026: 1.1 Age categories, 1.2 Bodyweight categories, and weigh-in procedure.',
+    url: 'https://www.powerlifting.sport/rules/codes/info/technical-rules',
+  },
   opldata: {
     id: 'opldata',
     text: 'OpenPowerlifting. Powerlifting competition results database, released into the public domain. Raw full-power results; see the export date on the page.',

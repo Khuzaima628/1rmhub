@@ -47,6 +47,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/': '2026-11-17',
   '/sinclair-calculator/': '2026-11-17',
   '/methodology/': '2026-11-17',
+  '/powerlifting-weight-classes/': '2026-11-18',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
@@ -125,6 +126,7 @@ export const FOOTER_GROUPS = [
       { href: '/dots-calculator/', label: 'DOTS Calculator' },
       { href: '/strength-percentile-calculator/', label: 'Strength Percentile Calculator' },
       { href: '/sinclair-calculator/', label: 'Sinclair Calculator' },
+      { href: '/powerlifting-weight-classes/', label: 'Powerlifting Weight Classes' },
     ],
   },
   {
