@@ -1,0 +1,108 @@
+---
+// Strength standards for one lift, built from the OpenPowerlifting
+// percentiles (src/data/opl-percentiles.json). Shows real percentiles by sex
+// and IPF class in kg and lb — no invented "beginner/elite" labels.
+import StrengthPercentileCalculator from './StrengthPercentileCalculator.astro';
+import data from '../data/opl-percentiles.json';
+import { CLASSES, percentileOf } from '../lib/strength-percentile.js';
+import { fromKg } from '../lib/onerepmax.js';
+import { formatDate } from '../config/site';
+
+interface Props {
+  lift: 'squat' | 'bench' | 'deadlift';
+  /** Lift name in a sentence, e.g. "bench press". */
+  name: string;
+  /** A round example lift in kg for the "is X good?" answer, e.g. 100. */
+  exampleKg: number;
+}
+const { lift, name, exampleKg } = Astro.props;
+
+type Group = { count: number; squat: number[]; bench: number[]; deadlift: number[] };
+const groups = data.groups as Record<'M' | 'F', Record<string, Group>>;
+const PCTS = [10, 25, 50, 75, 90];
+const lb = (kg: number) => String(Math.round(fromKg(kg, 'lb')));
+const rows = (sex: 'M' | 'F') =>
+  CLASSES[sex].map((c) => ({ label: c.label, count: groups[sex][c.id].count, q: groups[sex][c.id][lift] }));
+const tables = [
+  { sex: 'M' as const, who: 'Men', rows: rows('M') },
+  { sex: 'F' as const, who: 'Women', rows: rows('F') },
+];
+const m83 = groups.M['83'];
+const ex = percentileOf(m83[lift], exampleKg);
+const ordinal = (n: number) => { const v = n % 100; return `${n}${v >= 11 && v <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`; };
+const exampleRank = ex.edge === 'below' ? 'below the 1st percentile' : ex.edge === 'above' ? 'above the 99th percentile' : `about the ${ordinal(ex.pct)} percentile`;
+const exportDate = formatDate(data.exportDate);
+const lifters = data.lifters.toLocaleString('en-US');
+---
+<StrengthPercentileCalculator lift={lift} heading={`Check your ${name}`} />
+
+<div class="prose">
+  <section aria-labelledby="std-answer-heading">
+    <h2 id="std-answer-heading">{name[0].toUpperCase() + name.slice(1)} standards by weight class</h2>
+    <p class="answer">
+      Among raw powerlifting competitors, the median {name} for men in the 83 kg class is
+      {' '}{m83[lift][49]} kg ({lb(m83[lift][49])} lb), and the top 10% lift {m83[lift][89]} kg
+      ({lb(m83[lift][89])} lb) or more. A {exampleKg} kg ({lb(exampleKg)} lb) {name} at that
+      bodyweight is {exampleRank}. The tables below give the same percentiles for every IPF weight
+      class, for men and women, from {lifters} lifters in the OpenPowerlifting database.
+    </p>
+  </section>
+
+  <section aria-labelledby="std-read-heading">
+    <h2 id="std-read-heading">How to read these standards</h2>
+    <p>
+      Each number is a percentile: the 50th percentile is the median (half of the lifters in that class
+      lifted more, half lifted less), and the 90th percentile is a result only 10% of competitors beat.
+      There are no labels such as &ldquo;beginner&rdquo; or &ldquo;elite&rdquo; &mdash; those are opinions, while
+      these are real competition results.
+    </p>
+    <p>
+      <strong>These are competition lifters, not average gym-goers.</strong> Everyone counted trained
+      for and entered a raw powerlifting meet, so they are stronger on average than people who lift
+      for general fitness.
+    </p>
+  </section>
+
+  {tables.map((t) => (
+    <section aria-labelledby={`std-${t.sex}-heading`}>
+      <h2 id={`std-${t.sex}-heading`}>{t.who}&rsquo;s {name} standards</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>{t.who}: raw competition {name} percentiles by IPF weight class (kg)</caption>
+          <thead>
+            <tr><th scope="col">Class</th>{PCTS.map((p) => <th scope="col" class="num">{p}th</th>)}<th scope="col" class="num">Lifters</th></tr>
+          </thead>
+          <tbody>
+            {t.rows.map((r) => (
+              <tr><th scope="row">{r.label}</th>{PCTS.map((p) => <td class="num">{r.q[p - 1]}</td>)}<td class="num">{r.count.toLocaleString('en-US')}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption>{t.who}: the same {name} percentiles in pounds (rounded to 1 lb)</caption>
+          <thead>
+            <tr><th scope="col">Class</th>{PCTS.map((p) => <th scope="col" class="num">{p}th</th>)}</tr>
+          </thead>
+          <tbody>
+            {t.rows.map((r) => (
+              <tr><th scope="row">{r.label}</th>{PCTS.map((p) => <td class="num">{lb(r.q[p - 1])}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  ))}
+
+  <section aria-labelledby="std-data-heading">
+    <h2 id="std-data-heading">Where the numbers come from</h2>
+    <ul>
+      <li><strong>Raw only:</strong> bare knees or knee sleeves; no knee wraps or supportive suits and shirts.</li>
+      <li><strong>Full-power meets only:</strong> lifters who did all three lifts at the same meet, with a valid result.</li>
+      <li><strong>One result per lifter:</strong> each lifter&rsquo;s best competition total, so frequent competitors are not counted many times.</li>
+      <li><strong>Weight class</strong> by bodyweight at that meet, using the <a href="/powerlifting-weight-classes/">IPF weight classes</a>. All ages and federations are included.</li>
+      <li><strong>Export date:</strong> {exportDate}. Percentiles are rounded to 0.5 kg.</li>
+    </ul>
+  </section>
+</div>

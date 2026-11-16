@@ -51,6 +51,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/powerlifting-weight-classes/': '2026-11-18',
   '/weighted-pull-up-calculator/': '2026-11-20',
   '/531-calculator/': '2026-11-20',
+  '/bench-press-standards/': '2026-11-20',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
@@ -132,6 +133,7 @@ export const FOOTER_GROUPS = [
       { href: '/powerlifting-weight-classes/', label: 'Powerlifting Weight Classes' },
       { href: '/weighted-pull-up-calculator/', label: 'Weighted Pull-Up Calculator' },
       { href: '/531-calculator/', label: '5/3/1 Calculator' },
+      { href: '/bench-press-standards/', label: 'Bench Press Standards' },
     ],
   },
   {

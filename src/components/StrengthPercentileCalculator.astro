@@ -6,10 +6,18 @@
 import { SITE } from '../config/site';
 import UnitToggle from './UnitToggle.astro';
 
+interface Props {
+  /** Fix the lift (standards pages): hides the lift choice. */
+  lift?: 'squat' | 'bench' | 'deadlift';
+  heading?: string;
+}
+const { lift, heading = 'Strength percentile calculator' } = Astro.props;
+const LIFT_NAMES = { squat: 'squat', bench: 'bench press', deadlift: 'deadlift' };
+
 const unit = SITE.defaultUnit;
 ---
 <section class="card calculator" aria-labelledby="sp-heading" data-strength-percentile>
-  <h2 id="sp-heading">Strength percentile calculator</h2>
+  <h2 id="sp-heading">{heading}</h2>
   <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled.</p></noscript>
   <form id="sp-form" novalidate>
     <div class="field-row">
@@ -27,6 +35,7 @@ const unit = SITE.defaultUnit;
       </div>
     </div>
     <div class="field-row">
+      {lift ? <input type="hidden" id="sp-lift" value={lift} /> : (
       <div class="field">
         <label for="sp-lift">Lift</label>
         <select id="sp-lift">
@@ -36,8 +45,9 @@ const unit = SITE.defaultUnit;
           <option value="total">Total (squat + bench + deadlift)</option>
         </select>
       </div>
+      )}
       <div class="field">
-        <label for="sp-weight">Best single (<span data-unit-label>{unit}</span>)</label>
+        <label for="sp-weight">{lift ? `Best ${LIFT_NAMES[lift]} single` : 'Best single'} (<span data-unit-label>{unit}</span>)</label>
         <input id="sp-weight" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 140' : 'e.g. 315'} data-ph-kg="e.g. 140" data-ph-lb="e.g. 315" autocomplete="off" aria-describedby="sp-error" />
       </div>
     </div>

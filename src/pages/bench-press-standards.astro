@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LiftStandards from '../components/LiftStandards.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import data from '../data/opl-percentiles.json';
+import { percentileOf } from '../lib/strength-percentile.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor } from '../config/site';
+
+const title = 'Bench Press Standards — Raw Lifters by Weight Class';
+const description =
+  'Bench press standards for men and women by IPF weight class, in kg and lb: real percentiles from raw powerlifting competitions, plus a quick bench check.';
+const path = '/bench-press-standards/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+
+const g = data.groups as Record<'M' | 'F', Record<string, { bench: number[] }>>;
+const ordinal = (n: number) => { const v = n % 100; return `${n}${v >= 11 && v <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`; };
+const pctOf = (sex: 'M' | 'F', cls: string, kg: number) => ordinal(percentileOf(g[sex][cls].bench, kg).pct);
+const m93_140 = pctOf('M', '93', 140);
+const f63_60 = pctOf('F', '63', 60);
+
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub Bench Press Standards', description,
+    features: ['Bench press percentiles by IPF weight class', 'Men and women', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Bench Press Standards', href: path }]} jsonLd={jsonLd}>
+  <h1>Bench Press Standards</h1>
+  <p class="lead">
+    How strong is your bench press? See real bench press results from raw powerlifting competitions
+    for every weight class, for men and women, in kg and lb.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Data exported {formatDate(data.exportDate)}</p>
+
+  <LiftStandards lift="bench" name="bench press" exampleKg={100} />
+
+  <div class="prose">
+    <section aria-labelledby="bench-comp-heading">
+      <h2 id="bench-comp-heading">A competition bench is a paused bench</h2>
+      <p>
+        Every result in these tables was judged under powerlifting rules. Under IPF rules the lifter
+        lowers the bar to the chest, holds it motionless, and only presses after the referee&rsquo;s
+        &ldquo;Press&rdquo; command, then locks the elbows and waits for &ldquo;Rack&rdquo;. A touch-and-go
+        bench in the gym usually moves more weight than a paused one, so if your best is touch-and-go,
+        expect it to rank a little higher here than it would on the platform.
+      </p>
+      <p>
+        If you only know a set of several reps, estimate your single first with the
+        {' '}<a href="/bench-press-calculator/">bench press calculator</a>, and treat the percentile as an
+        estimate too.
+      </p>
+    </section>
+
+    <section aria-labelledby="bench-faq-heading">
+      <h2 id="bench-faq-heading">Bench press standards: common questions</h2>
+      <h3>Is a 140 kg bench good?</h3>
+      <p>
+        For a man in the 93 kg class, a 140 kg (309 lb) bench is about the {m93_140} percentile of raw
+        competitors in that class. Because everyone counted is a competitive lifter, that is a strong
+        result for anyone who trains.
+      </p>
+      <h3>What is a good bench press for a woman?</h3>
+      <p>
+        For a woman in the 63 kg class, a 60 kg (132 lb) bench is about the {f63_60} percentile of raw
+        competitors. Use the tables above for your own weight class.
+      </p>
+      <h3>Why not use a bodyweight ratio, like &ldquo;1.5× bodyweight&rdquo;?</h3>
+      <p>
+        Strength does not rise in a straight line with bodyweight, so a single ratio flatters light
+        lifters and is harsh on heavy ones. Comparing within a weight class avoids that. To compare
+        lifters across classes, use the <a href="/dots-calculator/">DOTS calculator</a>.
+      </p>
+      <h3>Is this the average bench press?</h3>
+      <p>
+        No. It is the spread of results among people who compete in raw powerlifting. There is no
+        reliable public dataset of everyday gym-goers&rsquo; maxes, so these pages do not guess one.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.bench, LINKS.strength, LINKS.weightClasses, LINKS.increase]} />
+  <p class="disclaimer">
+    This page uses data from the OpenPowerlifting project, <a href="https://www.openpowerlifting.org" rel="noopener">https://www.openpowerlifting.org</a>.
+    You may download a copy of the data at <a href="https://gitlab.com/openpowerlifting/opl-data" rel="noopener">https://gitlab.com/openpowerlifting/opl-data</a>.
+  </p>
+  <SourceList ids={['opldata', 'ipfrules']} />
+</BaseLayout>
