@@ -390,3 +390,13 @@ describe('contact email links', () => {
     expect(bad).toEqual([]);
   });
 });
+
+describe('visible text spacing', () => {
+  it('no word is glued to a link (e.g. "see the1RM guide"), which happens if HTML whitespace is compressed away', () => {
+    const glued = /[A-Za-z0-9,;:]<a\s[^>]*>[^<]*<\/a>|<\/a>[A-Za-z]{2,}/g;
+    const bad = walk(DIST)
+      .filter((f) => f.endsWith('.html'))
+      .flatMap((f) => (readFileSync(f, 'utf8').match(glued) ?? []).map((m) => `${relative(DIST, f)}: ${m.slice(0, 80)}`));
+    expect(bad).toEqual([]);
+  });
+});

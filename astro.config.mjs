@@ -29,6 +29,9 @@ function lastmodFor(url) {
 }
 
 export default defineConfig({
+  // Keep whitespace as written: compressHTML deletes the line break between a word and a
+  // link that starts on the next source line, gluing them together ("see the1RM guide").
+  compressHTML: false,
   // Production custom domain on Cloudflare Pages.
   site: 'https://1rmhub.com',
   // Every page is a directory (/plate-calculator/index.html). Cloudflare Pages
