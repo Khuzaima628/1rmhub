@@ -1,0 +1,31 @@
+# 1RMHub
+
+> Free, transparent strength-training calculators. Estimate a one rep max (1RM) from any set, see six published formulas side by side, and get training percentages, RPE-based loads, plate loading, warm-up sets, DOTS scores and strength percentiles from OpenPowerlifting data. No signup.
+
+Every formula is cited to its published source; estimates are shown as a range, not a single "true" number.
+
+## Calculators
+- [One rep max calculator](https://1rmhub.com/): 1RM from weight and reps with Epley, Brzycki, Lombardi, Mayhew, O'Conner and Wathan
+- [Bench press calculator](https://1rmhub.com/bench-press-calculator/)
+- [Squat calculator](https://1rmhub.com/squat-calculator/)
+- [Deadlift calculator](https://1rmhub.com/deadlift-calculator/)
+- [Overhead press calculator](https://1rmhub.com/overhead-press-calculator/)
+- [1RM percentage calculator](https://1rmhub.com/1rm-percentage-calculator/): training weights from 50% to 100%
+- [RPE calculator](https://1rmhub.com/rpe-calculator/): 1RM from reps and RPE, and loads for a target RPE
+- [Plate calculator](https://1rmhub.com/plate-calculator/): plates per side for any target weight
+- [Warm-up calculator](https://1rmhub.com/warm-up-calculator/)
+- [DOTS calculator](https://1rmhub.com/dots-calculator/)
+- [Strength percentile calculator](https://1rmhub.com/strength-percentile-calculator/): how a lift compares with competitive raw powerlifters
+
+## Guides
+- [What is a one rep max?](https://1rmhub.com/guides/what-is-1rm/)
+- [1RM formulas compared](https://1rmhub.com/guides/1rm-formulas/)
+- [How to test your 1RM safely](https://1rmhub.com/guides/how-to-test-1rm/)
+- [How to increase your 1RM](https://1rmhub.com/guides/increase-1rm/)
+- [RPE scale](https://1rmhub.com/guides/rpe-scale/)
+- [Training max](https://1rmhub.com/guides/training-max/)
+
+## About
+- [Methodology](https://1rmhub.com/methodology/): formulas, sources and limits
+- [About](https://1rmhub.com/about/)
+- [Contact](https://1rmhub.com/contact/)

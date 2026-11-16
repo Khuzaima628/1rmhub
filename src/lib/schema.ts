@@ -46,6 +46,8 @@ export function organizationNode(site: string): Node {
     url: `${site}/`,
     logo: { '@type': 'ImageObject', url: `${site}/logo-512.png`, width: 512, height: 512 },
     founder: { '@id': ids(site).editor },
+    knowsAbout: ['One-repetition maximum', 'Strength training', 'Powerlifting', 'Rating of perceived exertion'],
+    ...(SITE.socialProfiles.length ? { sameAs: [...SITE.socialProfiles] } : {}),
     ...(SITE.contactEmail ? { email: SITE.contactEmail } : {}),
   };
 }

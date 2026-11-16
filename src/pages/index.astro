@@ -9,7 +9,7 @@ import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { webAppNode, webPageNode, faqNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, reviewedFor } from '../config/site';
+import { SITE, reviewedFor, formatDate } from '../config/site';
 
 const title = 'One Rep Max Calculator — Free 1RM Calculator | 1RMHub';
 const description =
@@ -93,6 +93,7 @@ const jsonLd = [
     formulas, the honest range between them, training percentages, plate loading
     and warm-up sets — free, instant, no signup.
   </p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor('/')}>{formatDate(reviewedFor('/'))}</time></p>
 
   <OneRepMaxCalculator />
 

@@ -16,6 +16,12 @@ export const SITE = {
   policyDate: '2026-11-07',
   /** Default date the calculator pages and methodology were last reviewed. */
   contentReviewed: '2026-11-02',
+  /** Official brand profiles, listed as Organization sameAs (only real, owned accounts). */
+  socialProfiles: [
+    'https://www.instagram.com/1rmhub/',
+    'https://www.pinterest.com/1rmhub/',
+    'https://www.tiktok.com/@1rmhub',
+  ],
 };
 
 /**
