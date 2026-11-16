@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SmolovCalculator from '../components/SmolovCalculator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { SMOLOV_DAYS, SMOLOV_ADD } from '../lib/smolov.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor, EDITOR } from '../config/site';
+
+const title = 'Smolov Calculator — Squat Base Cycle Weights';
+const description =
+  'Free Smolov calculator: enter your squat 1RM and get every weight for the Smolov base cycle (4x9, 5x7, 7x5, 10x3) in kg or lb, rounded to loadable plates.';
+const path = '/smolov-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+const reps = SMOLOV_DAYS.reduce((s, d) => s + d.sets * d.reps, 0);
+
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub Smolov Calculator', description,
+    features: ['Smolov base mesocycle weights', 'Weekly add-ons in kg or lb', 'Rounded to loadable plates'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Smolov Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>Smolov Calculator</h1>
+  <p class="lead">
+    Enter your squat one rep max and get the weights for all three loading weeks of the Smolov base
+    cycle, in kg or lb, rounded down to weights you can load.
+  </p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
+
+  <SmolovCalculator />
+
+  <div class="prose">
+    <section aria-labelledby="smolov-what-heading">
+      <h2 id="smolov-what-heading">What the Smolov base cycle is</h2>
+      <p class="answer">
+        Smolov is a high-volume Russian squat program. Its base cycle has you squat four days a week
+        for three weeks: 4 sets of 9 at 70% of your 1RM, 5 sets of 7 at 75%, 7 sets of 5 at 80% and 10
+        sets of 3 at 85% &mdash; {reps} working reps a week. In week 2 you add {SMOLOV_ADD.kg[1]} kg
+        ({SMOLOV_ADD.lb[1]} lb) to every weight, in week 3 {SMOLOV_ADD.kg[2]} kg ({SMOLOV_ADD.lb[2]} lb),
+        and in week 4 you rest and then test your new max.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>Smolov base cycle: the weekly scheme</caption>
+          <thead><tr><th scope="col">Day</th><th scope="col" class="num">Sets × reps</th><th scope="col" class="num">Week 1</th><th scope="col" class="num">Week 2</th><th scope="col" class="num">Week 3</th></tr></thead>
+          <tbody>
+            {SMOLOV_DAYS.map((d) => (
+              <tr><th scope="row">{d.day}</th><td class="num">{d.sets} × {d.reps}</td><td class="num">{d.pct}%</td><td class="num">{d.pct}% + {SMOLOV_ADD.kg[1]} kg</td><td class="num">{d.pct}% + {SMOLOV_ADD.kg[2]} kg</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="smolov-source-heading">
+      <h2 id="smolov-source-heading">Where this version comes from</h2>
+      <p>
+        Smolov is credited to the Russian coach Sergey Smolov and was made known outside Russia by
+        Pavel Tsatsouline. The original Russian text is not publicly available, and published copies
+        differ in details &mdash; especially in the other phases of the full 13-week program. This
+        calculator covers only the base cycle, using the scheme and weekly add-ons that independent
+        published copies agree on (see the sources below).
+      </p>
+      <p>
+        The full program also has an introductory phase before the base cycle, and a
+        &ldquo;switching&rdquo; phase and an intense phase after it. Because those parts vary between
+        sources, they are not calculated here.
+      </p>
+    </section>
+
+    <section aria-labelledby="smolov-safety-heading">
+      <h2 id="smolov-safety-heading">Before you start</h2>
+      <ul>
+        <li><strong>It is very demanding.</strong> Squatting heavy four days a week leaves little room for other training.</li>
+        <li><strong>Use a true, recent max.</strong> Every weight is a percentage of it, so an inflated max makes every session too heavy. If you only know a rep set, estimate your max with the <a href="/squat-calculator/">squat calculator</a> and stay conservative.</li>
+        <li><strong>Form comes first.</strong> If you cannot finish the sets with good technique, lower the weight rather than grinding through bad reps.</li>
+        <li><strong>Recovery matters.</strong> Sleep, food and rest days carry more weight than usual on a program this hard.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="smolov-faq-heading">
+      <h2 id="smolov-faq-heading">Smolov: common questions</h2>
+      <h3>Should I use my 1RM or a training max?</h3>
+      <p>
+        The base cycle is written as percentages of your 1RM. Some lifters use a slightly lower number
+        to make it more manageable; if you do, enter that number instead, and every weight drops with it.
+      </p>
+      <h3>Why are the weights rounded down?</h3>
+      <p>
+        So every weight can be loaded with standard plates and never exceeds the exact percentage. Use
+        the <a href="/plate-calculator/">plate calculator</a> to see which plates to put on the bar.
+      </p>
+      <h3>What is Smolov Jr?</h3>
+      <p>
+        A shorter program (usually three weeks) that lifters often use for the bench press. It is
+        a different scheme from the base cycle on this page.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.squat, LINKS.squatStandards, LINKS.trainingMax, LINKS.plates]} />
+  <SourceList ids={['smolovwiki', 'liftvaultsmolov', 'tadlocksmolov']} />
+</BaseLayout>

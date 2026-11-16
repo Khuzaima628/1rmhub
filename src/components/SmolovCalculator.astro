@@ -1,0 +1,74 @@
+---
+// Smolov base mesocycle calculator: squat 1RM in, three weeks of sets out.
+// One instance per page. Math: src/lib/smolov.js (tested).
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="smolov-heading" data-smolov-calculator>
+  <h2 id="smolov-heading">Smolov base cycle calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled. The scheme table below works without it.</p></noscript>
+  <form id="smolov-form" novalidate>
+    <div class="field-row">
+      <UnitToggle id="smolov-unit" unit={unit} />
+      <div class="field">
+        <label for="smolov-max">Squat 1RM (<span data-unit-label>{unit}</span>)</label>
+        <input id="smolov-max" type="number" inputmode="decimal" min="0" step="any" autocomplete="off"
+          placeholder={unit === 'kg' ? 'e.g. 140' : 'e.g. 315'} data-ph-kg="e.g. 140" data-ph-lb="e.g. 315" aria-describedby="smolov-error" />
+      </div>
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">Build my base cycle</button></div>
+    <p class="error" id="smolov-error" role="alert" hidden></p>
+  </form>
+  <p class="disclaimer">No tested max? <a href="/squat-calculator/">Estimate your squat 1RM</a> from a recent heavy set first.</p>
+  <div id="smolov-result" aria-live="polite"></div>
+</section>
+
+<script>
+  import { smolovBase } from '../lib/smolov.js';
+  import { validateWeight } from '../lib/onerepmax.js';
+  import { num, esc, bindUnitToggle, convertInput, paintUnitLabels, scrollToEl, showFieldError, clearFieldError } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-smolov-calculator]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('smolov-form'), maxEl = $('smolov-max'), errorEl = $('smolov-error'), out = $('smolov-result');
+    let shown = false;
+
+    const toggle = bindUnitToggle(root.querySelector('#smolov-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      convertInput(maxEl, prev, next);
+      paintUnitLabels(root, next);
+      if (shown) calculate(false);
+    });
+
+    function calculate(scroll: boolean) {
+      clearFieldError(errorEl, [maxEl]);
+      const check = validateWeight(maxEl.value, 'your squat 1RM');
+      if (!check.ok) {
+        showFieldError(errorEl, check.error, maxEl, { focus: scroll });
+        out.innerHTML = '';
+        shown = false;
+        return;
+      }
+      const u = toggle.get() as 'kg' | 'lb';
+      const { weeks, repsPerWeek } = smolovBase(check.value, u);
+      const weekTables = weeks.map((w) => `
+        <div class="table-wrap">
+          <table>
+            <caption>Week ${w.week}${w.add ? ` (percentages + ${w.add} ${u})` : ''}</caption>
+            <thead><tr><th scope="col">Day</th><th scope="col" class="num">Sets × reps</th><th scope="col" class="num">% of 1RM</th><th scope="col" class="num">Weight</th></tr></thead>
+            <tbody>${w.days.map((d) => `<tr><th scope="row">${esc(d.day)}</th><td class="num">${d.sets} × ${d.reps}</td><td class="num">${d.pct}%${w.add ? ` + ${w.add}` : ''}</td><td class="num">${esc(num(d.weight))} ${u}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>`).join('');
+      out.innerHTML = `<div class="result-headline">
+          <div class="result-label">Base cycle for a ${esc(num(check.value))} ${u} squat</div>
+          <p class="result-sub">${repsPerWeek} working reps a week. Weights are rounded down to ${u === 'kg' ? '2.5 kg' : '5 lb'}. Week 4: rest early in the week, then test your new max.</p>
+        </div>${weekTables}`;
+      shown = true;
+      if (scroll) scrollToEl(out);
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); calculate(true); });
+  }
+</script>

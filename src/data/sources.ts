@@ -128,6 +128,21 @@ export const SOURCES: Record<string, Source> = {
     text: 'International Powerlifting Federation. (2026). IPF Technical Rulebook, effective 1 March 2026: 1.1 Age categories, 1.2 Bodyweight categories, and weigh-in procedure.',
     url: 'https://www.powerlifting.sport/rules/codes/info/technical-rules',
   },
+  smolovwiki: {
+    id: 'smolovwiki',
+    text: 'Smolov Squat Routine. Wikipedia: origin credited to Sergey Smolov; popularized by Pavel Tsatsouline; base cycle of four squat sessions a week ending with a re-test of the 1RM.',
+    url: 'https://en.wikipedia.org/wiki/Smolov_Squat_Routine',
+  },
+  liftvaultsmolov: {
+    id: 'liftvaultsmolov',
+    text: 'Lift Vault. Smolov squat program: base cycle 4x9 at 70%, 5x7 at 75%, 7x5 at 80%, 10x3 at 85%, plus 20 lb in week 2 (published program copy).',
+    url: 'https://liftvault.com/programs/powerlifting/smolov/',
+  },
+  tadlocksmolov: {
+    id: 'tadlocksmolov',
+    text: 'Tadlock, J. (2011). Smolov base mesocycle: the same scheme with 20 lb (10 kg) added in week 2 and 30 lb (15 kg) in week 3 (independent published copy).',
+    url: 'https://justintadlock.com/archives/2011/12/05/smolov-base-mesocycle',
+  },
   opldata: {
     id: 'opldata',
     text: 'OpenPowerlifting. Powerlifting competition results database, released into the public domain. Raw full-power results; see the export date on the page.',
