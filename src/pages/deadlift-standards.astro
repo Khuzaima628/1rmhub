@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LiftStandards from '../components/LiftStandards.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import data from '../data/opl-percentiles.json';
+import { percentileOf } from '../lib/strength-percentile.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor, EDITOR } from '../config/site';
+
+const title = 'Deadlift Standards — Raw Lifters by Weight Class';
+const description =
+  'Deadlift standards for men and women by IPF weight class, in kg and lb: real percentiles from raw powerlifting competitions, plus a quick deadlift check.';
+const path = '/deadlift-standards/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+
+const g = data.groups as Record<'M' | 'F', Record<string, { deadlift: number[] }>>;
+const ordinal = (n: number) => { const v = n % 100; return `${n}${v >= 11 && v <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`; };
+const pctOf = (sex: 'M' | 'F', cls: string, kg: number) => ordinal(percentileOf(g[sex][cls].deadlift, kg).pct);
+const m93_250 = pctOf('M', '93', 250);
+const f63_120 = pctOf('F', '63', 120);
+
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub Deadlift Standards', description,
+    features: ['Deadlift percentiles by IPF weight class', 'Men and women', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Deadlift Standards', href: path }]} jsonLd={jsonLd}>
+  <h1>Deadlift Standards</h1>
+  <p class="lead">
+    How strong is your deadlift? See real deadlift results from raw powerlifting competitions
+    for every weight class, for men and women, in kg and lb.
+  </p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Data exported {formatDate(data.exportDate)}</p>
+
+  <LiftStandards lift="deadlift" name="deadlift" exampleKg={180} />
+
+  <div class="prose">
+    <section aria-labelledby="dl-comp-heading">
+      <h2 id="dl-comp-heading">What counts as a competition deadlift</h2>
+      <p>
+        Every result in these tables was judged under powerlifting rules. Under IPF rules the bar is
+        lifted from the floor until the lifter stands erect with the knees locked, and it must be held
+        there until the referee&rsquo;s &ldquo;Down&rdquo; command. Once the bar starts rising it may not move
+        downward before lockout, so hitched or bounced reps do not count. Any grip is allowed, and both
+        conventional and sumo stances are included in these tables.
+      </p>
+      <p>
+        If you only know a set of several reps, estimate your single first with the
+        {' '}<a href="/deadlift-calculator/">deadlift calculator</a>, and treat the percentile as an estimate too.
+      </p>
+    </section>
+
+    <section aria-labelledby="dl-faq-heading">
+      <h2 id="dl-faq-heading">Deadlift standards: common questions</h2>
+      <h3>Is a 250 kg deadlift good?</h3>
+      <p>
+        For a man in the 93 kg class, a 250 kg (551 lb) deadlift is about the {m93_250} percentile of raw
+        competitors in that class.
+      </p>
+      <h3>What is a good deadlift for a woman?</h3>
+      <p>
+        For a woman in the 63 kg class, a 120 kg (265 lb) deadlift is about the {f63_120} percentile of
+        raw competitors. Use the tables above for your own weight class.
+      </p>
+      <h3>Do straps count?</h3>
+      <p>
+        No. Lifting straps are not on the IPF list of permitted personal equipment, so these results were
+        pulled with the lifter&rsquo;s own grip. A deadlift done with straps in the gym may be heavier than you could hold
+        on the platform.
+      </p>
+      <h3>Is this the average deadlift?</h3>
+      <p>
+        No. It is the spread of results among people who compete in raw powerlifting. There is no
+        reliable public dataset of everyday gym-goers&rsquo; maxes, so these pages do not guess one.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.deadlift, LINKS.strength, LINKS.squatStandards, LINKS.weightClasses]} />
+  <p class="disclaimer">
+    This page uses data from the OpenPowerlifting project, <a href="https://www.openpowerlifting.org" rel="noopener">https://www.openpowerlifting.org</a>.
+    You may download a copy of the data at <a href="https://gitlab.com/openpowerlifting/opl-data" rel="noopener">https://gitlab.com/openpowerlifting/opl-data</a>.
+  </p>
+  <SourceList ids={['opldata', 'ipfrules']} />
+</BaseLayout>

@@ -54,6 +54,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/bench-press-standards/': '2026-11-20',
   '/squat-standards/': '2026-11-23',
   '/leg-press-calculator/': '2026-11-24',
+  '/deadlift-standards/': '2026-11-25',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
@@ -138,6 +139,7 @@ export const FOOTER_GROUPS = [
       { href: '/531-calculator/', label: '5/3/1 Calculator' },
       { href: '/bench-press-standards/', label: 'Bench Press Standards' },
       { href: '/squat-standards/', label: 'Squat Standards' },
+      { href: '/deadlift-standards/', label: 'Deadlift Standards' },
     ],
   },
   {

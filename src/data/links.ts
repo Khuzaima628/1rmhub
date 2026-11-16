@@ -15,6 +15,7 @@ export const LINKS = {
   benchStandards: { href: '/bench-press-standards/', title: 'Bench Press Standards', text: 'Real bench press percentiles by weight class from raw powerlifting meets.' },
   squatStandards: { href: '/squat-standards/', title: 'Squat Standards', text: 'Real squat percentiles by weight class from raw powerlifting meets.' },
   legPress: { href: '/leg-press-calculator/', title: 'Leg Press Calculator', text: 'Estimate a leg press max — and why sled weight and machine type matter.' },
+  deadliftStandards: { href: '/deadlift-standards/', title: 'Deadlift Standards', text: 'Real deadlift percentiles by weight class from raw powerlifting meets.' },
   percent: { href: '/1rm-percentage-calculator/', title: '1RM Percentage Calculator', text: 'Turn a known 1RM into working weights, e.g. 80% for sets of five.' },
   plates: { href: '/plate-calculator/', title: 'Plate Calculator', text: 'See which plates to load per side — never over your target.' },
   warmup: { href: '/warm-up-calculator/', title: 'Warm-up Calculator', text: 'Build a warm-up ramp to your top set, with loadable weights.' },
