@@ -45,6 +45,11 @@ export const EXERCISES: Exercise[] = [
     sources: ['meneses2013'],
   },
   {
+    id: 'leg-press', label: 'Leg Press', page: '/leg-press-calculator/',
+    note: 'Leg press results depend on the machine. In one study the formulas overestimated the max on a 45° leg press; in another, on a different machine, most of them underestimated it. Estimate from a heavy set of 10 reps or fewer on the machine you train on.',
+    sources: ['meneses2013', 'reynolds'],
+  },
+  {
     id: 'dumbbell-bench', label: 'Dumbbell Bench Press', weightLabel: 'Weight of one dumbbell',
     note: 'We found no study testing these formulas against a measured dumbbell bench press max; they were tested on the barbell bench press. Enter the weight of one dumbbell, and the estimate is for one dumbbell too.',
     sources: [],
@@ -69,15 +74,4 @@ export const EXERCISES: Exercise[] = [
     note: 'These formulas were tested mainly on the bench press, squat, deadlift and leg press. For other exercises, treat the number as a rough guide.',
     sources: ['lesuer', 'reynolds', 'meneses2013'],
   },
-  { id: 'bench-press', label: 'Bench Press', page: '/bench-press-calculator/' },
-  { id: 'squat', label: 'Squat', page: '/squat-calculator/' },
-  { id: 'deadlift', label: 'Deadlift', page: '/deadlift-calculator/' },
-  { id: 'overhead-press', label: 'Overhead Press', page: '/overhead-press-calculator/' },
-  { id: 'barbell-row', label: 'Barbell Row', page: '/barbell-row-calculator/' },
-  { id: 'leg-press', label: 'Leg Press', page: '/leg-press-calculator/' },
-  { id: 'dumbbell-bench', label: 'Dumbbell Bench Press' },
-  { id: 'incline-bench', label: 'Incline Bench Press', page: '/incline-bench-press-calculator/' },
-  { id: 'front-squat', label: 'Front Squat', page: '/front-squat-calculator/' },
-  { id: 'hip-thrust', label: 'Hip Thrust', page: '/hip-thrust-calculator/' },
-  { id: 'custom', label: 'Other / Custom Exercise' },
 ];
