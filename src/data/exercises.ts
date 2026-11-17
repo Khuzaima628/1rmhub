@@ -20,7 +20,7 @@ export interface Exercise {
 
 export const EXERCISES: Exercise[] = [
   {
-    id: 'bench-press', label: 'Bench Press', page: '/bench-press-calculator/',
+    id: 'bench-press', label: 'Bench Press', page: '/bench-press-calculator/', standards: '/bench-press-standards/',
     note: 'The bench press is the most-studied lift for these formulas. Studies agree they are most accurate from a set of 10 reps or fewer, but they disagree on which single formula comes closest.',
     sources: ['whisenant2003', 'mayhew2008', 'reynolds'],
   },
