@@ -34,7 +34,7 @@ const unit = SITE.defaultUnit;
 
     <div class="field-row">
       <div class="field">
-        <label for="weight">Weight lifted</label>
+        <label for="weight" id="weight-label">{EXERCISES.find((e) => e.id === exercise)?.weightLabel ?? 'Weight lifted'}</label>
         <input id="weight" name="weight" type="number" inputmode="decimal" min="0" step="any"
           placeholder={unit === 'kg' ? 'e.g. 100' : 'e.g. 225'} data-ph-kg="e.g. 100" data-ph-lb="e.g. 225" autocomplete="off" aria-describedby="form-error" />
       </div>
@@ -173,8 +173,11 @@ const unit = SITE.defaultUnit;
       const liftLink = info?.page && info.page !== location.pathname
         ? ` · <a href="${esc(info.page)}">${esc(info.label)} calculator and tips</a>`
         : '';
+      const standardsLink = info?.standards && info.standards !== location.pathname
+        ? ` · <a href="${esc(info.standards)}">How strong is this? ${esc(info.label)} standards</a>`
+        : '';
       const liftNote = info
-        ? `<p class="result-sub lift-note"><strong>${esc(info.label)}:</strong> ${esc(info.note)}${liftLink}
+        ? `<p class="result-sub lift-note"><strong>${esc(info.label)}:</strong> ${esc(info.note)}${liftLink}${standardsLink}
             · <a href="/methodology/#sources-heading">Sources</a></p>`
         : '';
 
@@ -241,11 +244,15 @@ const unit = SITE.defaultUnit;
     wirePlateButtons(coreEl, unit);
     form.addEventListener('submit', (e) => { e.preventDefault(); calculate({ scroll: true }); });
     primaryEl.addEventListener('change', () => { if (last) render(); });
-    exerciseEl.addEventListener('change', () => { if (last) render(); });
+    // Some exercises need a clearer weight label (e.g. one dumbbell).
+    const weightLabelEl = $('weight-label');
+    const paintWeightLabel = () => { weightLabelEl.textContent = exInfo()?.weightLabel ?? 'Weight lifted'; };
+    exerciseEl.addEventListener('change', () => { paintWeightLabel(); if (last) render(); });
 
     $('reset-btn').addEventListener('click', () => {
       form.reset();
       exerciseEl.value = defaultExercise;
+      paintWeightLabel();
       toggle.set(defaultUnit);
       clearFieldError(errorEl, [weightEl, repsEl]);
       resultsEl.hidden = true;
@@ -311,6 +318,7 @@ const unit = SITE.defaultUnit;
       repsEl.value = numeric('r');
       bwEl.value = numeric('bw');
       if (hasOption(exerciseEl, p.get('e'))) exerciseEl.value = p.get('e')!;
+      paintWeightLabel();
       if (hasOption(primaryEl, p.get('f'))) primaryEl.value = p.get('f')!;
       calculate({ scroll: false });
     }

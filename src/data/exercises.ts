@@ -10,6 +10,10 @@ export interface Exercise {
   page?: string;
   /** One short, sourced note shown under the result for this lift. */
   note: string;
+  /** Label for the weight field when this exercise is chosen (default: "Weight lifted"). */
+  weightLabel?: string;
+  /** This lift's strength standards page, linked from the result once that page is live. */
+  standards?: string;
   /** Source ids (src/data/sources.ts) the note relies on. Empty only for statements about our own search. */
   sources: string[];
 }
@@ -41,8 +45,8 @@ export const EXERCISES: Exercise[] = [
     sources: ['meneses2013'],
   },
   {
-    id: 'dumbbell-bench', label: 'Dumbbell Bench Press',
-    note: 'We found no study testing these formulas against a measured dumbbell bench press max; they were tested on the barbell bench press. Enter the weight of one dumbbell or of both together, whichever you track: the estimate is in the same terms.',
+    id: 'dumbbell-bench', label: 'Dumbbell Bench Press', weightLabel: 'Weight of one dumbbell',
+    note: 'We found no study testing these formulas against a measured dumbbell bench press max; they were tested on the barbell bench press. Enter the weight of one dumbbell, and the estimate is for one dumbbell too.',
     sources: [],
   },
   {

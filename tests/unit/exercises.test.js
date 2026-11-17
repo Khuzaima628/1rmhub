@@ -3,6 +3,8 @@
  * note relies on exists in the bibliography.
  */
 import { describe, it, expect } from 'vitest';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { EXERCISES } from '../../src/data/exercises.ts';
 import { SOURCES } from '../../src/data/sources.ts';
 
@@ -28,7 +30,12 @@ describe('exercise notes', () => {
     }
   });
 
-  it('lift pages are internal paths', () => {
-    for (const e of EXERCISES.filter((x) => x.page)) expect(e.page).toMatch(/^\/[a-z0-9-]+\/$/);
+  it('lift pages and standards pages are internal paths that exist as page files', () => {
+    for (const e of EXERCISES) {
+      for (const path of [e.page, e.standards].filter(Boolean)) {
+        expect(path, e.id).toMatch(/^\/[a-z0-9-]+\/$/);
+        expect(existsSync(join(process.cwd(), 'src/pages', `${path.slice(1, -1)}.astro`)), `${e.id} → ${path}`).toBe(true);
+      }
+    }
   });
 });
