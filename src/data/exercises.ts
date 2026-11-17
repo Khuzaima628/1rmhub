@@ -25,7 +25,7 @@ export const EXERCISES: Exercise[] = [
     sources: ['whisenant2003', 'mayhew2008', 'reynolds'],
   },
   {
-    id: 'squat', label: 'Squat', page: '/squat-calculator/',
+    id: 'squat', label: 'Squat', page: '/squat-calculator/', standards: '/squat-standards/',
     note: 'At the same percentage of their max, lifters manage more reps on the squat than on the bench press, especially with lighter weights. The formulas assume the same pattern for every lift, so a heavier set of 3–6 reps gives the most reliable squat estimate.',
     sources: ['shimano2006', 'reynolds'],
   },
