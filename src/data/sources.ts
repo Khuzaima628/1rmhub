@@ -123,4 +123,29 @@ export const SOURCES: Record<string, Source> = {
     text: 'American College of Sports Medicine. (2009). Position stand: Progression models in resistance training for healthy adults. Medicine & Science in Sports & Exercise, 41(3), 687–708.',
     url: 'https://pubmed.ncbi.nlm.nih.gov/19204579/',
   },
+  awasinclairmen: {
+    id: 'awasinclairmen',
+    text: 'Alberta Weightlifting Association. Male Sinclair Coefficients (2025–2028). Copy hosted by the Polish Weightlifting Federation (PZPC).',
+    url: 'https://www.pzpc.pl/public/system/files/site_content/185/7343-2025_2028-Sinclair_coefficients-Men.pdf',
+  },
+  awasinclairwomen: {
+    id: 'awasinclairwomen',
+    text: 'Alberta Weightlifting Association. Female Sinclair Coefficients (2025–2028). Copy hosted by the Polish Weightlifting Federation (PZPC).',
+    url: 'https://www.pzpc.pl/public/system/files/site_content/185/7344-2025_2028-Sinclair_coefficients-Women.pdf',
+  },
+  wikisinclair: {
+    id: 'wikisinclair',
+    text: 'Wikipedia. Sinclair coefficient: formula and use by the International Weightlifting Federation.',
+    url: 'https://en.wikipedia.org/wiki/Sinclair_coefficient',
+  },
+  iwftcrr: {
+    id: 'iwftcrr',
+    text: 'International Weightlifting Federation. (2024). Technical and Competition Rules & Regulations, section 3.3.3 Barbell: bar, discs and collars. Copy hosted by the Polish Weightlifting Federation (PZPC).',
+    url: 'https://pzpc.pl/download/file/7080',
+  },
+  ipfequip: {
+    id: 'ipfequip',
+    text: 'International Powerlifting Federation. (2026). IPF Technical Rulebook, effective 1 March 2026, section 2: Equipment and specifications (bar, discs and collars).',
+    url: 'https://www.powerlifting.sport/rules/codes/info/technical-rules',
+  },
 };

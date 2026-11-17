@@ -4,7 +4,7 @@ import RpeCalculator from '../components/RpeCalculator.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
-import { rpeFraction } from '../lib/onerepmax.js';
+import { rpeFraction, rirFromRpe, RPE_VALUES } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
 import { SITE, formatDate, reviewedFor } from '../config/site';
@@ -21,6 +21,8 @@ const chartRows = Array.from({ length: 10 }, (_, i) => i + 1).map((reps) => ({
   reps,
   cells: chartRpes.map((rpe) => rpeFraction(reps, rpe)),
 }));
+// RIR → RPE rows from the same scale the calculator offers.
+const rirRows = RPE_VALUES.filter((rpe) => Number.isInteger(rpe)).map((rpe) => ({ rpe, rir: rirFromRpe(rpe) }));
 const jsonLd = [
   webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: '1RMHub RPE Calculator', description,
@@ -49,6 +51,28 @@ const jsonLd = [
         This reps-in-reserve version of the scale was described by Zourdos and colleagues in 2016.
         It lets you train hard without going to failure every set, and it adjusts to how strong you
         are on the day.
+      </p>
+    </section>
+
+    <section aria-labelledby="rir-heading">
+      <h2 id="rir-heading">RPE vs RIR: using this as an RIR calculator</h2>
+      <p>
+        RIR (reps in reserve) counts how many more good reps you could have done. On the scale this
+        calculator uses, RPE and RIR are two ways of saying the same thing:
+        <strong>RPE = 10 − RIR</strong>. If you track RIR, pick the matching RPE above.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>RIR to RPE conversion</caption>
+          <thead><tr><th scope="col" class="num">Reps in reserve (RIR)</th><th scope="col" class="num">RPE to choose</th></tr></thead>
+          <tbody>
+            {rirRows.map((r) => <tr><th scope="row" class="num">{r.rir}</th><td class="num">RPE {r.rpe}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Half steps work the same way: 1.5 reps in reserve is RPE 8.5. For more on rating a set honestly,
+        see <a href="/guides/rpe-scale/">the RPE scale explained</a>.
       </p>
     </section>
 

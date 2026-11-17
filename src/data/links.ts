@@ -22,4 +22,6 @@ export const LINKS = {
   rpeGuide: { href: '/guides/rpe-scale/', title: 'RPE Scale Explained', text: 'The RPE 6–10 scale with reps in reserve, how to rate a set, and an RPE chart.' },
   increase: { href: '/guides/increase-1rm/', title: 'How to Increase Your 1RM', text: 'What research shows about getting stronger: heavy loads, weekly sets, frequency and recovery.' },
   methodology: { href: '/methodology/', title: 'Methodology', text: 'Exactly how every number on 1RMHub is calculated and rounded.' },
+  sinclair: { href: '/sinclair-calculator/', title: 'Sinclair Calculator', text: 'Score a weightlifting total against bodyweight with the 2025–2028 Sinclair coefficients.' },
+  barbellWeight: { href: '/guides/barbell-weight/', title: 'How Much Does a Barbell Weigh?', text: 'Men’s, women’s and powerlifting bar weights from the official rules, plus how to weigh any bar.' },
 };

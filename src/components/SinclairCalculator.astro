@@ -1,0 +1,119 @@
+---
+// Sinclair calculator for Olympic weightlifting. Total can be typed directly or
+// built from the best snatch and clean & jerk. One instance per page.
+// Math: src/lib/sinclair.js (tested against the published 2025–2028 tables).
+import { SITE } from '../config/site';
+import UnitToggle from './UnitToggle.astro';
+
+const unit = SITE.defaultUnit;
+---
+<section class="card calculator" aria-labelledby="sinclair-heading" data-sinclair-calculator>
+  <h2 id="sinclair-heading">Sinclair calculator</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled. The coefficient table below works without it.</p></noscript>
+  <form id="sinclair-form" novalidate>
+    <div class="field-row">
+      <div class="field">
+        <label for="sinclair-sex">Category</label>
+        <select id="sinclair-sex">
+          <option value="male">Men</option>
+          <option value="female">Women</option>
+        </select>
+      </div>
+      <UnitToggle id="sinclair-unit" unit={unit} />
+      <div class="field">
+        <label for="sinclair-bw">Bodyweight (<span data-unit-label>{unit}</span>)</label>
+        <input id="sinclair-bw" type="number" inputmode="decimal" min="0" step="any" placeholder={unit === 'kg' ? 'e.g. 81' : 'e.g. 179'} data-ph-kg="e.g. 81" data-ph-lb="e.g. 179" autocomplete="off" aria-describedby="sinclair-error" />
+      </div>
+    </div>
+    <fieldset class="plate-fieldset">
+      <legend>Your lifts <span class="hint">(best successful snatch and clean &amp; jerk, or type a total)</span></legend>
+      <div class="field-row">
+        <div class="field">
+          <label for="sinclair-snatch">Snatch</label>
+          <input id="sinclair-snatch" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" data-lift />
+        </div>
+        <div class="field">
+          <label for="sinclair-cj">Clean &amp; jerk</label>
+          <input id="sinclair-cj" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" data-lift />
+        </div>
+      </div>
+      <div class="field">
+        <label for="sinclair-total">Total (<span data-unit-label>{unit}</span>) <span class="hint">filled in from the lifts, or type your own</span></label>
+        <input id="sinclair-total" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" aria-describedby="sinclair-error" />
+      </div>
+    </fieldset>
+    <div class="actions"><button type="submit" class="btn btn-primary">Calculate Sinclair</button></div>
+    <p class="error" id="sinclair-error" role="alert" hidden></p>
+  </form>
+  <div id="sinclair-result" aria-live="polite"></div>
+</section>
+
+<script>
+  import { sinclairScore, SINCLAIR_MIN_BODYWEIGHT } from '../lib/sinclair.js';
+  import { toKg, fromKg, validateWeight } from '../lib/onerepmax.js';
+  import { f1, num, esc, bindUnitToggle, convertInput, paintUnitLabels, showFieldError, clearFieldError } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-sinclair-calculator]');
+  if (root) {
+    const $ = <T extends HTMLElement = HTMLInputElement>(id: string) => document.getElementById(id) as T;
+    const form = $<HTMLFormElement>('sinclair-form'), sexEl = $<HTMLSelectElement>('sinclair-sex');
+    const bwEl = $('sinclair-bw'), totalEl = $('sinclair-total'), errorEl = $('sinclair-error'), out = $('sinclair-result');
+    const lifts = [...root.querySelectorAll<HTMLInputElement>('[data-lift]')];
+
+    const toggle = bindUnitToggle(root.querySelector('#sinclair-form [data-unit-toggle]')!, (next: string, prev: string) => {
+      [bwEl, totalEl, ...lifts].forEach((el) => convertInput(el, prev, next));
+      paintUnitLabels(root, next);
+      out.innerHTML = '';
+    });
+
+    // Same rule as the DOTS calculator: an auto-filled total follows the lifts
+    // and is cleared if a lift becomes invalid; a typed total is left alone.
+    let totalFromLifts = false;
+    totalEl.addEventListener('input', () => { totalFromLifts = false; });
+    lifts.forEach((el) => el.addEventListener('input', () => {
+      const values = lifts.map((l) => Number(l.value));
+      if (lifts.every((l) => l.value.trim() !== '') && values.every((v) => Number.isFinite(v) && v > 0)) {
+        totalEl.value = num(values.reduce((a, b) => a + b, 0));
+        totalFromLifts = true;
+        out.innerHTML = '';
+      } else if (totalFromLifts) {
+        totalEl.value = '';
+        totalFromLifts = false;
+        out.innerHTML = '';
+      }
+    }));
+
+    function fail(message: string, el: HTMLInputElement) {
+      showFieldError(errorEl, message, el);
+      out.innerHTML = '';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearFieldError(errorEl, [bwEl, totalEl]);
+      const u = toggle.get();
+      const sex = sexEl.value as 'male' | 'female';
+      const bw = validateWeight(bwEl.value, 'your bodyweight');
+      if (!bw.ok) return fail(bw.error, bwEl);
+      const bwKg = toKg(bw.value, u);
+      const minKg = SINCLAIR_MIN_BODYWEIGHT[sex];
+      if (bwKg < minKg) {
+        return fail(`The published Sinclair tables start at ${num(fromKg(minKg, u), 1)} ${u} bodyweight for ${sex === 'male' ? 'men' : 'women'}. Please check the number and the unit.`, bwEl);
+      }
+      const totalText = totalEl.value.trim();
+      const total = Number(totalText);
+      if (totalText === '' || !Number.isFinite(total) || total <= 0) {
+        return fail('Please enter your total as a number, or fill in both lifts.', totalEl);
+      }
+      if (total > 1500) return fail('That total is above any recorded result — please check the number and the unit.', totalEl);
+      errorEl.hidden = true;
+      const result = sinclairScore(toKg(total, u), bwKg, sex);
+      const scoreInUnit = fromKg(result.score, u);
+      out.innerHTML = `<div class="result-headline">
+          <div class="result-label">Sinclair total</div>
+          <div class="result-big">${f1(scoreInUnit)} ${u}</div>
+          <p class="result-sub">${esc(num(total))} ${u} total × coefficient ${result.coefficient.toFixed(6)} at ${esc(num(bw.value))} ${u} bodyweight (${sex === 'male' ? 'men' : 'women'}, 2025–2028 constants)</p>
+        </div>`;
+    });
+  }
+</script>

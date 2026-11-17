@@ -7,6 +7,8 @@ import FormulaTable from '../components/FormulaTable.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
+import WorkedExample from '../components/WorkedExample.astro';
+import { estimateAll, epley, repMaxTable, LB_PER_KG } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode, faqNode } from '../lib/schema';
 import { LINKS } from '../data/links';
 import { SITE, reviewedFor, formatDate } from '../config/site';
@@ -16,6 +18,16 @@ const description =
   'Free one rep max calculator using 6 published formulas. See every estimate, the range between them, training percentages, plate loading and warm-up sets.';
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const url = `${site}/`;
+
+// Static worked example, readable without JavaScript (search engines and AI
+// crawlers that don't run scripts see real answers).
+const example = { weight: 225, reps: 5 };
+const exampleEst = estimateAll(example.weight, example.reps);
+// Rep maxes use the Epley estimate, the same equation the table inverts, so the
+// row for the reps actually done returns the weight actually lifted.
+const exampleEpley = epley(example.weight, example.reps);
+const exampleRepMaxes = repMaxTable(exampleEpley);
+const f1 = (v: number) => v.toFixed(1);
 
 // FAQ — rendered verbatim below AND used for the FAQPage JSON-LD, so the
 // structured data always matches the visible text. Questions here are not
@@ -127,6 +139,28 @@ const jsonLd = [
     </p>
   </section>
 
+  <section id="example" aria-labelledby="example-heading">
+    <h2 id="example-heading">Example: 1RM from 225 lb for 5 reps</h2>
+    <p>
+      Here is what the calculator shows for a set of {example.weight} lb for {example.reps} clean reps. The
+      numbers below come from the same code the calculator runs.
+    </p>
+    <WorkedExample weight={example.weight} reps={example.reps} unit="lb" lift="any lift" />
+    <div class="table-wrap">
+      <table>
+        <caption>Estimated rep maxes from the Epley 1RM of {f1(exampleEpley)} lb</caption>
+        <thead><tr><th scope="col">Reps</th><th scope="col" class="num">Estimated max for those reps</th></tr></thead>
+        <tbody>
+          {exampleRepMaxes.map((r) => <tr><th scope="row">{r.reps}RM</th><td class="num">{f1(r.value)} lb</td></tr>)}
+        </tbody>
+      </table>
+    </div>
+    <p>
+      In kilograms, the same set is about {f1(example.weight / LB_PER_KG)} kg × {example.reps} reps, for an
+      Average Estimate of about {f1(exampleEst.average / LB_PER_KG)} kg.
+    </p>
+  </section>
+
   <section id="formulas" aria-labelledby="formulas-heading">
     <h2 id="formulas-heading">The six 1RM formulas, side by side</h2>
     <p>
@@ -166,7 +200,7 @@ const jsonLd = [
     </ul>
   </section>
 
-  <RelatedLinks heading="All calculators" items={[LINKS.bench, LINKS.squat, LINKS.deadlift, LINKS.ohp, LINKS.row, LINKS.frontSquat, LINKS.incline, LINKS.hipThrust, LINKS.percent, LINKS.plates, LINKS.warmup, LINKS.rpe, LINKS.dots, LINKS.strength]} />
+  <RelatedLinks heading="All calculators" items={[LINKS.bench, LINKS.squat, LINKS.deadlift, LINKS.ohp, LINKS.row, LINKS.frontSquat, LINKS.incline, LINKS.hipThrust, LINKS.percent, LINKS.plates, LINKS.warmup, LINKS.rpe, LINKS.dots, LINKS.sinclair, LINKS.strength]} />
 
   <section id="faq" aria-labelledby="faq-heading">
     <h2 id="faq-heading">Frequently asked questions</h2>

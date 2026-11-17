@@ -1,0 +1,140 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SinclairCalculator from '../components/SinclairCalculator.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import SourceList from '../components/SourceList.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { SINCLAIR_CONSTANTS, SINCLAIR_CYCLE, sinclairCoefficient, sinclairScore } from '../lib/sinclair.js';
+import { webAppNode, webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { formatDate, reviewedFor } from '../config/site';
+
+const title = 'Sinclair Calculator — Weightlifting Total by Bodyweight';
+const description =
+  'Sinclair calculator for Olympic weightlifting: turn your snatch + clean & jerk total into a Sinclair total with the 2025–2028 coefficients, in kg or lb.';
+const path = '/sinclair-calculator/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const url = `${site}${path}`;
+// Static tables computed with the tested functions the calculator uses.
+const bodyweights = [50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150];
+const coefRows = bodyweights.map((bw) => ({
+  bw,
+  male: sinclairCoefficient(bw, 'male'),
+  female: sinclairCoefficient(bw, 'female'),
+}));
+const exMen = { bw: 81, total: 305, ...sinclairScore(305, 81, 'male') };
+const exWomen = { bw: 63, total: 200, ...sinclairScore(200, 63, 'female') };
+const c6 = (v: number) => v.toFixed(6);
+const jsonLd = [
+  webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
+  webAppNode({ site, url, name: '1RMHub Sinclair Calculator', description,
+    features: ['Sinclair total for men and women', '2025–2028 coefficients', 'Total from snatch and clean & jerk', 'kg and lb'] }),
+];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Sinclair Calculator', href: path }]} jsonLd={jsonLd}>
+  <h1>Sinclair Calculator</h1>
+  <p class="lead">
+    Compare Olympic weightlifting totals across bodyweights. Enter your best snatch and clean &amp; jerk
+    and get your Sinclair total with the current {SINCLAIR_CYCLE} coefficients.
+  </p>
+  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
+
+  <SinclairCalculator />
+
+  <div class="prose">
+    <section aria-labelledby="what-sinclair-heading">
+      <h2 id="what-sinclair-heading">What is a Sinclair total?</h2>
+      <p class="answer">
+        A Sinclair total is your weightlifting total (best snatch + best clean &amp; jerk) multiplied by a
+        coefficient for your bodyweight. It estimates what you would total if you were a lifter in the
+        heaviest class with the same level of ability, so lifters of different sizes can be ranked on one
+        scale. For example, an {exMen.bw} kg man with a {exMen.total} kg total has a Sinclair total of
+        {' '}{exMen.score.toFixed(1)} kg.
+      </p>
+      <p>
+        The International Weightlifting Federation (IWF) uses Sinclair coefficients to compare results
+        across bodyweight categories. The coefficients are worked out statistically and set for one
+        Olympic cycle at a time, so the same total scores differently from one cycle to the next.
+      </p>
+    </section>
+
+    <section aria-labelledby="formula-sinclair-heading">
+      <h2 id="formula-sinclair-heading">The Sinclair formula</h2>
+      <p>
+        <code>coefficient = 10^(A × (log₁₀(bodyweight ÷ b))²)</code> when your bodyweight is below
+        <em>b</em>, and <code>1</code> when it is at or above <em>b</em>. Then
+        <code>Sinclair total = total × coefficient</code>. Bodyweight and total are in kilograms.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>Sinclair constants for {SINCLAIR_CYCLE}</caption>
+          <thead><tr><th scope="col">Constant</th><th scope="col" class="num">Men</th><th scope="col" class="num">Women</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">A</th><td class="num"><code>{SINCLAIR_CONSTANTS.male.A}</code></td><td class="num"><code>{SINCLAIR_CONSTANTS.female.A}</code></td></tr>
+            <tr><th scope="row">b (kg)</th><td class="num"><code>{SINCLAIR_CONSTANTS.male.b}</code></td><td class="num"><code>{SINCLAIR_CONSTANTS.female.b}</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        We checked these constants against the published {SINCLAIR_CYCLE} coefficient tables from the
+        Alberta Weightlifting Association: they reproduce every row, for men and women, to all six decimal
+        places. If you enter pounds, the calculator converts to kilograms first (1 kg = 2.20462 lb). The
+        coefficient has no unit, so the Sinclair total is shown in the unit you entered.
+      </p>
+    </section>
+
+    <section aria-labelledby="coef-heading">
+      <h2 id="coef-heading">Sinclair coefficients by bodyweight</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>Sinclair coefficient ({SINCLAIR_CYCLE}) at example bodyweights</caption>
+          <thead><tr><th scope="col" class="num">Bodyweight</th><th scope="col" class="num">Men</th><th scope="col" class="num">Women</th></tr></thead>
+          <tbody>
+            {coefRows.map((r) => (
+              <tr><th scope="row" class="num">{r.bw} kg</th><td class="num">{c6(r.male)}</td><td class="num">{c6(r.female)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Multiply your total by the coefficient for your bodyweight. A {exWomen.bw} kg woman with a
+        {' '}{exWomen.total} kg total: {exWomen.total} × {c6(exWomen.coefficient)} = {exWomen.score.toFixed(1)} kg.
+      </p>
+    </section>
+
+    <section aria-labelledby="use-sinclair-heading">
+      <h2 id="use-sinclair-heading">Using your Sinclair total</h2>
+      <ul>
+        <li><strong>Weightlifting only.</strong> Sinclair is built for the snatch and clean &amp; jerk. For a powerlifting total (squat, bench press and deadlift), use the <a href="/dots-calculator/">DOTS calculator</a>.</li>
+        <li><strong>Compare within one cycle.</strong> The constants change every Olympic cycle, so a Sinclair total from older coefficients is not directly comparable with one from the {SINCLAIR_CYCLE} constants.</li>
+        <li><strong>Use competition lifts.</strong> The formula is meant for real best lifts. Estimated maxes give an estimated score.</li>
+        <li><strong>Track yourself.</strong> Your own Sinclair total over time is a fair measure of progress, especially if your bodyweight changes.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="sinclair-faq-heading">
+      <h2 id="sinclair-faq-heading">Sinclair calculator: common questions</h2>
+      <h3>Why did my Sinclair total change in 2025?</h3>
+      <p>
+        New constants started with the {SINCLAIR_CYCLE} cycle. With the same total and bodyweight, your
+        coefficient, and so your Sinclair total, can be a little higher or lower than with the old ones.
+      </p>
+      <h3>Why is the coefficient 1 for very heavy lifters?</h3>
+      <p>
+        The formula treats the heaviest lifters as the reference. At or above <em>b</em>
+        ({SINCLAIR_CONSTANTS.male.b} kg for men, {SINCLAIR_CONSTANTS.female.b} kg for women), the
+        Sinclair total is simply your total.
+      </p>
+      <h3>Can I enter my lifts in pounds?</h3>
+      <p>
+        Yes. Pick lb and the calculator converts your bodyweight to kilograms for the coefficient. The
+        Sinclair total is shown in pounds.
+      </p>
+    </section>
+  </div>
+
+  <AdSlot />
+
+  <RelatedLinks items={[LINKS.dots, LINKS.home, LINKS.percent, LINKS.barbellWeight]} />
+  <SourceList ids={['awasinclairmen', 'awasinclairwomen', 'wikisinclair']} />
+</BaseLayout>

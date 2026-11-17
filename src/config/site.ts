@@ -34,7 +34,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/bench-press-calculator/': '2026-11-09',
   '/overhead-press-calculator/': '2026-11-09',
   '/barbell-row-calculator/': '2026-11-09',
-  '/rpe-calculator/': '2026-11-09',
+  '/rpe-calculator/': '2026-11-17',
   '/1rm-percentage-calculator/': '2026-11-09',
   '/warm-up-calculator/': '2026-11-09',
   '/plate-calculator/': '2026-11-09',
@@ -44,6 +44,8 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/strength-percentile-calculator/': '2026-11-09',
   '/deadlift-calculator/': '2026-11-12',
   '/squat-calculator/': '2026-11-12',
+  '/': '2026-11-17',
+  '/sinclair-calculator/': '2026-11-17',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
@@ -119,6 +121,7 @@ export const FOOTER_GROUPS = [
       { href: '/rpe-calculator/', label: 'RPE Calculator' },
       { href: '/dots-calculator/', label: 'DOTS Calculator' },
       { href: '/strength-percentile-calculator/', label: 'Strength Percentile Calculator' },
+      { href: '/sinclair-calculator/', label: 'Sinclair Calculator' },
     ],
   },
   {
@@ -130,6 +133,7 @@ export const FOOTER_GROUPS = [
       { href: '/guides/training-max/', label: 'What Is a Training Max?' },
       { href: '/guides/rpe-scale/', label: 'RPE Scale Explained' },
       { href: '/guides/increase-1rm/', label: 'How to Increase Your 1RM' },
+      { href: '/guides/barbell-weight/', label: 'How Much Does a Barbell Weigh?' },
       { href: '/methodology/', label: 'Methodology' },
       { href: '/guides/', label: 'All guides' },
     ],

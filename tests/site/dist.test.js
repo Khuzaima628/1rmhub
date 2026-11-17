@@ -55,6 +55,7 @@ describe('every indexable page has complete, unique metadata', () => {
       '/contact/', '/deadlift-calculator/', '/disclaimer/', '/guides/', '/guides/1rm-formulas/',
       '/front-squat-calculator/', '/hip-thrust-calculator/', '/incline-bench-press-calculator/', '/guides/how-to-test-1rm/', '/guides/increase-1rm/', '/guides/rpe-scale/', '/guides/training-max/', '/guides/what-is-1rm/', '/methodology/', '/overhead-press-calculator/', '/plate-calculator/',
       '/privacy/', '/rpe-calculator/', '/squat-calculator/', '/strength-percentile-calculator/', '/terms/', '/warm-up-calculator/', '/dots-calculator/',
+      '/sinclair-calculator/', '/guides/barbell-weight/',
     ].sort());
   });
 
