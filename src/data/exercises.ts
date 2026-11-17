@@ -30,7 +30,7 @@ export const EXERCISES: Exercise[] = [
     sources: ['shimano2006', 'reynolds'],
   },
   {
-    id: 'deadlift', label: 'Deadlift', page: '/deadlift-calculator/',
+    id: 'deadlift', label: 'Deadlift', page: '/deadlift-calculator/', standards: '/deadlift-standards/',
     note: 'In the one study that tested these formulas on the deadlift, every formula underestimated the lifters’ measured max (untrained college students). Your true deadlift max may be higher than shown.',
     sources: ['lesuer'],
   },
