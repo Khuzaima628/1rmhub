@@ -61,6 +61,17 @@ const jsonLd = [
       <li><strong>Units:</strong> 1 kg = {LB_PER_KG} lb. Switching units converts the numbers you typed so the set keeps its meaning.</li>
     </ul>
 
+    <h2>The exercise you choose</h2>
+    <p>
+      The same six formulas run for every exercise. We looked for published, validated versions of
+      these formulas for individual lifts and found none that could be applied to any weight and rep
+      count, so the exercise does not change the number. It labels your result and adds one short note
+      about what studies found for that lift, such as the finding that the formulas underestimated
+      the deadlift in the one study that tested it (LeSuer et al., 1997). For several lifts,
+      including the overhead press, barbell row and hip thrust, we found no study that tested these
+      formulas at all, and the note says so.
+    </p>
+
     <h2>Rounding rules</h2>
     <ul>
       <li><strong>Display:</strong> headline numbers to 0.1, individual formulas to 0.01. Calculations use full precision; only the display is rounded.</li>
@@ -108,5 +119,5 @@ const jsonLd = [
       made promptly and the review date above is updated.
     </p>
   </article>
-  <SourceList ids={['epley', 'brzycki', 'lombardi', 'mayhew', 'oconner', 'wathan', 'lesuer', 'reynolds']} />
+  <SourceList ids={['epley', 'brzycki', 'lombardi', 'mayhew', 'oconner', 'wathan', 'lesuer', 'reynolds', 'shimano2006', 'whisenant2003', 'mayhew2008', 'meneses2013']} />
 </BaseLayout>

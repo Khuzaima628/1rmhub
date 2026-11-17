@@ -143,6 +143,21 @@ export const SOURCES: Record<string, Source> = {
     text: 'International Weightlifting Federation. (2024). Technical and Competition Rules & Regulations, section 3.3.3 Barbell: bar, discs and collars. Copy hosted by the Polish Weightlifting Federation (PZPC).',
     url: 'https://pzpc.pl/download/file/7080',
   },
+  whisenant2003: {
+    id: 'whisenant2003',
+    text: 'Whisenant, M. J., Panton, L. B., East, W. B., & Broeder, C. E. (2003). Validation of submaximal prediction equations for the 1 repetition maximum bench press test on a group of collegiate football players. Journal of Strength and Conditioning Research, 17(2), 221–227.',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/12741856/',
+  },
+  mayhew2008: {
+    id: 'mayhew2008',
+    text: 'Mayhew, J. L., Johnson, B. D., LaMonte, M. J., Lauber, D., & Kemmler, W. (2008). Accuracy of prediction equations for determining one repetition maximum bench press in women before and after resistance training. Journal of Strength and Conditioning Research, 22(5), 1570–1577.',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/18714223/',
+  },
+  meneses2013: {
+    id: 'meneses2013',
+    text: 'Menêses, A. L., Santana, F. S., Soares, A. H. G., et al. (2013). Validade das equações preditivas de uma repetição máxima varia de acordo com o exercício realizado em adultos jovens treinados [The validity of 1RM prediction equations varies with the exercise in trained young adults]. Revista Brasileira de Atividade Física & Saúde, 18(1), 95–104.',
+    url: 'https://doi.org/10.12820/2317-1634.2013v18n1p95',
+  },
   ipfequip: {
     id: 'ipfequip',
     text: 'International Powerlifting Federation. (2026). IPF Technical Rulebook, effective 1 March 2026, section 2: Equipment and specifications (bar, discs and collars).',

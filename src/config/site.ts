@@ -46,6 +46,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/squat-calculator/': '2026-11-12',
   '/': '2026-11-17',
   '/sinclair-calculator/': '2026-11-17',
+  '/methodology/': '2026-11-17',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */

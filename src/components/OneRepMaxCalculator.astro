@@ -26,9 +26,10 @@ const unit = SITE.defaultUnit;
   <form id="calc-form" novalidate>
     <div class="field">
       <label for="exercise">Exercise</label>
-      <select id="exercise" name="exercise">
+      <select id="exercise" name="exercise" aria-describedby="exercise-hint">
         {EXERCISES.map((e) => <option value={e.id} selected={e.id === exercise}>{e.label}</option>)}
       </select>
+      <p class="hint" id="exercise-hint">Labels your result and adds notes for that lift. The formulas are the same for every lift.</p>
     </div>
 
     <div class="field-row">
@@ -98,6 +99,7 @@ const unit = SITE.defaultUnit;
   } from '../lib/onerepmax.js';
   import { f1, f2, num, esc, copyText, flash, bindUnitToggle, convertInput, scrollToEl, showFieldError, clearFieldError } from '../scripts/dom.js';
   import { percentTableHtml, repMaxTableHtml, wirePlateButtons } from '../scripts/tables.js';
+  import { EXERCISES } from '../data/exercises';
 
   const root = document.querySelector<HTMLElement>('[data-orm-calculator]');
   if (root) init(root);
@@ -123,6 +125,9 @@ const unit = SITE.defaultUnit;
     const unit = () => toggle.get();
     const other = () => (unit() === 'kg' ? 'lb' : 'kg');
     const exLabel = () => exerciseEl.options[exerciseEl.selectedIndex]?.text ?? '';
+    const exInfo = () => EXERCISES.find((x) => x.id === exerciseEl.value);
+    // A named lift (not "Other / Custom") is shown in the headline and status.
+    const namedLift = () => (exerciseEl.value === 'custom' ? '' : exLabel());
     const hasOption = (sel: HTMLSelectElement, value: string | null) =>
       value !== null && [...sel.options].some((o) => o.value === value);
 
@@ -162,7 +167,16 @@ const unit = SITE.defaultUnit;
       const { weight, reps, est } = last;
       const u = unit(), o = other();
       const head = headline(last);
-      statusEl.textContent = `Estimated one rep max: ${f1(fromKg(head.kg, u))} ${u} (${head.name}).`;
+      const lift = namedLift();
+      statusEl.textContent = `Estimated ${lift ? `${lift.toLowerCase()} ` : ''}one rep max: ${f1(fromKg(head.kg, u))} ${u} (${head.name}).`;
+      const info = exInfo();
+      const liftLink = info?.page && info.page !== location.pathname
+        ? ` · <a href="${esc(info.page)}">${esc(info.label)} calculator and tips</a>`
+        : '';
+      const liftNote = info
+        ? `<p class="result-sub lift-note"><strong>${esc(info.label)}:</strong> ${esc(info.note)}${liftLink}
+            · <a href="/methodology/#sources-heading">Sources</a></p>`
+        : '';
 
       let bwLine = '';
       if (bwEl.value.trim() !== '') {
@@ -196,12 +210,13 @@ const unit = SITE.defaultUnit;
         <div class="print-header"><strong>1RMHub result — ${esc(exLabel())}, ${esc(num(weight))} ${u} × ${reps}</strong></div>
         ${notices}
         <div class="result-headline">
-          <div class="result-label">Estimated 1RM — ${esc(head.name)}</div>
+          <div class="result-label">${lift ? `${esc(lift)} — estimated 1RM (${esc(head.name)})` : `Estimated 1RM — ${esc(head.name)}`}</div>
           <div class="result-big">${f1(fromKg(head.kg, u))} ${u}</div>
           <div class="result-both">${f1(fromKg(head.kg, o))} ${o}</div>
           <p class="result-sub"><strong>Average Estimate ≈ ${f1(fromKg(est.average, u))} ${u}</strong>
             · range ${f1(fromKg(est.min, u))}–${f1(fromKg(est.max, u))} ${u}${spreadLine}</p>
           <p class="result-sub">${esc(confidenceNote(reps))}</p>
+          ${liftNote}
           ${bwLine}
           <p class="disclaimer">An estimate from a submaximal set — not a tested max and not a guarantee of what you can lift today.</p>
         </div>
