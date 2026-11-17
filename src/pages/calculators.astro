@@ -1,0 +1,82 @@
+---
+// Calculators hub: every calculator on the site, grouped by job.
+// The list of pages comes from the footer's "Calculators" group (the single
+// list of live calculators), so a new calculator appears here automatically.
+// Groups below only decide WHERE a page is shown; a page not named in any
+// group still appears under "More calculators", so nothing is ever missing.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { webPageNode } from '../lib/schema';
+import { LINKS } from '../data/links';
+import { FOOTER_GROUPS } from '../config/site';
+
+const title = 'Lifting Calculators — 1RM, Plates, RPE, DOTS & More';
+const description =
+  'Every free 1RMHub lifting calculator in one place: one rep max by lift, percentages, plates, warm-ups, RPE, DOTS, Sinclair and strength standards.';
+const path = '/calculators/';
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+
+const live = (FOOTER_GROUPS.find((g) => g.title === 'Calculators')?.links ?? []).filter((l) => l.href !== path);
+const byHref = new Map(Object.values(LINKS).map((l) => [l.href, l]));
+const card = (link: { href: string; label: string }) => {
+  const known = byHref.get(link.href);
+  return { href: link.href, title: known?.title ?? link.label, text: known?.text ?? '' };
+};
+
+const GROUPS = [
+  {
+    heading: 'One rep max by lift',
+    intro: 'Estimate your max from a set you have lifted, with lift-specific advice.',
+    hrefs: ['/', '/bench-press-calculator/', '/squat-calculator/', '/deadlift-calculator/', '/overhead-press-calculator/',
+      '/barbell-row-calculator/', '/front-squat-calculator/', '/incline-bench-press-calculator/', '/hip-thrust-calculator/',
+      '/weighted-pull-up-calculator/', '/leg-press-calculator/'],
+  },
+  {
+    heading: 'Training tools',
+    intro: 'Turn a max into the weights you actually load.',
+    hrefs: ['/1rm-percentage-calculator/', '/plate-calculator/', '/warm-up-calculator/', '/rpe-calculator/',
+      '/531-calculator/', '/smolov-calculator/'],
+  },
+  {
+    heading: 'Strength scores and standards',
+    intro: 'Compare your lifts with other lifters and across bodyweights.',
+    hrefs: ['/strength-percentile-calculator/', '/dots-calculator/', '/sinclair-calculator/', '/bench-press-standards/',
+      '/squat-standards/', '/deadlift-standards/', '/powerlifting-weight-classes/'],
+  },
+];
+
+const placed = new Set(GROUPS.flatMap((g) => g.hrefs));
+const sections = GROUPS.map((g) => ({
+  ...g,
+  items: g.hrefs.map((h) => live.find((l) => l.href === h)).filter((l) => l !== undefined).map(card),
+}));
+const extra = live.filter((l) => !placed.has(l.href)).map(card);
+if (extra.length > 0) {
+  sections.push({ heading: 'More calculators', intro: '', hrefs: [], items: extra });
+}
+const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, type: 'CollectionPage' })];
+---
+<BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Calculators', href: path }]} jsonLd={jsonLd}>
+  <h1>Lifting Calculators</h1>
+  <p class="lead">
+    Every free calculator on 1RMHub, in one place. Each one runs in your browser, shows its formula
+    and lists its sources.
+  </p>
+
+  {sections.filter((s) => s.items.length > 0).map((s, i) => (
+    <section aria-labelledby={`calc-group-${i}`}>
+      <h2 id={`calc-group-${i}`}>{s.heading}</h2>
+      {s.intro && <p>{s.intro}</p>}
+      <ul class="link-grid">
+        {s.items.map((c) => <li><a href={c.href}>{c.title}</a>{c.text && <p>{c.text}</p>}</li>)}
+      </ul>
+    </section>
+  ))}
+
+  <section aria-labelledby="calc-guides">
+    <h2 id="calc-guides">Learn the numbers</h2>
+    <p>
+      Not sure which tool to use? Start with <a href="/guides/what-is-1rm/">what a one rep max is</a>, see
+      how the <a href="/guides/1rm-formulas/">1RM formulas</a> compare, or browse <a href="/guides/">all guides</a>.
+    </p>
+  </section>
+</BaseLayout>

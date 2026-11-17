@@ -96,6 +96,7 @@ export function isoDateTime(d: string | Date): string {
 /** Primary navigation and footer link groups — the single list of public pages. */
 export const NAV = [
   { href: '/', label: '1RM Calculator' },
+  { href: '/calculators/', label: 'Calculators' },
   { href: '/1rm-percentage-calculator/', label: 'Percentages' },
   { href: '/plate-calculator/', label: 'Plates' },
   { href: '/warm-up-calculator/', label: 'Warm-up' },
@@ -106,6 +107,7 @@ export const FOOTER_GROUPS = [
   {
     title: 'Calculators',
     links: [
+      { href: '/calculators/', label: 'All calculators' },
       { href: '/', label: 'One Rep Max Calculator' },
       { href: '/bench-press-calculator/', label: 'Bench Press Calculator' },
       { href: '/squat-calculator/', label: 'Squat Calculator' },

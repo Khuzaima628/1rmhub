@@ -47,6 +47,19 @@ beforeAll(() => {
 
 const indexable = () => pages.filter((p) => !p.is404);
 
+describe('calculators hub', () => {
+  it('lists every calculator from the footer in its main content', () => {
+    const hub = pages.find((p) => p.route === '/calculators/');
+    expect(hub).toBeDefined();
+    const main = hub.html.match(/<main[\s\S]*?<\/main>/)[0];
+    const footer = hub.html.match(/<footer[\s\S]*?<\/footer>/)[0];
+    const group = footer.split(/>Calculators</)[1].split(/<\/ul>/)[0];
+    const hrefs = [...group.matchAll(/href="([^"]+)"/g)].map((m) => m[1]).filter((h) => h !== '/calculators/');
+    expect(hrefs.length).toBeGreaterThan(10);
+    for (const h of hrefs) expect(main, h).toContain(`href="${h}"`);
+  });
+});
+
 describe('every indexable page has complete, unique metadata', () => {
   it('builds the expected set of pages', () => {
     const routes = indexable().map((p) => p.route).sort();
@@ -55,7 +68,7 @@ describe('every indexable page has complete, unique metadata', () => {
       '/contact/', '/deadlift-calculator/', '/disclaimer/', '/guides/', '/guides/1rm-formulas/',
       '/front-squat-calculator/', '/hip-thrust-calculator/', '/incline-bench-press-calculator/', '/guides/how-to-test-1rm/', '/guides/increase-1rm/', '/guides/rpe-scale/', '/guides/training-max/', '/guides/what-is-1rm/', '/methodology/', '/overhead-press-calculator/', '/plate-calculator/',
       '/privacy/', '/rpe-calculator/', '/squat-calculator/', '/strength-percentile-calculator/', '/terms/', '/warm-up-calculator/', '/dots-calculator/',
-      '/sinclair-calculator/', '/guides/barbell-weight/',
+      '/sinclair-calculator/', '/guides/barbell-weight/', '/calculators/',
     ].sort());
   });
 
