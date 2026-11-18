@@ -42,7 +42,8 @@ const unit = SITE.defaultUnit;
       <div class="field">
         <label for="reps">Reps completed <span class="hint">({MIN_REPS}–{MAX_REPS})</span></label>
         <input id="reps" name="reps" type="number" inputmode="numeric" min={MIN_REPS} max={MAX_REPS} step="1"
-          placeholder="e.g. 5" autocomplete="off" aria-describedby="form-error" />
+          placeholder="e.g. 5" autocomplete="off" aria-describedby="reps-hint form-error" />
+        <p class="hint" id="reps-hint">Stopped short of failure? Use the <a href="/rpe-calculator/">RPE calculator</a>.</p>
       </div>
     </div>
 
