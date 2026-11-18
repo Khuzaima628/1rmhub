@@ -29,7 +29,7 @@ const unit = SITE.defaultUnit;
       <select id="exercise" name="exercise" aria-describedby="exercise-hint">
         {EXERCISES.map((e) => <option value={e.id} selected={e.id === exercise}>{e.label}</option>)}
       </select>
-      <p class="hint" id="exercise-hint">Labels your result and adds notes for that lift. The formulas are the same for every lift.</p>
+      <p class="hint field-note" id="exercise-hint">Labels your result and adds notes for that lift. The formulas are the same for every lift.</p>
     </div>
 
     <div class="field-row">
@@ -43,7 +43,7 @@ const unit = SITE.defaultUnit;
         <label for="reps">Reps completed <span class="hint">({MIN_REPS}–{MAX_REPS})</span></label>
         <input id="reps" name="reps" type="number" inputmode="numeric" min={MIN_REPS} max={MAX_REPS} step="1"
           placeholder="e.g. 5" autocomplete="off" aria-describedby="reps-hint form-error" />
-        <p class="hint" id="reps-hint">Stopped short of failure? Use the <a href="/rpe-calculator/">RPE calculator</a>.</p>
+        <p class="hint field-note" id="reps-hint">Didn't reach failure? Use the <a href="/rpe-calculator/">RPE calculator</a> to account for reps in reserve.</p>
       </div>
     </div>
 

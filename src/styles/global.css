@@ -183,6 +183,7 @@ a:hover { text-decoration-thickness: 2px; }
 
 label, .field-label { display: block; font-weight: 600; margin-bottom: 0.35rem; }
 .hint { font-weight: 400; color: var(--text-muted); font-size: 0.85rem; }
+.field-note { margin: 0.35rem 0 0; }
 
 input[type="number"], input[type="text"], select {
   width: 100%; min-height: var(--tap);
