@@ -47,7 +47,7 @@ const faqs = [
   },
   {
     q: 'How many reps should I use for a 1RM estimate?',
-    a: 'Use a set of about 3 to 6 clean reps taken close to failure. Heavier sets need less extrapolation, and a 2006 study found 5-rep-max tests predicted 1RM more accurately than 10- or 20-rep tests. This calculator accepts 1 to 12 reps and shows no number above 12.',
+    a: 'Use a set of about 3 to 6 clean reps taken close to failure. Heavier sets need less extrapolation, and a 2006 study found 5-rep-max tests predicted 1RM more accurately than 10- or 20-rep tests. This calculator accepts 1 to 12 reps and shows no number above 12. If you stopped with reps left in the tank, enter the set in the RPE calculator instead, which adjusts for the reps you had left.',
   },
   {
     q: 'Is a calculated 1RM accurate?',
@@ -127,7 +127,7 @@ const jsonLd = [
   <section id="how-it-works" aria-labelledby="how-heading">
     <h2 id="how-heading">How the calculator works</h2>
     <ol class="tight">
-      <li><strong>Enter a set you actually lifted</strong> — the weight, how many clean reps you completed, and your unit.</li>
+      <li><strong>Enter a set you actually lifted</strong> — the weight, how many clean reps you completed, and your unit. Bodyweight is optional: add it and the result also shows your estimated max as a multiple of bodyweight (for example, 1.50× bodyweight).</li>
       <li><strong>Six published formulas run on it</strong> — Epley, Brzycki, Lombardi, Mayhew, O&rsquo;Conner and Wathan. Every equation is shown below; nothing is hidden.</li>
       <li><strong>You get the honest range</strong> — the Average Estimate (the plain mean of the six), the lowest and highest formula, how far apart they are, and a confidence note tied to your rep count.</li>
       <li><strong>Training tools use the result</strong> — a percentage table, 2RM–10RM estimates, a plate loader and a warm-up generator, all rounded <em>down</em> to weights you can actually load.</li>
