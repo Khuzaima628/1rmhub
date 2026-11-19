@@ -1,6 +1,10 @@
 ---
 import ExerciseLayout from '../layouts/ExerciseLayout.astro';
 import { LINKS } from '../data/links';
+import { estimateAll } from '../lib/onerepmax.js';
+const chartWeights = [75,95,115,135,155];
+const chartReps = [3, 5, 6];
+const chartRows = chartWeights.map((weight) => ({ weight, cells: chartReps.map((r) => estimateAll(weight, r).average) }));
 ---
 <ExerciseLayout
   title="Overhead Press One Rep Max Calculator — Estimate Your OHP 1RM"
@@ -27,6 +31,22 @@ import { LINKS } from '../data/links';
       studies we cite tested the bench press, squat, deadlift and leg press. The estimate is still a
       reasonable guide, but expect more individual variation than on the bench press.
     </p>
+    <h3>Overhead press 1RM chart</h3>
+    <p>
+      Find the weight you pressed and the reps you got. Each number is the Average Estimate of the
+      six formulas, rounded to the nearest pound. The calculator above also works in kg and shows the full range.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <caption>Estimated overhead press 1RM (Average Estimate, lb) by weight and reps</caption>
+        <thead><tr><th scope="col">Weight lifted</th>{chartReps.map((r) => <th scope="col" class="num">{r} reps</th>)}</tr></thead>
+        <tbody>
+          {chartRows.map((row) => (
+            <tr><th scope="row">{row.weight} lb</th>{row.cells.map((v) => <td class="num">{v.toFixed(0)} lb</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <section aria-labelledby="ohp-strict-heading">
