@@ -1,6 +1,10 @@
 ---
 import ExerciseLayout from '../layouts/ExerciseLayout.astro';
 import { LINKS } from '../data/links';
+import { estimateAll } from '../lib/onerepmax.js';
+const chartWeights = [95,115,135,155,185];
+const chartReps = [3, 5, 6];
+const chartRows = chartWeights.map((weight) => ({ weight, cells: chartReps.map((r) => estimateAll(weight, r).average) }));
 ---
 <ExerciseLayout
   title="Incline Bench Press 1RM Calculator — Estimate Your Incline Max"
@@ -27,6 +31,22 @@ import { LINKS } from '../data/links';
       (Mayhew et al., 1992; LeSuer et al., 1997). The incline press is a similar pressing movement,
       so the estimate is a reasonable guide, but treat it as less certain than a flat bench estimate.
     </p>
+    <h3>Incline bench 1RM chart</h3>
+    <p>
+      Find the weight you pressed on the incline and the reps you got. Each number is the Average Estimate of the
+      six formulas, rounded to the nearest pound. The calculator above also works in kg and shows the full range.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <caption>Estimated incline bench 1RM (Average Estimate, lb) by weight and reps</caption>
+        <thead><tr><th scope="col">Weight lifted</th>{chartReps.map((r) => <th scope="col" class="num">{r} reps</th>)}</tr></thead>
+        <tbody>
+          {chartRows.map((row) => (
+            <tr><th scope="row">{row.weight} lb</th>{row.cells.map((v) => <td class="num">{v.toFixed(0)} lb</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <section aria-labelledby="ib-angle-heading">
