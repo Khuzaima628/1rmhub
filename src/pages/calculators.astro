@@ -55,6 +55,22 @@ const extra = live.filter((l) => !placed.has(l.href)).map(card);
 if (extra.length > 0) {
   sections.push({ heading: 'More calculators', intro: '', hrefs: [], also: [], items: extra });
 }
+// "Which tool when": one row per common question. Only pages that are live.
+const WHICH = [
+  { q: 'I lifted a set for reps and want my max', href: '/', tool: '1RM Calculator' },
+  { q: 'I stopped with reps left in the tank', href: '/rpe-calculator/', tool: 'RPE Calculator' },
+  { q: 'My program says to lift 80% of my max', href: '/1rm-percentage-calculator/', tool: '1RM Percentage Calculator' },
+  { q: 'Which plates do I put on the bar?', href: '/plate-calculator/', tool: 'Plate Calculator' },
+  { q: 'How do I warm up to my top set?', href: '/warm-up-calculator/', tool: 'Warm-up Calculator' },
+  { q: 'I am starting 5/3/1', href: '/531-calculator/', tool: '5/3/1 Calculator' },
+  { q: 'What training max should I use?', href: '/guides/training-max/', tool: 'Training Max Calculator' },
+  { q: 'I do pull-ups or dips with added weight', href: '/weighted-pull-up-calculator/', tool: 'Weighted Pull-Up and Dip Calculator' },
+  { q: 'How strong am I compared with other lifters?', href: '/strength-percentile-calculator/', tool: 'Strength Percentile Calculator' },
+  { q: 'Is my bench press good for my weight?', href: '/bench-press-standards/', tool: 'Bench Press Standards' },
+  { q: 'Compare powerlifting totals across bodyweights', href: '/dots-calculator/', tool: 'DOTS, Wilks and IPF GL Calculator' },
+  { q: 'Compare weightlifting totals across bodyweights', href: '/sinclair-calculator/', tool: 'Sinclair Calculator' },
+  { q: 'Which powerlifting weight class am I in?', href: '/powerlifting-weight-classes/', tool: 'Powerlifting Weight Classes' },
+];
 const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, type: 'CollectionPage' })];
 ---
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Calculators', href: path }]} jsonLd={jsonLd}>
@@ -73,6 +89,19 @@ const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, descript
       </ul>
     </section>
   ))}
+
+  <section aria-labelledby="calc-which">
+    <h2 id="calc-which">Which tool when</h2>
+    <div class="table-wrap">
+      <table>
+        <caption>Find the right calculator for your question</caption>
+        <thead><tr><th scope="col">If you want to…</th><th scope="col">Use</th></tr></thead>
+        <tbody>
+          {WHICH.map((w) => <tr><td>{w.q}</td><td><a href={w.href}>{w.tool}</a></td></tr>)}
+        </tbody>
+      </table>
+    </div>
+  </section>
 
   <section aria-labelledby="calc-guides">
     <h2 id="calc-guides">Learn the numbers</h2>
