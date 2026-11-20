@@ -52,7 +52,6 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/weighted-pull-up-calculator/': '2026-11-20',
   '/531-calculator/': '2026-11-20',
   '/bench-press-standards/': '2026-11-20',
-  '/bench-press-standards/': '2026-11-21',
   '/squat-standards/': '2026-11-23',
 };
 
