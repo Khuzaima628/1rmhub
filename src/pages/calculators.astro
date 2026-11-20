@@ -35,6 +35,8 @@ const GROUPS = [
     intro: 'Turn a max into the weights you actually load.',
     hrefs: ['/1rm-percentage-calculator/', '/plate-calculator/', '/warm-up-calculator/', '/rpe-calculator/',
       '/531-calculator/', '/smolov-calculator/'],
+    // Tools that live inside a guide (not in the footer's calculator list).
+    also: [{ href: '/guides/training-max/', title: 'Training Max Calculator', text: 'Get your training max (85% or 90% of your 1RM) for 5/3/1 and similar programs.' }],
   },
   {
     heading: 'Strength scores and standards',
@@ -47,11 +49,11 @@ const GROUPS = [
 const placed = new Set(GROUPS.flatMap((g) => g.hrefs));
 const sections = GROUPS.map((g) => ({
   ...g,
-  items: g.hrefs.map((h) => live.find((l) => l.href === h)).filter((l) => l !== undefined).map(card),
+  items: [...g.hrefs.map((h) => live.find((l) => l.href === h)).filter((l) => l !== undefined).map(card), ...(g.also ?? [])],
 }));
 const extra = live.filter((l) => !placed.has(l.href)).map(card);
 if (extra.length > 0) {
-  sections.push({ heading: 'More calculators', intro: '', hrefs: [], items: extra });
+  sections.push({ heading: 'More calculators', intro: '', hrefs: [], also: [], items: extra });
 }
 const jsonLd = [webPageNode({ site, url: `${site}${path}`, name: title, description, type: 'CollectionPage' })];
 ---
