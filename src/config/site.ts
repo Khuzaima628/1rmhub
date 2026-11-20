@@ -36,7 +36,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/barbell-row-calculator/': '2026-11-19',
   '/rpe-calculator/': '2026-11-17',
   '/1rm-percentage-calculator/': '2026-11-09',
-  '/warm-up-calculator/': '2026-11-09',
+  '/warm-up-calculator/': '2026-11-20',
   '/plate-calculator/': '2026-11-09',
   '/front-squat-calculator/': '2026-11-19',
   '/incline-bench-press-calculator/': '2026-11-19',
@@ -48,7 +48,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/sinclair-calculator/': '2026-11-17',
   '/methodology/': '2026-11-17',
   '/powerlifting-weight-classes/': '2026-11-18',
-  '/weighted-pull-up-calculator/': '2026-11-22',
+  '/weighted-pull-up-calculator/': '2026-11-20',
 };
 
 /** Last-reviewed date (YYYY-MM-DD) for a page path such as '/dots-calculator/'. */
