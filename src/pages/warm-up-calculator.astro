@@ -7,11 +7,17 @@ import AdSlot from '../components/AdSlot.astro';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
 import { SITE, formatDate, reviewedFor } from '../config/site';
+import { warmupSets, loadableDown, loadStep } from '../lib/onerepmax.js';
 
 const title = 'Warm-up Calculator — Warm-up Sets for Lifting';
 const description =
   'Build warm-up sets for any top set: choose your jumps and reps, and get loadable weights with plates per side. A starting suggestion you can adjust by feel.';
 const path = '/warm-up-calculator/';
+// Worked example: the page's default ramp for 225 lb × 5, rounded down to loadable weights.
+// Rest times follow the NSCA 1RM-testing protocol (about 1, then 2, then 2–4 minutes).
+const exampleRest = ['1 min', '1 min', '2 min', '2–4 min', '—'];
+const exampleSets = warmupSets({ topWeight: 225, topReps: 5, startWeight: 45, percents: [50, 70, 85], repsPerSet: [8, 5, 3, 1] })
+  .map((set, i) => ({ ...set, weight: loadableDown(set.weight, loadStep('lb')), rest: exampleRest[i] }));
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const url = `${site}${path}`;
 const jsonLd = [
@@ -45,8 +51,29 @@ const jsonLd = [
       <p>
         That default is a sensible starting point, not a rule. Heavier lifters often need more jumps
         between the bar and their working weight; lighter lifters may need fewer. Rest briefly
-        between light warm-ups and a little longer before the last one.
+        between light warm-ups and a little longer before the last one (see the example below).
       </p>
+    </section>
+
+    <section aria-labelledby="example-wu-heading">
+      <h2 id="example-wu-heading">Example: warm-up for 225 lb × 5</h2>
+      <p>
+        This is the generator&rsquo;s default ramp for a top set of 225 lb for 5 reps, starting with
+        the 45 lb bar and rounded down to weights you can load. Rest times follow the NSCA 1RM-testing
+        protocol: about 1 minute after light sets, about 2 minutes as the weight gets heavier and 2–4
+        minutes before the set that counts. On a normal training day you can rest less after the light sets.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>Warm-up sets for 225 lb × 5 (default jumps of 50%, 70% and 85%)</caption>
+          <thead><tr><th scope="col">Set</th><th scope="col" class="num">Weight</th><th scope="col" class="num">Reps</th><th scope="col" class="num">Rest after</th></tr></thead>
+          <tbody>
+            {exampleSets.map((set) => (
+              <tr><th scope="row">{set.label}</th><td class="num">{set.weight} lb</td><td class="num">{set.reps}</td><td class="num">{set.rest}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section aria-labelledby="adjust-heading">
