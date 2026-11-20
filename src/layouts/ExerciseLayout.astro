@@ -9,7 +9,7 @@ import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { webAppNode, webPageNode } from '../lib/schema';
-import { SITE, formatDate, reviewedFor } from '../config/site';
+import { SITE, formatDate, reviewedFor, EDITOR } from '../config/site';
 
 interface Item { href: string; title: string; text: string }
 interface Props {
@@ -40,7 +40,7 @@ const jsonLd = [
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name, href: path }]} jsonLd={jsonLd}>
   <h1>{h1}</h1>
   <p class="lead">{lead}</p>
-  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · <a href="/methodology/">How we calculate</a></p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · <a href="/methodology/">How we calculate</a></p>
 
   <OneRepMaxCalculator exercise={exercise} heading={`${lift} 1RM calculator`} />
 

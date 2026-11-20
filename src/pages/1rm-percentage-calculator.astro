@@ -7,7 +7,7 @@ import AdSlot from '../components/AdSlot.astro';
 import { repsAtPercent } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, formatDate, reviewedFor } from '../config/site';
+import { SITE, formatDate, reviewedFor, EDITOR } from '../config/site';
 
 const title = '1RM Percentage Calculator — Training Weights from Your Max';
 const description =
@@ -28,7 +28,7 @@ const jsonLd = [
     Enter a one rep max — tested or estimated — to get working weights for every common
     percentage, or type any percentage you need. Every weight is also rounded down to one you can load.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Don&rsquo;t know your max? <a href="/">Estimate it first</a>.</p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Don&rsquo;t know your max? <a href="/">Estimate it first</a>.</p>
 
   <PercentageCalculator />
 

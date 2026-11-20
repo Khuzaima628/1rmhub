@@ -238,6 +238,14 @@ describe('structured data', () => {
     }
   });
 
+  it('every page with a "Last reviewed" date names its real editor in a visible byline', () => {
+    const reviewed = indexable().filter((p) => /class="page-meta"[^>]*>[\s\S]{0,200}?Last reviewed/.test(p.html));
+    expect(reviewed.length).toBeGreaterThan(10);
+    for (const p of reviewed) {
+      expect(p.html, p.route).toMatch(/<p class="page-meta">By <a href="\/about\/#editor" rel="author">Muhammad Khuzaima<\/a> · /);
+    }
+  });
+
   it('Article dates are full date-times with a timezone, matching the visible date', () => {
     const withTz = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/;
     for (const { p, data } of graphs()) {

@@ -7,7 +7,7 @@ import AdSlot from '../components/AdSlot.astro';
 import { SINCLAIR_CONSTANTS, SINCLAIR_CYCLE, sinclairCoefficient, sinclairScore } from '../lib/sinclair.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { formatDate, reviewedFor } from '../config/site';
+import { formatDate, reviewedFor, EDITOR } from '../config/site';
 
 const title = 'Sinclair Calculator — Weightlifting Total by Bodyweight';
 const description =
@@ -37,7 +37,7 @@ const jsonLd = [
     Compare Olympic weightlifting totals across bodyweights. Enter your best snatch and clean &amp; jerk
     and get your Sinclair total with the current {SINCLAIR_CYCLE} coefficients.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
 
   <SinclairCalculator />
 

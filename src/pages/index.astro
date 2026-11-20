@@ -11,7 +11,7 @@ import WorkedExample from '../components/WorkedExample.astro';
 import { estimateAll, epley, repMaxTable, LB_PER_KG } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode, faqNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, reviewedFor, formatDate } from '../config/site';
+import { SITE, reviewedFor, formatDate, EDITOR } from '../config/site';
 
 const title = 'One Rep Max Calculator — Free 1RM Calculator | 1RMHub';
 const description =
@@ -105,7 +105,7 @@ const jsonLd = [
     formulas, the honest range between them, training percentages, plate loading
     and warm-up sets — free, instant, no signup.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={reviewedFor('/')}>{formatDate(reviewedFor('/'))}</time></p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor('/')}>{formatDate(reviewedFor('/'))}</time></p>
 
   <OneRepMaxCalculator />
 

@@ -6,7 +6,7 @@ import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, formatDate, reviewedFor } from '../config/site';
+import { SITE, formatDate, reviewedFor, EDITOR } from '../config/site';
 import { warmupSets, loadableDown, loadStep } from '../lib/onerepmax.js';
 
 const title = 'Warm-up Calculator — Warm-up Sets for Lifting';
@@ -32,7 +32,7 @@ const jsonLd = [
     Enter your top set for the day and get a warm-up ramp that builds up to it, with each weight
     rounded down to what your plates can make.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
 
   <section class="card calculator" aria-labelledby="wu-heading">
     <h2 id="wu-heading">Warm-up set generator</h2>

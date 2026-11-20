@@ -8,7 +8,7 @@ import { DOTS_COEFFICIENTS, DOTS_BODYWEIGHT_RANGE, dotsScore } from '../lib/dots
 import { WILKS_COEFFICIENTS, WILKS_BODYWEIGHT_RANGE, IPF_GL_PARAMETERS, wilksScore, ipfGlScore } from '../lib/points.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
-import { SITE, formatDate, reviewedFor } from '../config/site';
+import { SITE, formatDate, reviewedFor, EDITOR } from '../config/site';
 
 const title = 'DOTS, Wilks and IPF GL Calculator — Powerlifting Scores';
 const description =
@@ -42,7 +42,7 @@ const jsonLd = [
     Score your powerlifting total against your bodyweight with the DOTS, Wilks and IPF GL formulas,
     so lifters of different sizes can be compared on one scale.
   </p>
-  <p class="page-meta">Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
+  <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time></p>
 
   <DotsCalculator />
 
