@@ -6,6 +6,7 @@ import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import data from '../data/opl-percentiles.json';
 import { CLASSES } from '../lib/strength-percentile.js';
+import { fromKg } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
 import { formatDate, reviewedFor, EDITOR } from '../config/site';
@@ -29,6 +30,13 @@ const medianRows = (sex: 'M' | 'F') =>
 const tables = [
   { sex: 'M' as const, caption: 'Men: median raw competition lifts by IPF weight class (kg)', rows: medianRows('M') },
   { sex: 'F' as const, caption: 'Women: median raw competition lifts by IPF weight class (kg)', rows: medianRows('F') },
+];
+const lb = (v: number) => Math.round(fromKg(v, 'lb')).toLocaleString('en-US');
+const PCTS = [25, 50, 75, 90];
+const totalRows = (sex: 'M' | 'F') => CLASSES[sex].map((c) => ({ label: c.label, q: groups[sex][c.id].total }));
+const totals = [
+  { who: 'Men', rows: totalRows('M') },
+  { who: 'Women', rows: totalRows('F') },
 ];
 const m83 = groups.M['83'];
 const kg = (v: number) => `${v} kg`;
@@ -101,6 +109,64 @@ const jsonLd = [
             </tbody>
           </table>
         </div>
+      ))}
+      {tables.map((t) => (
+        <div class="table-wrap">
+          <table>
+            <caption>{t.caption.replace('(kg)', 'in pounds (rounded to 1 lb)')}</caption>
+            <thead>
+              <tr><th scope="col">Class</th><th scope="col" class="num">Squat</th><th scope="col" class="num">Bench</th><th scope="col" class="num">Deadlift</th><th scope="col" class="num">Total</th></tr>
+            </thead>
+            <tbody>
+              {t.rows.map((r) => (
+                <tr><th scope="row">{r.label}</th><td class="num">{lb(r.squat)}</td><td class="num">{lb(r.bench)}</td><td class="num">{lb(r.deadlift)}</td><td class="num">{lb(r.total)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+      <p>
+        For the 10th to 90th percentiles of a single lift, see the <a href="/squat-standards/">squat standards</a>
+        {' '}and the <a href="/bench-press-standards/">bench press standards</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="total-pct-heading">
+      <h2 id="total-pct-heading">Powerlifting total percentiles by weight class</h2>
+      <p>
+        The total is the sum of a lifter&rsquo;s best squat, bench press and deadlift at one meet. The
+        25th percentile is a total that 75% of competitors in the class beat, and the 90th percentile is
+        a total that only 10% beat.
+      </p>
+      {totals.map((t) => (
+        <Fragment>
+          <div class="table-wrap">
+            <table>
+              <caption>{t.who}: raw competition total percentiles by IPF weight class (kg)</caption>
+              <thead>
+                <tr><th scope="col">Class</th>{PCTS.map((p) => <th scope="col" class="num">{p}th</th>)}</tr>
+              </thead>
+              <tbody>
+                {t.rows.map((r) => (
+                  <tr><th scope="row">{r.label}</th>{PCTS.map((p) => <td class="num">{r.q[p - 1]}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <caption>{t.who}: the same total percentiles in pounds (rounded to 1 lb)</caption>
+              <thead>
+                <tr><th scope="col">Class</th>{PCTS.map((p) => <th scope="col" class="num">{p}th</th>)}</tr>
+              </thead>
+              <tbody>
+                {t.rows.map((r) => (
+                  <tr><th scope="row">{r.label}</th>{PCTS.map((p) => <td class="num">{lb(r.q[p - 1])}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Fragment>
       ))}
     </section>
 
