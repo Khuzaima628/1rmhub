@@ -3,7 +3,7 @@ import ExerciseLayout from '../layouts/ExerciseLayout.astro';
 import { LINKS } from '../data/links';
 import { estimateAll } from '../lib/onerepmax.js';
 const chartWeights = [135,185,225,275,315];
-const chartReps = [3, 5, 6];
+const chartReps = [3, 5, 8, 10];
 const chartRows = chartWeights.map((weight) => ({ weight, cells: chartReps.map((r) => estimateAll(weight, r).average) }));
 ---
 <ExerciseLayout
@@ -46,7 +46,7 @@ const chartRows = chartWeights.map((weight) => ({ weight, cells: chartReps.map((
     <h3>Squat 1RM chart</h3>
     <p>
       Find the weight you squatted and the reps you got. Each number is the Average Estimate of the
-      six formulas, rounded to the nearest pound. The calculator above also works in kg and shows the full range.
+      six formulas, rounded to the nearest pound. Estimates from 8 and 10 reps are less precise than from 3 to 5, because the formulas spread further apart as reps rise. The calculator above also works in kg and shows the full range.
     </p>
     <div class="table-wrap">
       <table>
