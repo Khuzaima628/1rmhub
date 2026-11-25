@@ -334,6 +334,28 @@ export function repsAtPercent(pct) {
   };
 }
 
+/**
+ * "How many reps do I need?" — the fewest whole reps (1–12) at `weight` whose
+ * estimate reaches `target`, for the Average Estimate and for each formula.
+ * Same unit in, same unit out. `reps` is null when even 12 reps fall short
+ * (the formulas stop being useful there); formula entries likewise.
+ * Returns { pct, reps, range: [fewest, most] | null, perFormula }.
+ */
+export function repsForTarget(weight, target) {
+  if (!(weight > 0) || !(target > 0)) throw new RangeError('repsForTarget needs positive weights');
+  const reach = (value) => value >= target - 1e-9;
+  let reps = null;
+  const perFormula = FORMULAS.map((f) => ({ id: f.id, name: f.name, reps: null }));
+  for (let r = 1; r <= MAX_REPS; r += 1) {
+    const e = estimateAll(weight, r);
+    if (reps === null && reach(e.average)) reps = r;
+    e.rows.forEach((row, i) => { if (perFormula[i].reps === null && reach(row.value)) perFormula[i].reps = r; });
+  }
+  const found = perFormula.map((f) => f.reps).filter((r) => r !== null);
+  const range = found.length === perFormula.length ? [Math.min(...found), Math.max(...found)] : null;
+  return { pct: (weight / target) * 100, reps, range, perFormula };
+}
+
 /* ------------------------------------------------------------------ */
 /* Plate loading.                                                       */
 /* ------------------------------------------------------------------ */

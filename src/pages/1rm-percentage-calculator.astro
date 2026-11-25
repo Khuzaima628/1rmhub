@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PercentageCalculator from '../components/PercentageCalculator.astro';
+import RepsSolver from '../components/RepsSolver.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
@@ -19,7 +20,7 @@ const repRows = [95, 90, 85, 80, 75, 70, 65, 60].map(repsAtPercent);
 const jsonLd = [
   webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: '1RMHub Percentage Calculator', description,
-    features: ['Any percentage of a 1RM', 'Percentage table from 100% to 50%', 'Round-down loadable weights', 'Plate loader'] }),
+    features: ['Any percentage of a 1RM', 'Percentage table from 100% to 50%', 'Round-down loadable weights', 'Plate loader', 'Reps solver: reps needed at a weight to reach a target 1RM'] }),
 ];
 ---
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name: '1RM Percentage Calculator', href: path }]} jsonLd={jsonLd}>
@@ -31,6 +32,8 @@ const jsonLd = [
   <p class="page-meta">By <a href={EDITOR.href} rel="author">{EDITOR.name}</a> · Last reviewed <time datetime={reviewedFor(path)}>{formatDate(reviewedFor(path))}</time> · Don&rsquo;t know your max? <a href="/">Estimate it first</a>.</p>
 
   <PercentageCalculator />
+
+  <RepsSolver />
 
   <div class="prose">
     <section aria-labelledby="how-pct-heading">
@@ -94,6 +97,11 @@ const jsonLd = [
 
     <section aria-labelledby="pct-faq-heading">
       <h2 id="pct-faq-heading">1RM percentages: common questions</h2>
+      <h3>What rep max is 75% of my 1RM?</h3>
+      <p>
+        About a 10-rep max. Both the Epley and Brzycki formulas put 75% of your 1RM at 10 reps to
+        failure, as the table above shows. To work it out for any weight, use the reps solver above.
+      </p>
       <h3>What percentage of my 1RM can I lift for 5 reps?</h3>
       <p>
         For 5 reps to failure, the Epley formula implies about 85.7% of your 1RM and the Brzycki

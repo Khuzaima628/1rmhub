@@ -19,6 +19,7 @@ import {
   percentageTable,
   repMaxTable,
   solvePlates,
+  repsForTarget,
   LB_EXTRA_PLATES,
   warmupSets,
   toKg,
@@ -535,5 +536,40 @@ describe('plate solver — limited plates (home gym)', () => {
   it('55 lb plates are offered as an extra size and work in the solver', () => {
     expect(LB_EXTRA_PLATES).toContain(55);
     expect(solvePlates(155, 45, [55, ...LB_PLATES]).perSide).toEqual([55]);
+  });
+});
+
+describe('reps solver — how many reps for a target max', () => {
+  it('185 lb toward a 225 lb max: Epley needs 7 reps, Brzycki 8 (worked by hand)', () => {
+    const r = repsForTarget(185, 225);
+    expect(r.perFormula.find((f) => f.id === 'epley').reps).toBe(7); // 185 × (1 + 7/30) = 228.2; 6 reps = 222
+    expect(r.perFormula.find((f) => f.id === 'brzycki').reps).toBe(8); // 185 × 36/29 = 229.7; 7 reps = 222
+    expect(r.pct).toBeCloseTo(82.2, 1);
+    expect(r.range[0]).toBeLessThanOrEqual(r.reps);
+    expect(r.range[1]).toBeGreaterThanOrEqual(r.reps);
+  });
+
+  it('the answer is the fewest reps whose Average Estimate reaches the target', () => {
+    for (const [w, t] of [[100, 115], [185, 225], [60, 75], [140, 150]]) {
+      const { reps } = repsForTarget(w, t);
+      expect(estimateAll(w, reps).average).toBeGreaterThanOrEqual(t - 1e-9);
+      if (reps > 1) expect(estimateAll(w, reps - 1).average).toBeLessThan(t);
+    }
+  });
+
+  it('weight at or above the target needs 1 rep', () => {
+    expect(repsForTarget(230, 225).reps).toBe(1);
+    expect(repsForTarget(225, 225).reps).toBe(1);
+  });
+
+  it('too light for the target: null, never a number above 12', () => {
+    const r = repsForTarget(100, 200);
+    expect(r.reps).toBeNull();
+    expect(r.range).toBeNull();
+  });
+
+  it('rejects zero or negative weights', () => {
+    expect(() => repsForTarget(0, 100)).toThrow(RangeError);
+    expect(() => repsForTarget(100, -1)).toThrow(RangeError);
   });
 });

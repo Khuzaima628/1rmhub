@@ -1,0 +1,69 @@
+---
+// "How many reps do I need?" — the reverse of the 1RM calculator: given the
+// weight on the bar and a target max, the fewest reps whose estimate reaches
+// it. Unit-free (both numbers in the same unit). Math: repsForTarget (tested).
+---
+<section class="card calculator" aria-labelledby="reps-solver-heading" data-reps-solver>
+  <h2 id="reps-solver-heading">How many reps do I need? (reps solver)</h2>
+  <noscript><p class="notice">This calculator runs in your browser and needs JavaScript enabled. The reps table below works without it.</p></noscript>
+  <p class="hint">Enter both weights in the same unit (kg or lb).</p>
+  <form id="rs-form" novalidate>
+    <div class="field-row two">
+      <div class="field">
+        <label for="rs-weight">Weight on the bar</label>
+        <input id="rs-weight" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 185" autocomplete="off" aria-describedby="rs-error" />
+      </div>
+      <div class="field">
+        <label for="rs-target">Target 1RM</label>
+        <input id="rs-target" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 225" autocomplete="off" aria-describedby="rs-error" />
+      </div>
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">Find reps</button></div>
+    <p class="error" id="rs-error" role="alert" hidden></p>
+  </form>
+  <div id="rs-result" aria-live="polite"></div>
+</section>
+
+<script>
+  import { validateWeight, repsForTarget, MAX_REPS } from '../lib/onerepmax.js';
+  import { esc, num, showFieldError, clearFieldError } from '../scripts/dom.js';
+
+  const root = document.querySelector<HTMLElement>('[data-reps-solver]');
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('#rs-form')!;
+    const weightEl = root.querySelector<HTMLInputElement>('#rs-weight')!;
+    const targetEl = root.querySelector<HTMLInputElement>('#rs-target')!;
+    const errorEl = root.querySelector<HTMLElement>('#rs-error')!;
+    const out = root.querySelector<HTMLElement>('#rs-result')!;
+    const plural = (n: number) => `${n} rep${n === 1 ? '' : 's'}`;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearFieldError(errorEl, [weightEl, targetEl]);
+      out.innerHTML = '';
+      const w = validateWeight(weightEl.value, 'the weight on the bar');
+      if (!w.ok) return showFieldError(errorEl, w.error, weightEl);
+      const t = validateWeight(targetEl.value, 'your target 1RM');
+      if (!t.ok) return showFieldError(errorEl, t.error, targetEl);
+
+      const r = repsForTarget(w.value, t.value);
+      const pct = `${num(Math.round(r.pct * 10) / 10)}%`;
+      let html: string;
+      if (r.reps === 1) {
+        html = `<p><strong>1 rep.</strong> ${esc(num(w.value))} is already at or above your ${esc(num(t.value))} target.</p>`;
+      } else if (r.reps === null) {
+        html = `<p><strong>More than ${MAX_REPS} reps.</strong> ${esc(num(w.value))} is only ${esc(pct)} of ${esc(num(t.value))}.
+          Above ${MAX_REPS} reps the formulas disagree too much to be useful, so pick a heavier weight.</p>`;
+      } else {
+        const range = r.range && r.range[0] !== r.range[1]
+          ? ` The six formulas range from ${r.range[0]} to ${r.range[1]} reps.` : '';
+        const warn = r.reps > 10 ? ' Above 10 reps estimates are less reliable.' : '';
+        html = `<p class="plate-load"><strong>${esc(plural(r.reps))} at ${esc(num(w.value))}</strong>
+          (${esc(pct)} of ${esc(num(t.value))}) to failure, by the Average Estimate.${range}${warn}</p>
+          <ul>${r.perFormula.map((f) => `<li>${esc(f.name)}: ${f.reps === null ? `more than ${MAX_REPS}` : esc(plural(f.reps))}</li>`).join('')}</ul>`;
+      }
+      out.innerHTML = `<div class="result-box">${html}
+        <p class="disclaimer">Clean reps to failure, the same rule as the 1RM calculator. Real lifters vary, so treat it as a guide.</p></div>`;
+    });
+  }
+</script>
