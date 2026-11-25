@@ -349,3 +349,7 @@ ul.tight li, ol.tight li { margin-bottom: 0.4rem; }
   body.print-one .print-target .print-source { display: block; font-size: 10pt; }
   body.print-one .print-target .table-wrap { overflow: visible; }
 }
+@media print {
+  body.print-one { background: #fff !important; }
+  body.print-one .print-target, body.print-one .print-target * { color: #000 !important; background: transparent !important; border-color: #999 !important; }
+}
