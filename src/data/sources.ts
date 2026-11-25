@@ -173,6 +173,11 @@ export const SOURCES: Record<string, Source> = {
     text: 'Menêses, A. L., Santana, F. S., Soares, A. H. G., et al. (2013). Validade das equações preditivas de uma repetição máxima varia de acordo com o exercício realizado em adultos jovens treinados [The validity of 1RM prediction equations varies with the exercise in trained young adults]. Revista Brasileira de Atividade Física & Saúde, 18(1), 95–104.',
     url: 'https://doi.org/10.12820/2317-1634.2013v18n1p95',
   },
+  rogueplates: {
+    id: 'rogueplates',
+    text: 'Rogue Fitness. Color Echo Bumper Plates: pound plates sold in pairs from 10 lb to 55 lb (manufacturer product page).',
+    url: 'https://www.roguefitness.com/rogue-color-echo-bumper-plate',
+  },
   ipfequip: {
     id: 'ipfequip',
     text: 'International Powerlifting Federation. (2026). IPF Technical Rulebook, effective 1 March 2026, section 2: Equipment and specifications (bar, discs and collars).',

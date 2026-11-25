@@ -2,14 +2,14 @@
 // Reverse plate calculator: "what's on the bar?" — bar + plates on one side
 // → total. Has its own kg/lb toggle; each unit has its own plate sizes and bar
 // presets. Math: src/lib/bartotal.js (tested).
-import { KG_PLATES, LB_PLATES, BAR_PRESETS } from '../lib/onerepmax.js';
+import { KG_PLATES, LB_PLATES, LB_EXTRA_PLATES, BAR_PRESETS } from '../lib/onerepmax.js';
 import UnitToggle from './UnitToggle.astro';
 
 interface Props { unit: 'kg' | 'lb' }
 const { unit } = Astro.props;
 const sets = [
   { unit: 'kg', plates: KG_PLATES, bars: BAR_PRESETS.filter((b) => b.unit === 'kg') },
-  { unit: 'lb', plates: LB_PLATES, bars: BAR_PRESETS.filter((b) => b.unit === 'lb') },
+  { unit: 'lb', plates: [...LB_EXTRA_PLATES, ...LB_PLATES], bars: BAR_PRESETS.filter((b) => b.unit === 'lb') },
 ];
 ---
 <section class="card calculator" aria-labelledby="rev-heading" data-bar-total>

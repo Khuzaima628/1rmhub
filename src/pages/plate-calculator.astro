@@ -4,6 +4,7 @@ import PlateLoader from '../components/PlateLoader.astro';
 import BarTotal from '../components/BarTotal.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import AdSlot from '../components/AdSlot.astro';
+import SourceList from '../components/SourceList.astro';
 import { solvePlates, KG_PLATES, LB_PLATES } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
@@ -21,7 +22,7 @@ const kgRows = [40, 60, 80, 100, 120, 140, 160, 180].map((t) => ({ t, ...solvePl
 const jsonLd = [
   webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: '1RMHub Plate Calculator', description,
-    features: ['Per-side plate breakdown', 'Custom bar weight', 'Choose available plate sizes', 'Never exceeds the target weight', 'Reverse mode: total weight from the plates on the bar'] }),
+    features: ['Per-side plate breakdown', 'Custom bar weight', 'Choose available plate sizes', 'Never exceeds the target weight', 'Reverse mode: total weight from the plates on the bar', 'Home-gym mode: limit how many pairs of each plate you have'] }),
 ];
 ---
 <BaseLayout title={title} description={description} path={path} crumbs={[{ name: 'Plate Calculator', href: path }]} jsonLd={jsonLd}>
@@ -122,10 +123,23 @@ const jsonLd = [
         can only change the total in 5 lb steps (one plate on each side). When the target falls
         between steps, the calculator loads the heaviest weight that does not go over it.
       </p>
+      <h3>Does the calculator use 55 lb plates?</h3>
+      <p>
+        Only if you tick them. Some pound bumper plate sets include a 55 lb plate, but most gyms
+        have 45 lb as their largest plate, so 55 lb is offered and left unticked by default.
+      </p>
+      <h3>What if I only have a few plates at home?</h3>
+      <p>
+        Tick &ldquo;I only have a few plates&rdquo; and enter how many pairs of each size you own
+        (one pair is one plate on each side). The calculator then stays within those plates. If
+        they cannot reach your target, it loads the heaviest weight they can make and shows how far
+        under the target that is.
+      </p>
     </section>
   </div>
 
   <AdSlot />
 
   <RelatedLinks items={[LINKS.barbellWeight, LINKS.warmup, LINKS.percent, LINKS.home]} />
+  <SourceList ids={['ipfequip', 'iwftcrr', 'rogueplates']} />
 </BaseLayout>

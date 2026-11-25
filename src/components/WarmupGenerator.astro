@@ -107,12 +107,13 @@ const gid = gearId ?? `${id}-gear`;
       const platesRes = gear.plates();
       if (!platesRes.ok) return fail(platesRes.error, platesRes.input);
       const plates = platesRes.value;
+      const limits = platesRes.limits;
       const rows = sets.map((s: { label: string; weight: number; reps: number; pct: number }) => {
         let loadCell: string;
         if (s.weight < bar.value) {
           loadCell = '<span class="hint">lighter than the bar</span>';
         } else {
-          const solved = solvePlates(s.weight, bar.value, plates);
+          const solved = solvePlates(s.weight, bar.value, plates, limits);
           const perSide = solved.perSide.length ? `${solved.perSide.map((p: number) => num(p)).join(' + ')} / side` : 'bar only';
           loadCell = `${esc(num(solved.loaded))} ${unit}<br><span class="hint">${esc(perSide)}</span>`;
         }

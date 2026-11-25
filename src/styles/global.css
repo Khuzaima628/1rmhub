@@ -332,3 +332,7 @@ ul.tight li, ol.tight li { margin-bottom: 0.4rem; }
 
 /* Unfilled configuration value — visible on purpose so it cannot ship unnoticed. */
 .todo { background: var(--warn-bg); border: 1px dashed var(--warn-border); padding: 0 0.3rem; }
+.plate-limit-toggle { display: flex; align-items: center; gap: 0.4rem; font-weight: 400; min-height: var(--tap); margin-top: 0.5rem; }
+.plate-limit-toggle input { width: 1.25rem; height: 1.25rem; flex: none; }
+.plate-limits input { width: 4.5rem; }
+.plate-limits .hint { flex-basis: 100%; margin: 0; }

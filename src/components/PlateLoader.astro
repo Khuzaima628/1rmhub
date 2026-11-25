@@ -70,7 +70,7 @@ const gid = gearId ?? `${id}-gear`;
       if (!bar.ok) return fail(bar.error, bar.input);
       const plates = gear.plates();
       if (!plates.ok) return fail(plates.error, plates.input);
-      const solved = solvePlates(t.value, bar.value, plates.value);
+      const solved = solvePlates(t.value, bar.value, plates.value, plates.limits);
       out.innerHTML = plateResultHtml(solved, { target: t.value, bar: bar.value, unit, platesTicked: plates.value.length });
     }
 

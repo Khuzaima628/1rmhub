@@ -3,7 +3,7 @@
  * plate loader and the warm-up generator. One instance per settings block,
  * cached so two widgets pointing at the same block share the same state.
  */
-import { BAR_PRESETS, KG_PLATES, LB_PLATES, MAX_WEIGHT } from '../lib/onerepmax.js';
+import { BAR_PRESETS, KG_PLATES, LB_PLATES, LB_EXTRA_PLATES, MAX_PAIRS, MAX_WEIGHT } from '../lib/onerepmax.js';
 import { esc, num, parseList } from './dom.js';
 
 const cache = new WeakMap();
@@ -20,6 +20,9 @@ function createGear(root) {
   const checks = root.querySelector('[data-gear-plates]');
   const extra = root.querySelector('[data-gear-extra]');
   const unitLabels = root.querySelectorAll('[data-unit-label]');
+  const limitOn = root.querySelector('[data-gear-limit]');
+  const limitsBox = root.querySelector('[data-gear-limits]');
+  const limitNote = limitsBox.querySelector('.hint');
   const listeners = new Set();
   // GearFields.astro pre-renders the options for its initial unit (no layout
   // shift, usable before JS runs); setUnit only rebuilds on a real change.
@@ -33,6 +36,11 @@ function createGear(root) {
   custom.addEventListener('input', notify);
   checks.addEventListener('change', notify);
   extra.addEventListener('change', notify);
+  limitOn.addEventListener('change', () => {
+    limitsBox.hidden = !limitOn.checked;
+    notify();
+  });
+  limitsBox.addEventListener('input', notify);
 
   /** Rebuild the bar presets and plate list for a unit (no-op if unchanged, so ticks survive). */
   function setUnit(next) {
@@ -46,10 +54,16 @@ function createGear(root) {
     customWrap.hidden = true;
     custom.value = String(presets[0].value);
     extra.value = ''; // sizes typed for one unit are meaningless in the other
-    const plates = unit === 'kg' ? KG_PLATES : LB_PLATES;
+    // Extra sizes (55 lb) are offered but unticked: most gyms do not have them.
+    const plates = unit === 'kg' ? KG_PLATES.map((p) => ({ p, on: true }))
+      : [...LB_EXTRA_PLATES.map((p) => ({ p, on: false })), ...LB_PLATES.map((p) => ({ p, on: true }))];
     checks.innerHTML = plates
-      .map((p) => `<label><input type="checkbox" value="${p}" checked /> ${num(p)} ${unit}</label>`)
+      .map(({ p, on }) => `<label><input type="checkbox" value="${p}"${on ? ' checked' : ''} /> ${num(p)} ${unit}</label>`)
       .join('');
+    limitsBox.innerHTML = plates
+      .map(({ p }) => `<label>Pairs of ${num(p)} ${unit} <input type="number" inputmode="numeric" min="0" max="${MAX_PAIRS}" step="1" placeholder="any" autocomplete="off" data-pairs="${p}" /></label>`)
+      .join('');
+    limitsBox.append(limitNote);
   }
 
   /** Bar weight in the current unit: { ok, value } or { ok: false, error, input }. */
@@ -70,7 +84,21 @@ function createGear(root) {
     if (!extras || extras.some((p) => p <= 0 || p > 100)) {
       return { ok: false, error: 'Extra plate sizes must be numbers above 0 (up to 100), separated by commas.', input: extra };
     }
-    return { ok: true, value: [...new Set([...ticked, ...extras])] };
+    const value = [...new Set([...ticked, ...extras])];
+    // Optional per-side limits (home gym); blank = unlimited.
+    const limits = {};
+    if (limitOn.checked) {
+      for (const input of limitsBox.querySelectorAll('[data-pairs]')) {
+        const text = input.value.trim();
+        if (text === '') continue;
+        const n = Number(text);
+        if (!Number.isInteger(n) || n < 0 || n > MAX_PAIRS) {
+          return { ok: false, error: `Pairs of ${num(Number(input.dataset.pairs))} ${unit}: enter a whole number from 0 to ${MAX_PAIRS}, or leave it blank.`, input };
+        }
+        limits[input.dataset.pairs] = n;
+      }
+    }
+    return { ok: true, value, limits };
   }
 
   return {
@@ -79,7 +107,7 @@ function createGear(root) {
     plates,
     getUnit: () => unit,
     /** The typed inputs, so a form can clear their invalid mark. */
-    inputs: [custom, extra],
+    get inputs() { return [custom, extra, ...limitsBox.querySelectorAll('[data-pairs]')]; },
     onChange: (fn) => listeners.add(fn),
   };
 }
