@@ -5,7 +5,8 @@ import RepsSolver from '../components/RepsSolver.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
-import { repsAtPercent } from '../lib/onerepmax.js';
+import PrintChart from '../components/PrintChart.astro';
+import { repsAtPercent, loadableDown, loadStep } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
 import { SITE, formatDate, reviewedFor, EDITOR } from '../config/site';
@@ -17,6 +18,9 @@ const path = '/1rm-percentage-calculator/';
 const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const url = `${site}${path}`;
 const repRows = [95, 90, 85, 80, 75, 70, 65, 60].map(repsAtPercent);
+const chartPcts = [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50];
+const chartMaxes = [{ max: 100, unit: 'kg' }, { max: 150, unit: 'kg' }, { max: 225, unit: 'lb' }, { max: 315, unit: 'lb' }];
+const num = (v: number) => String(Math.round(v * 100) / 100);
 const jsonLd = [
   webPageNode({ site, url, name: title, description, reviewed: reviewedFor(path) }),
   webAppNode({ site, url, name: '1RMHub Percentage Calculator', description,
@@ -50,6 +54,27 @@ const jsonLd = [
       </p>
     </section>
 
+    <section aria-labelledby="pct-chart-heading">
+      <h2 id="pct-chart-heading">1RM percentage chart</h2>
+      <p>
+        Working weights from 50% to 100% for four common maxes, rounded down to a loadable weight
+        (2.5 kg or 5 lb). For any other max, use the calculator above.
+      </p>
+      <PrintChart>
+      <div class="table-wrap">
+        <table>
+          <caption>1RM percentage chart: loadable training weights (rounded down)</caption>
+          <thead><tr><th scope="col">% of 1RM</th>{chartMaxes.map((m) => <th scope="col" class="num">{m.max} {m.unit} max</th>)}</tr></thead>
+          <tbody>
+            {chartPcts.map((p) => (
+              <tr><th scope="row">{p}%</th>{chartMaxes.map((m) => <td class="num">{num(loadableDown((m.max * p) / 100, loadStep(m.unit)))}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      </PrintChart>
+    </section>
+
     <section aria-labelledby="reps-pct-heading">
       <h2 id="reps-pct-heading">How many reps can you do at each percentage?</h2>
       <p>
@@ -57,6 +82,7 @@ const jsonLd = [
         do at a given percentage. Treat these as rough guides: people vary widely, especially at
         lower percentages, and the two formulas disagree more as the weight gets lighter.
       </p>
+      <PrintChart>
       <div class="table-wrap">
         <table>
           <caption>Reps to failure implied by the Epley and Brzycki formulas</caption>
@@ -69,6 +95,7 @@ const jsonLd = [
         </table>
       </div>
       <p class="disclaimer">Epley: reps = 30 × (100 ÷ % − 1). Brzycki: reps = 37 − 36 × % ÷ 100.</p>
+      </PrintChart>
     </section>
 
     <section aria-labelledby="zones-heading">

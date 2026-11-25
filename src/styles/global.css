@@ -340,3 +340,12 @@ ul.tight li, ol.tight li { margin-bottom: 0.4rem; }
 .cite-this summary { cursor: pointer; font-weight: 600; min-height: var(--tap); display: flex; align-items: center; }
 .cite-this .cite-text { overflow-wrap: anywhere; margin: 0.5rem 0; }
 .cite-this .hint { margin: 0.5rem 0 0; }
+.print-chart-btn { margin: 0.25rem 0 1rem; }
+.print-source { display: none; }
+@media print {
+  body.print-one * { visibility: hidden; }
+  body.print-one .print-target, body.print-one .print-target * { visibility: visible; }
+  body.print-one .print-target { position: absolute; left: 0; top: 0; width: 100%; }
+  body.print-one .print-target .print-source { display: block; font-size: 10pt; }
+  body.print-one .print-target .table-wrap { overflow: visible; }
+}

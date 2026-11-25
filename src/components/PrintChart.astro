@@ -1,0 +1,28 @@
+---
+// Wraps one chart/table so it can be printed on its own (gym wall, notebook).
+// The button prints only this chart, with the page address under it; the
+// rest of the page is hidden for that print only (see .print-one in global.css).
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const address = `${site}${Astro.url.pathname}`.replace(/^https?:\/\//, '');
+---
+<div class="print-chart" data-print-chart>
+  <slot />
+  <p class="print-source">From 1RMHub · {address}</p>
+  <button type="button" class="btn no-print print-chart-btn" data-print-btn>Print this chart</button>
+</div>
+
+<script>
+  const done = () => {
+    document.body.classList.remove('print-one');
+    document.querySelectorAll('.print-target').forEach((el) => el.classList.remove('print-target'));
+  };
+  window.addEventListener('afterprint', done);
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-print-btn]')) {
+    btn.addEventListener('click', () => {
+      done();
+      btn.closest('[data-print-chart]')?.classList.add('print-target');
+      document.body.classList.add('print-one');
+      window.print();
+    });
+  }
+</script>

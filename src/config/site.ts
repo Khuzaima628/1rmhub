@@ -34,7 +34,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/bench-press-calculator/': '2026-11-19',
   '/overhead-press-calculator/': '2026-11-19',
   '/barbell-row-calculator/': '2026-11-19',
-  '/rpe-calculator/': '2026-11-17',
+  '/rpe-calculator/': '2026-11-25',
   '/1rm-percentage-calculator/': '2026-11-25',
   '/warm-up-calculator/': '2026-11-20',
   '/front-squat-calculator/': '2026-11-19',

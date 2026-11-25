@@ -5,6 +5,7 @@ import BarTotal from '../components/BarTotal.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import AdSlot from '../components/AdSlot.astro';
 import SourceList from '../components/SourceList.astro';
+import PrintChart from '../components/PrintChart.astro';
 import { solvePlates, KG_PLATES, LB_PLATES } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
@@ -69,6 +70,7 @@ const jsonLd = [
 
     <section aria-labelledby="ref-heading">
       <h2 id="ref-heading">Common barbell weights: plates per side</h2>
+      <PrintChart>
       <div class="table-wrap">
         <table>
           <caption>Pounds, 45 lb bar, standard plates (45, 35, 25, 10, 5, 2.5 lb)</caption>
@@ -87,6 +89,7 @@ const jsonLd = [
           </tbody>
         </table>
       </div>
+      </PrintChart>
     </section>
 
     <section aria-labelledby="bar-heading">

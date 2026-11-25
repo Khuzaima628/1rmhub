@@ -4,6 +4,7 @@ import RpeCalculator from '../components/RpeCalculator.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
 import AdSlot from '../components/AdSlot.astro';
+import PrintChart from '../components/PrintChart.astro';
 import { rpeFraction, rirFromRpe, RPE_VALUES } from '../lib/onerepmax.js';
 import { webAppNode, webPageNode } from '../lib/schema';
 import { LINKS } from '../data/links';
@@ -95,6 +96,7 @@ const jsonLd = [
         Each cell is the percentage of your 1RM for that many reps at that RPE, calculated with the
         Epley equation on reps to failure. Real lifters vary, so use it as a starting point.
       </p>
+      <PrintChart>
       <div class="table-wrap">
         <table>
           <caption>Estimated percentage of 1RM by reps and RPE (Epley, reps to failure)</caption>
@@ -112,6 +114,7 @@ const jsonLd = [
         </table>
       </div>
       <p class="disclaimer">— means more than 12 reps to failure, where estimates are not shown.</p>
+      </PrintChart>
     </section>
 
     <section aria-labelledby="accuracy-rpe-heading">
