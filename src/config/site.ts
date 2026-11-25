@@ -42,7 +42,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/incline-bench-press-calculator/': '2026-11-19',
   '/hip-thrust-calculator/': '2026-11-19',
   '/strength-percentile-calculator/': '2026-11-23',
-  '/deadlift-calculator/': '2026-11-12',
+  '/deadlift-calculator/': '2026-11-25',
   '/squat-calculator/': '2026-11-23',
   '/': '2026-11-20',
   '/calculators/': '2026-11-20',
