@@ -341,6 +341,10 @@ export function repsAtPercent(pct) {
 /** Standard plate sets available in most gyms. The lifter ticks what they have. */
 export const KG_PLATES = [25, 20, 15, 10, 5, 2.5, 1.25];
 export const LB_PLATES = [45, 35, 25, 10, 5, 2.5];
+/** Less common sizes, offered but unticked by default (e.g. 55 lb bumper plates). */
+export const LB_EXTRA_PLATES = [55];
+/** Most plates of one size the "limited plates" option accepts per side. */
+export const MAX_PAIRS = 20;
 
 /** Common bar weights (kg or lb). Custom values are also allowed. */
 export const BAR_PRESETS = [
@@ -371,10 +375,14 @@ const MAX_CELLS = 1_000_000;
  * exceeding it: `belowBar` is true and the UI explains instead of suggesting
  * the bar.
  *
+ * Optional `maxPerSide` ({ [plateSize]: count }) limits how many plates of a
+ * size fit on one side — a home gym with, say, one pair of 45s. Sizes not in
+ * it are unlimited. The same rounding rule applies within those limits.
+ *
  * Returns { loaded, shortfall, perSide, belowBar } — perSide lists one plate
  * per entry, heaviest first (the pair on the other side mirrors it).
  */
-export function solvePlates(target, bar, availablePlates) {
+export function solvePlates(target, bar, availablePlates, maxPerSide = null) {
   const t = Math.round(Number(target) * SCALE);
   const b = Math.round(Number(bar) * SCALE);
   if (!Number.isFinite(t) || !Number.isFinite(b) || t <= 0 || b < 0) {
@@ -396,6 +404,17 @@ export function solvePlates(target, bar, availablePlates) {
   const cells = Math.floor(perSideCap / unit);
   if (cells > MAX_CELLS) throw new RangeError('Target is too large for the plate solver');
   const steps = plates.map((p) => p / unit);
+
+  const limits = new Map();
+  for (const [size, max] of Object.entries(maxPerSide ?? {})) {
+    const key = Math.round(Number(size) * SCALE);
+    const n = Number(max);
+    if (Number.isFinite(key) && Number.isInteger(n) && n >= 0) limits.set(key, n);
+  }
+  if ([...limits.keys()].some((k) => plates.includes(k))) {
+    return solveLimited(b, t, plates, steps, unit, cells, limits);
+  }
+
   const count = new Array(cells + 1).fill(Infinity);
   count[0] = 0;
   for (let s = 1; s <= cells; s += 1) {
@@ -412,6 +431,46 @@ export function solvePlates(target, bar, availablePlates) {
     const step = steps.find((st) => st <= s && count[s - st] === count[s] - 1);
     perSide.push((step * unit) / SCALE);
     s -= step;
+  }
+  const loaded = b + 2 * best * unit;
+  return { loaded: round3(loaded / SCALE), shortfall: round3((t - loaded) / SCALE), perSide, belowBar: false };
+}
+
+/** Cells above this are refused in limited mode (its cost grows with cells × plates). */
+const MAX_LIMITED_CELLS = 20_000;
+
+/**
+ * solvePlates with a per-side count limit on some sizes (bounded knapsack).
+ * Layers go lightest → heaviest; reading the choices back from the heaviest
+ * layer and keeping the LARGEST count on ties gives "fewest plates, heaviest
+ * first", matching the unlimited solver.
+ */
+function solveLimited(b, t, plates, steps, unit, cells, limits) {
+  if (cells > MAX_LIMITED_CELLS) throw new RangeError('Target is too large for the plate solver');
+  const order = plates.map((p, i) => ({ step: steps[i], max: limits.has(p) ? limits.get(p) : Infinity })).reverse();
+  let dp = new Float64Array(cells + 1).fill(Infinity);
+  dp[0] = 0;
+  const choices = [];
+  for (const { step, max } of order) {
+    const next = new Float64Array(cells + 1).fill(Infinity);
+    const pick = new Uint16Array(cells + 1);
+    for (let s = 0; s <= cells; s += 1) {
+      const top = Math.min(max, Math.floor(s / step));
+      for (let c = top; c >= 0; c -= 1) {
+        const v = dp[s - c * step] + c;
+        if (v < next[s]) { next[s] = v; pick[s] = c; }
+      }
+    }
+    choices.push(pick);
+    dp = next;
+  }
+  let best = cells;
+  while (best > 0 && dp[best] === Infinity) best -= 1;
+  const perSide = [];
+  for (let i = order.length - 1, s = best; i >= 0; i -= 1) {
+    const c = choices[i][s];
+    for (let k = 0; k < c; k += 1) perSide.push((order[i].step * unit) / SCALE);
+    s -= c * order[i].step;
   }
   const loaded = b + 2 * best * unit;
   return { loaded: round3(loaded / SCALE), shortfall: round3((t - loaded) / SCALE), perSide, belowBar: false };

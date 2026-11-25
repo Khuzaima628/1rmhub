@@ -19,6 +19,7 @@ import {
   percentageTable,
   repMaxTable,
   solvePlates,
+  LB_EXTRA_PLATES,
   warmupSets,
   toKg,
   fromKg,
@@ -480,5 +481,59 @@ describe('published claims about the formulas are true (src/data/formulas.ts, gu
     expect(range(115, 5)).toEqual([129, 137]); // overhead press page
     expect(range(135, 8)).toEqual([162, 172]); // row page
     expect(epley(225, 5)).toBe(262.5); // homepage FAQ
+  });
+});
+
+describe('plate solver — limited plates (home gym)', () => {
+  it('one pair of 45s: 315 lb loads 45 + 35 + 35 + 25 + ... within the limit', () => {
+    const solved = solvePlates(315, 45, LB_PLATES, { 45: 1 });
+    expect(solved.perSide.filter((p) => p === 45)).toHaveLength(1);
+    expect(solved.loaded).toBe(315);
+    expect(solved.perSide[0]).toBe(45);
+  });
+
+  it('runs out of plates: rounds down and shows the shortfall', () => {
+    // Only one pair of 45s and one pair of 25s: max per side is 70.
+    const solved = solvePlates(225, 45, [45, 25], { 45: 1, 25: 1 });
+    expect(solved).toMatchObject({ loaded: 185, shortfall: 40, perSide: [45, 25] });
+  });
+
+  it('a limit of 0 removes that size', () => {
+    expect(solvePlates(135, 45, LB_PLATES, { 45: 0 }).perSide).not.toContain(45);
+  });
+
+  it('no limits (or limits for sizes not ticked) gives the same answer as before', () => {
+    for (let t = 45; t <= 500; t += 2.5) {
+      expect(solvePlates(t, 45, LB_PLATES, {})).toEqual(solvePlates(t, 45, LB_PLATES));
+      expect(solvePlates(t, 45, LB_PLATES, { 55: 2 })).toEqual(solvePlates(t, 45, LB_PLATES));
+    }
+  });
+
+  it('matches a brute force (heaviest loadable, then fewest plates) and never breaks a limit', () => {
+    const plates = [45, 35, 25, 10, 5, 2.5];
+    const limits = { 45: 2, 35: 1, 25: 1, 10: 2, 5: 1, 2.5: 1 };
+    const combos = [];
+    const walk = (i, sum, n, used) => {
+      if (i === plates.length) { combos.push({ sum, n, used }); return; }
+      for (let c = 0; c <= limits[plates[i]]; c += 1) walk(i + 1, sum + c * plates[i], n + c, { ...used, [plates[i]]: c });
+    };
+    walk(0, 0, 0, {});
+    for (let t = 45; t <= 450; t += 2.5) {
+      const cap = (t - 45) / 2;
+      const ok = combos.filter((c) => c.sum <= cap + 1e-9);
+      const bestSum = Math.max(...ok.map((c) => c.sum));
+      const fewest = Math.min(...ok.filter((c) => c.sum === bestSum).map((c) => c.n));
+      const solved = solvePlates(t, 45, plates, limits);
+      expect(solved.loaded).toBeCloseTo(45 + 2 * bestSum, 6);
+      expect(solved.perSide).toHaveLength(fewest);
+      expect(solved.loaded).toBeLessThanOrEqual(t);
+      for (const p of plates) expect(solved.perSide.filter((x) => x === p).length).toBeLessThanOrEqual(limits[p]);
+      expect([...solved.perSide].sort((a, b) => b - a)).toEqual(solved.perSide);
+    }
+  });
+
+  it('55 lb plates are offered as an extra size and work in the solver', () => {
+    expect(LB_EXTRA_PLATES).toContain(55);
+    expect(solvePlates(155, 45, [55, ...LB_PLATES]).perSide).toEqual([55]);
   });
 });
