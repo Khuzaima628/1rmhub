@@ -152,3 +152,33 @@ as important: a wide spread is a sign to treat the number cautiously.
 Lander's formula, which appears on some calculators, is not included until its equation can be
 verified against its original published source. See the [methodology](/methodology/) for every
 other rule the calculator follows.
+
+## 1RM formulas: common questions
+
+### What is the Brzycki equation?
+
+**{fx.brzycki.equation}**, where *w* is the weight lifted and *r* the reps completed. Matt Brzycki
+published it in 1993. For 100 kg × 5 it gives {at('brzycki', 5)} kg. It is meant for sets of about
+10 reps or fewer.
+
+### What is the Epley formula?
+
+**{fx.epley.equation}**. It adds about 3.3% of the weight for every rep. For 100 kg × 5 it gives
+{at('epley', 5)} kg, a little higher than Brzycki below 10 reps.
+
+### Which 1RM formula is most accurate?
+
+No single formula is most accurate for everyone. Studies have found that accuracy changes with
+the lift and the number of reps, and every equation tested underestimated the deadlift in one
+study (LeSuer et al., 1997). Use a heavy set of about 3–6 reps and look at the range of all six.
+
+### Why do 1RM calculators give different numbers?
+
+Most calculators use just one formula, and the formulas disagree: for 100 kg × 5 they range from
+{Math.min(...FORMULAS.map((f) => f.fn(100, 5))).toFixed(1)} to {Math.max(...FORMULAS.map((f) => f.fn(100, 5))).toFixed(1)} kg.
+Two calculators using different formulas will give different answers for the same set.
+
+### Can I use these formulas for more than 12 reps?
+
+Not reliably. Above about 10 reps the formulas spread far apart, and a long set is limited by
+endurance as much as strength. 1RMHub warns above 10 reps and gives no estimate above 12.
