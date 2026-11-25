@@ -336,3 +336,7 @@ ul.tight li, ol.tight li { margin-bottom: 0.4rem; }
 .plate-limit-toggle input { width: 1.25rem; height: 1.25rem; flex: none; }
 .plate-limits input { width: 4.5rem; }
 .plate-limits .hint { flex-basis: 100%; margin: 0; }
+.cite-this { margin: 1.5rem 0; border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.75rem; }
+.cite-this summary { cursor: pointer; font-weight: 600; min-height: var(--tap); display: flex; align-items: center; }
+.cite-this .cite-text { overflow-wrap: anywhere; margin: 0.5rem 0; }
+.cite-this .hint { margin: 0.5rem 0 0; }

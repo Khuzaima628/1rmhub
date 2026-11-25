@@ -5,6 +5,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import RelatedLinks from '../../components/RelatedLinks.astro';
 import SourceList from '../../components/SourceList.astro';
 import AdSlot from '../../components/AdSlot.astro';
+import CiteThis from '../../components/CiteThis.astro';
 import { articleNode, webPageNode } from '../../lib/schema';
 import { LINKS } from '../../data/links';
 import { EDITOR, formatDate, isoDate, isoDateTime } from '../../config/site';
@@ -44,4 +45,5 @@ const jsonLd = [
   <AdSlot />
   {relatedItems.length > 0 && <RelatedLinks items={relatedItems} />}
   {sources.length > 0 && <SourceList ids={sources} />}
+  <CiteThis title={title} url={url} date={updated ?? published} />
 </BaseLayout>

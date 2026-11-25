@@ -1,0 +1,37 @@
+---
+// "Cite this page": an APA-style reference with a copy button, for writers,
+// students and coaches who quote a guide or data table. Works without JS
+// (the text is selectable); the button only copies it.
+import { EDITOR, SITE, formatDate, isoDate } from '../config/site';
+
+interface Props {
+  title: string;
+  /** Absolute page URL. */
+  url: string;
+  /** Last published/updated/reviewed date (ISO). */
+  date: string | Date;
+}
+const { title, url, date } = Astro.props;
+const iso = isoDate(date);
+const [y] = iso.split('-');
+const monthDay = formatDate(iso).replace(/,? \d{4}$/, '');
+const [first, ...rest] = EDITOR.name.split(' ');
+const author = `${rest.join(' ')}, ${first[0]}.`;
+const reference = `${author} (${y}, ${monthDay}). ${title}. ${SITE.name}. ${url}`;
+---
+<details class="cite-this">
+  <summary>Cite this page</summary>
+  <p class="cite-text" data-cite-text>{reference}</p>
+  <button type="button" class="btn" data-cite-copy>Copy citation</button>
+  <p class="hint">APA style. Check your style guide for other formats.</p>
+</details>
+
+<script>
+  import { copyText, flash } from '../scripts/dom.js';
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-cite-copy]')) {
+    btn.addEventListener('click', async () => {
+      const text = btn.parentElement?.querySelector('[data-cite-text]')?.textContent?.trim() ?? '';
+      flash(btn, (await copyText(text)) ? 'Copied' : 'Copy failed');
+    });
+  }
+</script>

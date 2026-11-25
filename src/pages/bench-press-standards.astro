@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import LiftStandards from '../components/LiftStandards.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import SourceList from '../components/SourceList.astro';
+import CiteThis from '../components/CiteThis.astro';
 import AdSlot from '../components/AdSlot.astro';
 import data from '../data/opl-percentiles.json';
 import { percentileOf } from '../lib/strength-percentile.js';
@@ -91,4 +92,5 @@ const jsonLd = [
     You may download a copy of the data at <a href="https://gitlab.com/openpowerlifting/opl-data" rel="noopener">https://gitlab.com/openpowerlifting/opl-data</a>.
   </p>
   <SourceList ids={['opldata', 'ipfrules']} />
+  <CiteThis title={title} url={url} date={reviewedFor(path)} />
 </BaseLayout>
