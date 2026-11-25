@@ -35,6 +35,11 @@ export const EXERCISES: Exercise[] = [
     sources: ['lesuer'],
   },
   {
+    id: 'trap-bar-deadlift', label: 'Trap Bar Deadlift',
+    note: 'We found no study testing these formulas against a measured trap bar deadlift max; they were tested on the straight-bar deadlift. The bar shape and handle height change the lift, so compare trap bar numbers only with other trap bar numbers, on the same bar and handles.',
+    sources: [],
+  },
+  {
     id: 'overhead-press', label: 'Overhead Press', page: '/overhead-press-calculator/',
     note: 'We found no study testing these formulas against a measured overhead press max. They were tested on the bench press, squat, deadlift and leg press, so treat this as a rough guide and use a set of 10 reps or fewer.',
     sources: ['reynolds'],
