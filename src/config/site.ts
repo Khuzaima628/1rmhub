@@ -42,7 +42,7 @@ const PAGE_REVIEWED: Record<string, string> = {
   '/hip-thrust-calculator/': '2026-11-19',
   '/strength-percentile-calculator/': '2026-11-23',
   '/deadlift-calculator/': '2026-11-25',
-  '/squat-calculator/': '2026-11-23',
+  '/squat-calculator/': '2026-11-28',
   '/': '2026-11-25',
   '/calculators/': '2026-11-20',
   '/sinclair-calculator/': '2026-11-17',
